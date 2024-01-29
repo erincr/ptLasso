@@ -1,0 +1,21 @@
+Package: ptLasso
+Type: Package
+Title: Pretrained Lasso
+Description: Fit a pretrained lasso model.
+Version: 1.0
+Date:
+Author: Erin Craig and Rob Tibshirani
+Maintainer: Erin Craig  <erincr@stanford.edu>
+License: GPL-2
+URL: 
+Packaged: 
+Repository: CRAN
+Date/Publication:
+NeedsCompilation: yes
+RoxygenNote: 7.3.0
+Imports: 
+    ggplot2,
+    glmnet,
+    gridExtra,
+    Matrix,
+    stats
