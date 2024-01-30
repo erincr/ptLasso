@@ -9,6 +9,7 @@
   xtest,
   groupstest = NULL,
   ytest = NULL,
+  offset = NULL,
   type = c("link", "response", "class"),
   s = "lambda.min"
 )

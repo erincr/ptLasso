@@ -23,6 +23,7 @@ ptLasso(
   trace.it = FALSE,
   weights = NULL,
   parallel = FALSE,
+  offset = NULL,
   ...
 )
 }
@@ -60,6 +61,8 @@ ptLasso(
 \item{weights}{observation weights. Can be total counts if responses are proportion matrices. Default is 1 for each observation.}
 
 \item{parallel}{If \code{TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. See the example below.}
+
+\item{offset}{A vector of length 'nobs' that is included in the linear predictor (a 'nobs x nc' matrix for the '"multinomial"' family). Useful for the '"poisson"' family (e.g. log of exposure time), or for refining a model by starting at a current fit. Default is 'NULL'. If supplied, then values must also be supplied to the 'predict' function.}
 
 \item{...}{Additional arguments to be passed to the cv.glmnet function.}
 

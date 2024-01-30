@@ -85,7 +85,7 @@ makedata=function(nn,p,k,scommon,sindiv,class.sizes,del,del2, means, sigma, outc
   
   groups = c(unlist(sapply(1:k, function(i) rep(i, class.sizes[i]))))
   
-  return(enlist(x, y, snr, mu, groups))
+  return(ptLasso:::enlist(x, y, snr, mu, groups))
   
 }
 
@@ -133,7 +133,7 @@ sigma=20
 
 out=makedata(nn=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
              class.sizes=class.sizes, del=del, del2=del2,
-             means=means, sigma=sigma)#, outcome="continuous")
+             means=means, sigma=sigma)
 
 x=out$x
 y=out$y
@@ -145,8 +145,7 @@ for(kk in 1:k) foldid[groups == kk] = sample(1:nfolds, class.sizes[kk], replace=
 
 out2=makedata(nn=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
              class.sizes=class.sizes, del=del, del2=del2,
-             means=means, sigma=sigma)#, #x.mean=out$x.mean, x.sds=out$x.sds,
-             #outcome="continuous")
+             means=means, sigma=sigma)
 xtest=out2$x
 groupstest=out2$groups
 ytest=out2$y
@@ -215,14 +214,14 @@ test_that("input_groups_gaussian_errpre_mae", {
 })
 
 test_that("input_groups_gaussian_cvfit", {
-    expect_equal(unname(cvfit$errpre[, "meanError"]),
+    expect_equal(unname(cvfit$errpre[, "mean"]),
                  c(1078.2883, 1113.6082, 1045.0445, 1048.0911, 1012.7833,  947.6540,  940.9555,
                    911.3491,  961.1960,  944.3964,  925.0839),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_cvfit_mae", {
-    expect_equal(unname(cvfit2$errpre[, "meanError"]),
+    expect_equal(unname(cvfit2$errpre[, "mean"]),
                  c(26.04082, 26.67820, 25.52361, 25.58128, 25.12847, 24.36098, 24.18239, 23.69399,
                    24.15136, 24.13376, 23.67217),
                  tolerance = test.tol)
@@ -263,7 +262,7 @@ ytest=out2$y
 # CV alpha: choose best performance e.g. just for one group
 # check size of glmnet objects
 fit=ptLasso(x,y,groups=groups,alpha=0.9,family="binomial",type.measure="auc",foldid=NULL, nfolds=3, overall.lambda="lambda.min")
-pred=predict.ptLasso(fit,xtest,groupstest=groupstest, ytest=ytest)
+pred=predict(fit,xtest,groupstest=groupstest, ytest=ytest)
 
 cvfit=cv.ptLasso(x,y,groups=groups,family="binomial",type.measure="auc",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
 pred.cv=predict(cvfit,xtest,groupstest=groupstest, ytest=ytest, alphatype="varying")
@@ -390,7 +389,7 @@ groupstest=out2$groups
 ytest=out2$y
 
 fit=ptLasso(x,y,groups=groups,alpha=0.9,family="multinomial",type.measure="class",foldid=NULL, nfolds=4, overall.lambda="lambda.min")
-pred=predict.ptLasso(fit,xtest,groupstest=groupstest, ytest=ytest, type="class")
+pred=predict(fit,xtest,groupstest=groupstest, ytest=ytest, type="class")
 cvfit=cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="class",foldid=NULL, nfolds=4, overall.lambda="lambda.min")
 
 test_that("input_groups_multinomial_errind", {
@@ -454,7 +453,7 @@ ytest=cbind(ytest,statustest)
 colnames(ytest)=c("time","status")
 
 fit=ptLasso(x,y,groups=groups,alpha=0.1,family="cox",type.measure="C",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
-pred=predict.ptLasso(fit,xtest,groupstest=groupstest, ytest=ytest)
+pred=predict(fit,xtest,groupstest=groupstest, ytest=ytest)
 
 cvfit = cv.ptLasso(x,y,groups=groups,family="cox",type.measure="C",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
 
@@ -502,7 +501,7 @@ groupstest=ytest
 
 
 fit=ptLasso(x,y,groups=groups,alpha=0.222,family="multinomial",useCase="targetGroups", type.measure="class",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
-pred=predict.ptLasso(fit,xtest,groupstest=groupstest, ytest=ytest)
+pred=predict(fit,xtest,groupstest=groupstest, ytest=ytest)
 
 fit2=ptLasso(x,y,groups=groups,alpha=0.222,family="multinomial",useCase="targetGroups", type.measure="deviance",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
 pred2=predict.ptLasso(fit2,xtest,groupstest=groupstest, ytest=ytest)

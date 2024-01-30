@@ -91,7 +91,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
                        weighted.mean(errind, w = group.weights),
                        errind)
 
-            names(errall) = names(errpre) = names(errind) = c("overallError", "avgError", "wtdAvgError", paste0("group", 1:length(results)))
+            names(errall) = names(errpre) = names(errind) = c("overall", "mean", "wtdMean", paste0("group", 1:length(results)))
          }
       
         out = enlist(
@@ -104,6 +104,8 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
             supind = results[[1]]$supind,
 
             useCase = cvfit$fit[[1]]$useCase,
+
+            type.measure = cvfit$fit[[1]]$type.measure,
 
             alpha,
             call
@@ -141,7 +143,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 #' @import glmnet
 #' @method predict ptLasso
 #' @export
-predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL, 
+predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL, offset = NULL,
                          type = c("link", "response", "class"), s="lambda.min"){
 
     this.call <- match.call()
@@ -316,7 +318,7 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, ytest=NULL, errFun=
                    mean(errpre, na.rm=TRUE),
                    weighted.mean(errpre[!is.na(errpre)], group.weights),
                    errpre[!is.na(errpre)])
-        names(errall) = names(errpre) = names(errind) = c("overallError", "meanError", "wtdMeanError", paste0("group", sort(unique(groupstest))))
+        names(errall) = names(errpre) = names(errind) = c("overall", "mean", "wtdMean", paste0("group", sort(unique(groupstest))))
     }
 
     out = enlist(linkall = phatall, linkind = phatind, linkpre = phatpre,
@@ -327,6 +329,7 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, ytest=NULL, errFun=
                  supind  = get.individual.support(fit, s=s),
                  supall  = get.overall.support(fit, s=s),
                  alpha = fit$alpha,
+                 type.measure = fit$type.measure,
                  call)
     
     if(!is.null(ytest)) {
@@ -386,7 +389,7 @@ predict.ptLasso.targetGroups=function(fit, xtest, s="lambda.min", ytest=NULL, er
         errind = c(errFun(ytest, phatind), mean(errind), errind)
         errpre = c(errFun(ytest, phatpre), mean(errpre), errpre)
         errall = c(errall.overall, NA, rep(NA, k))
-        names(errall) = names(errpre) = names(errind) = c("overallError", "meanError", paste("Group", as.character(1:k), sep=" "))
+        names(errall) = names(errpre) = names(errind) = c("overall", "mean", paste0("group", as.character(1:k)))
      }
 
     
@@ -403,14 +406,16 @@ predict.ptLasso.targetGroups=function(fit, xtest, s="lambda.min", ytest=NULL, er
                      supind = get.individual.support(fit, s=s),
                      supall = get.overall.support(fit, s=s),
                      alpha = fit$alpha,
+                     type.measure = measure,
                      call)
     } else {
         out = enlist(yhatall, yhatind, yhatpre,
-                      suppre = get.pretrain.support(fit, s=s),
-                      supind = get.individual.support(fit, s=s),
-                      supall = get.overall.support(fit, s=s),
-                      alpha = fit$alpha,
-                      call)
+                     suppre = get.pretrain.support(fit, s=s),
+                     supind = get.individual.support(fit, s=s),
+                     supall = get.overall.support(fit, s=s),
+                     alpha = fit$alpha,
+                     type.measure = measure,
+                     call)
     }
     class(out) = "predict.ptLasso"
     return(out)

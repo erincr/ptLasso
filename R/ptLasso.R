@@ -22,6 +22,8 @@
 #' @param trace.it If \code{trace.it=1}, then a progress bar is displayed; useful for big models that take a long time to fit.
 #' @param weights observation weights. Can be total counts if responses are proportion matrices. Default is 1 for each observation.
 #' @param parallel If \code{TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. See the example below.
+#' @param offset A vector of length 'nobs' that is included in the linear predictor (a 'nobs x nc' matrix for the '"multinomial"' family). Useful for the '"poisson"' family (e.g. log of exposure time), or for refining a model by starting at a current fit. Default is 'NULL'. If supplied, then values must also be supplied to the 'predict' function.
+
 #' @param ... Additional arguments to be passed to the cv.glmnet function.
 #'
 #' @return A ...
@@ -44,21 +46,24 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  standardize = TRUE,
                  verbose=FALSE, trace.it=FALSE, weights=NULL,
                  parallel = FALSE,
+                 offset = NULL,
                  ...) { # TODO How to handle if they input penalty.factor? offset? type.multinomial?
 
     this.call = match.call()
 
-    ####################################################################################
-    # Begin error checking:
-    ####################################################################################
     family = match.arg(family)
     type.measure = match.arg(type.measure)
     useCase = match.arg(useCase, c("inputGroups","targetGroups"), several.ok=FALSE)
 
+    if(is.null(offset)) offset = rep(0, nrow(x))
+    
+    ####################################################################################
+    # Begin error checking:
+    ####################################################################################
     if((abs(alpha) > 1) | (alpha < 0)) stop("alpha must be between 0 and 1")
     
     # In the future, we want to be able to pass in just the predictions from the overall model.
-                                        # This will be useful for settings where e.g. genentech has released a model (but maybe not as a glmnet object).
+    # This will be useful for settings where e.g. genentech has released a model (but maybe not as a glmnet object).
     if(!is.null(fitall)){
         if(!("cv.glmnet" %in% class(fitall))) stop("fitall must be a cv.glmnet object.")
      }

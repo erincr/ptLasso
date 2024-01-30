@@ -2,10 +2,12 @@
 
 S3method(coef,ptLasso)
 S3method(plot,cv.ptLasso)
-S3method(plot,predict.cv.ptLasso)
+S3method(plot,ptLasso)
 S3method(predict,cv.ptLasso)
 S3method(predict,ptLasso)
 S3method(print,cv.ptLasso)
+S3method(print,predict.cv.ptLasso)
+S3method(print,predict.ptLasso)
 export(cv.ptLasso)
 export(ptLasso)
 import(Matrix)
