@@ -18,13 +18,11 @@
 #' @param nfolds Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.
 #' @param foldid An optional vector of values between 1 and \code{nfold} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.
 #' @param standardize Should the predictors be standardized before fitting (default is TRUE).
-#' @param verbose If \code{verbose=1}, print a statement showing which model is currently being fit.
-#' @param trace.it If \code{trace.it=1}, then a progress bar is displayed; useful for big models that take a long time to fit.
+#' @param verbose If \code{verbose=1}, print a statement showing which model is currently being fit with \code{cv.glmnet}.
+#' @param trace.it If \code{trace.it=1}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit.
 #' @param weights observation weights. Can be total counts if responses are proportion matrices. Default is 1 for each observation.
 #' @param parallel If \code{TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. See the example below.
-#' @param offset A vector of length 'nobs' that is included in the linear predictor (a 'nobs x nc' matrix for the '"multinomial"' family). Useful for the '"poisson"' family (e.g. log of exposure time), or for refining a model by starting at a current fit. Default is 'NULL'. If supplied, then values must also be supplied to the 'predict' function.
-
-#' @param ... Additional arguments to be passed to the cv.glmnet function.
+#' @param ... Additional arguments to be passed to the cv.glmnet function. Note that \code{ptLasso} does not support the arguments \code{intercept}, \code{offset}, \code{fit} and \code{check.args}.
 #'
 #' @return A ...
 #'
@@ -42,20 +40,19 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  useCase=c("inputGroups","targetGroups"),
                  overall.lambda = "lambda.1se",
                  fitall=NULL, fitind=NULL,
-                 lambda=NULL, foldid=NULL, nfolds=10,
+                 lambda=NULL, foldid=NULL,
+                 nfolds=10,
                  standardize = TRUE,
-                 verbose=FALSE, trace.it=FALSE, weights=NULL,
-                 parallel = FALSE,
-                 offset = NULL,
-                 ...) { # TODO How to handle if they input penalty.factor? offset? type.multinomial?
-
+                 verbose=FALSE, #trace.it=FALSE,
+                 weights=NULL,
+                 penalty.factor = rep(1, nvars),
+                 ...
+                 ) {
     this.call = match.call()
 
     family = match.arg(family)
     type.measure = match.arg(type.measure)
     useCase = match.arg(useCase, c("inputGroups","targetGroups"), several.ok=FALSE)
-
-    if(is.null(offset)) offset = rep(0, nrow(x))
     
     ####################################################################################
     # Begin error checking:
@@ -150,7 +147,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     ####################################################################################
 
     xx = x
-    overall.pf = rep(1, p)
+    overall.pf = penalty.factor
     if(useCase == "inputGroups") {
         xx = cbind(onehot.groups, xx)
         overall.pf = c(rep(0, k), overall.pf)
@@ -171,9 +168,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                standardize=FALSE,
                                penalty.factor=overall.pf,
                                keep=TRUE,
-                               trace.it=trace.it,
                                weights=weights,
-                               parallel=parallel,
                                ...)
         } else if(family == "cox") {
             fitall = cv.glmnet(xx,y,
@@ -184,9 +179,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                standardize=FALSE,
                                penalty.factor=overall.pf,
                                keep=TRUE,
-                               trace.it=trace.it,
                                weights=weights,
-                               parallel=parallel,
                                ...)     
         } else if(useCase == "targetGroups") {
             fitall = cv.glmnet(x,y,
@@ -198,9 +191,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                penalty.factor=overall.pf,
                                type.multinomial = c("grouped"),
                                keep=TRUE,
-                               trace.it=trace.it,
                                weights=weights,
-                               parallel=parallel,
                                ...)     
         }
     }
@@ -258,10 +249,9 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                            type.measure=type.measure,
                                            foldid=foldid2[[kk]],
                                            intercept=intercept,
+                                           penalty.factor=penalty.factor,
                                            keep=TRUE,
-                                           trace.it=trace.it,
                                            weights=weights[train.ix],
-                                           parallel=parallel,
                                            ...)
                 } else if(family=="cox") {
                     fitind[[kk]]=cv.glmnet(x[train.ix,], y[train.ix, ],
@@ -270,9 +260,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                            type.measure=type.measure,
                                            foldid=foldid2[[kk]],
                                            keep=TRUE,
-                                           trace.it=trace.it,
                                            weights=weights[train.ix],
-                                           parallel=parallel,
                                            ...)
                 }
             }
@@ -292,11 +280,11 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                          family="binomial",
                                          foldid=foldid,
                                          type.measure=type.measure,
+                                         penalty.factor=penalty.factor,
                                          standardize=FALSE,
                                          keep=TRUE,
-                                         trace.it=trace.it,
-                                         weights=weights,
-                                         parallel=parallel,
+                                         trace.it=trace.it, weights=weights,
+                                         parallel=parallel, dfmax=dfmax, pmax=pmax,
                                          ...)
            }
            lamhat2 = fitind[[kk]]$lambda.min
@@ -325,13 +313,13 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  
                  fac = rep(1/alpha, p)
                  fac[supall] = 1
-                 pf = fac
+                 pf = penalty.factor * fac 
 
                  if((alpha == 0) & (length(supall) == 0)) {
                      almost.zero = 1e-9
                      fac = rep(1/almost.zero, p)
                      fac[supall] = 1
-                     pf = fac
+                     pf = penalty.factor * fac
                  }
 
                  if(family!="cox") fitpre[[kk]] = cv.glmnet(x[train.ix,],
@@ -344,11 +332,8 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                                             foldid=foldid2[[kk]],
                                                             keep=TRUE,
                                                             penalty.factor=pf,
-                                                            trace.it=trace.it,
                                                             weights=weights[train.ix],
-                                                            parallel=parallel,
-                                                            ...
-                                                            )
+                                                            ...)
                  if(family=="cox") fitpre[[kk]] = cv.glmnet(x[train.ix,],
                                                             y[train.ix,],
                                                             family=family, 
@@ -358,11 +343,8 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                                             standardize=FALSE,
                                                             foldid=foldid2[[kk]],
                                                             keep=TRUE,
-                                                            trace.it=trace.it,
                                                             weights=weights[train.ix],
-                                                            parallel=parallel,
-                                                            ...
-                                                            )
+                                                            ...)
              }
          } else if(useCase=="targetGroups"){
              for(kk in 1:k){ 
@@ -371,6 +353,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  
                  pf = rep(1/alpha, p)
                  pf[supall[[kk]]] = 1
+                 pf = pf * penalty.factor
 
                  yy=rep(0,nrow(x)) 
                  yy[y==kk]=1  
@@ -383,9 +366,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                           standardize=FALSE,
                                           keep=TRUE,
                                           type.measure=type.measure,
-                                          trace.it=trace.it,
                                           weights=weights,
-                                          parallel=parallel,
                                           ...)
                  
                  
