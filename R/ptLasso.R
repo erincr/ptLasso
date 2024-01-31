@@ -43,13 +43,16 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  lambda=NULL, foldid=NULL,
                  nfolds=10,
                  standardize = TRUE,
-                 verbose=FALSE, #trace.it=FALSE,
+                 verbose=FALSE,
                  weights=NULL,
-                 trace.it=FALSE,
                  penalty.factor = rep(1, nvars),
                  ...
                  ) {
     this.call = match.call()
+
+    for(argument in c("fit", "check.args", "offset", "intercept", "standardize.response")){
+        if(argument %in% names(list(...))) stop(paste0("ptLasso does not support the argument '", argument, "'."))
+    }
 
     family = match.arg(family)
     type.measure = match.arg(type.measure)
@@ -189,6 +192,8 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                weights=weights,
                                ...)     
         } else if(useCase == "targetGroups") {
+            type.multinomial = "grouped"
+            if("type.multinomial" %in% names(list(...))) type.multinomial = list(...)$type.multinomial
             fitall = cv.glmnet(x,y,
                                family=family,
                                foldid=foldid,  
@@ -196,7 +201,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                type.measure=type.measure,
                                standardize=FALSE,
                                penalty.factor=overall.pf,
-                               type.multinomial = c("grouped"),
+                               type.multinomial = type.multinomial,
                                keep=TRUE,
                                weights=weights,
                                ...)     
