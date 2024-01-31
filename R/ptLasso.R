@@ -45,6 +45,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  standardize = TRUE,
                  verbose=FALSE, #trace.it=FALSE,
                  weights=NULL,
+                 trace.it=FALSE,
                  penalty.factor = rep(1, nvars),
                  ...
                  ) {
@@ -53,6 +54,12 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     family = match.arg(family)
     type.measure = match.arg(type.measure)
     useCase = match.arg(useCase, c("inputGroups","targetGroups"), several.ok=FALSE)
+
+    np=dim(x)
+    ##check dims
+    if(is.null(np)|(np[2]<=1))stop("x should be a matrix with 2 or more columns")
+    nobs=as.integer(np[1])
+    nvars=as.integer(np[2])
     
     ####################################################################################
     # Begin error checking:
@@ -283,8 +290,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                          penalty.factor=penalty.factor,
                                          standardize=FALSE,
                                          keep=TRUE,
-                                         trace.it=trace.it, weights=weights,
-                                         parallel=parallel, dfmax=dfmax, pmax=pmax,
+                                         weights=weights,
                                          ...)
            }
            lamhat2 = fitind[[kk]]$lambda.min

@@ -104,10 +104,6 @@ makedata.targetgroups=function(nn, p, class.sizes, del, del2, scommon=10, sindiv
 
         x[y == i, 1:scommon] = x[y == i,1:scommon]+unlist(del[i])  #common features
         x[y == i, start.features:end.features]  = x[y == i, start.features:end.features] + unlist(del2[i])  #  indiv features
-
-        #means[[i]] = rep(0, p)
-        #means[[i]][1:scommon] = del[1]
-        #means[[i]][start.features:end.features] = del2[i]
         
         start.features = end.features + 1
     }
