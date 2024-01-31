@@ -21,37 +21,25 @@ subset.y <- function(y, ix, family) {
 #' @param groups \code{groups} vector as in \code{ptLasso}
 #' @param alpha A vector of values of the pretraining hyperparameter alpha. Defaults to \code{seq(0, 1, length.out=11)}.
 #' @param family Response type as in \code{ptLasso}.
-#' @param type.measure Measure computed in cv.glmnet, as in \code{ptLasso}.
+#' @param type.measure Measure computed in \code{cv.glmnet}, as in \code{ptLasso}.
 #' @param verbose If \code{verbose=1}, print a statement showing which model is currently being fit.
 #' @param ... Other arguments that can be passed to \code{ptLasso}.
 #'
 #' @return An object of class \code{"cv.ptLasso"}, which is a list with the
 #' ingredients of the cross-validation fit.
-#' \item{glmfit}{A fitted \code{ptLasso} object for the full data.}
-#' \item{theta}{Value of \code{theta} used in model fitting.}
-#' \item{lambda}{The values of \code{lambda} used in the fits.}
-#' \item{nzero}{If the groups overlap, the number of non-zero coefficients
-#'   in the model \code{glmfit} for the expanded feature space, at each value of
-#'   \code{lambda}. Otherwise, the number of non-zero coefficients in the model
-#'   \code{glmfit} for the original feature space.}
-#' \item{orignzero}{If the groups are overlapping, this is the number of
-#'   non-zero coefficients in the model \code{glmfit} for the original feature
-#'   space, at each \code{lambda}. If groups are not overlapping, it is
-#'   \code{NULL}.}
-#' \item{fit.preval}{If \code{keep=TRUE}, this is the array of prevalidated
-#'   fits.}
-#' \item{cvm}{The mean cross-validated error: a vector of length
-#'   \code{length(lambda)}.}
-#' \item{cvse}{Estimate of standard error of \code{cvm}.}
-#' \item{cvlo}{Lower curve = \code{cvm - cvsd}.}
-#' \item{cvup}{Upper curve = \code{cvm + cvsd}.}
-#' \item{lambda.min}{The value of \code{lambda} that gives minimum
-#'   \code{cvm}.}
-#' \item{lambda.1se}{The largest value of \code{lambda} such that the CV
-#'   error is within one standard error of the minimum.}
-#' \item{foldid}{If \code{keep=TRUE}, the fold assignments used.}
-#' \item{name}{Name of error measurement used for CV.}
-#' \item{call}{The call that produced this object.}
+#' \item{fitall}{A fitted \code{cv.glmnet} object trained using the full data.}
+#' \item{fitpre}{A list of fitted (pretrained) \code{cv.glmnet} objects, one trained with each group.}
+#' \item{fitind}{{A list of fitted \code{cv.glmnet} objects, one trained with each group.}
+#' \item{alphahat}{Value of \code{alpha} that optimizes CV performance on all data.}
+#' \item{varying.alphahat}{Vector of values of \code{alpha}, the kth of which optimizes performance for group k.}
+#' \item{alphalist}{Vector of all alphas that were compared.}
+#' \item{errall}{CV performance for the overall model.}
+#' \item{errpre}{CV performance for the pretrained models (one for each \code{alpha} tried).}
+#' \item{errind}{CV performance for the individual model.}
+#' \item{useCase}{Whether the objective is "inputGroups" or "targetGroups".}
+#' \item{type.measure}{Measure computed in \code{cv.glmnet}.}
+#' \item{family}{Response type.}
+#' \item{fit}{List of \code{ptLasso} objects, one for each \code{alpha} tried.}
 #'
 #' @seealso \code{\link{ptLasso}} and \code{\link{plot.cv.ptLasso}}.
 #' @examples
