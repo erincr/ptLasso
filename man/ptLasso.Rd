@@ -20,10 +20,8 @@ ptLasso(
   nfolds = 10,
   standardize = TRUE,
   verbose = FALSE,
-  trace.it = FALSE,
   weights = NULL,
-  parallel = FALSE,
-  offset = NULL,
+  penalty.factor = rep(1, nvars),
   ...
 )
 }
@@ -54,19 +52,17 @@ ptLasso(
 
 \item{standardize}{Should the predictors be standardized before fitting (default is TRUE).}
 
-\item{verbose}{If \code{verbose=1}, print a statement showing which model is currently being fit.}
-
-\item{trace.it}{If \code{trace.it=1}, then a progress bar is displayed; useful for big models that take a long time to fit.}
+\item{verbose}{If \code{verbose=1}, print a statement showing which model is currently being fit with \code{cv.glmnet}.}
 
 \item{weights}{observation weights. Can be total counts if responses are proportion matrices. Default is 1 for each observation.}
 
-\item{parallel}{If \code{TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. See the example below.}
-
-\item{offset}{A vector of length 'nobs' that is included in the linear predictor (a 'nobs x nc' matrix for the '"multinomial"' family). Useful for the '"poisson"' family (e.g. log of exposure time), or for refining a model by starting at a current fit. Default is 'NULL'. If supplied, then values must also be supplied to the 'predict' function.}
-
-\item{...}{Additional arguments to be passed to the cv.glmnet function.}
+\item{...}{Additional arguments to be passed to the cv.glmnet function. Note that \code{ptLasso} does not support the arguments \code{intercept}, \code{offset}, \code{fit} and \code{check.args}.}
 
 \item{type.measure:}{loss to use for cross-validation within each individual, overall, or pretrained lasso model. Currently five options, not all available for all models. The default is 'type.measure="deviance"', which uses squared-error for gaussian models (a.k.a 'type.measure="mse"' there), deviance for logistic and poisson regression, and partial-likelihood for the Cox model. 'type.measure="class"' applies to binomial and multinomial logistic regression only, and gives misclassification error. 'type.measure="auc"' is for two-class logistic regression only, and gives area under the ROC curve. 'type.measure="mse"' or 'type.measure="mae"' (mean absolute error) can be used by all models except the '"cox"'; they measure the deviation from the fitted mean to the response. 'type.measure="C"' is Harrel's concordance measure, only available for 'cox' models.}
+
+\item{trace.it}{If \code{trace.it=1}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit.}
+
+\item{parallel}{If \code{TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. See the example below.}
 }
 \value{
 A ...

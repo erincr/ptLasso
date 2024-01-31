@@ -2,7 +2,7 @@
 % Please edit documentation in R/coef.ptLasso.R
 \name{coef.ptLasso}
 \alias{coef.ptLasso}
-\title{Plot the cross-validation (or validation) curve produced by cv.ptLasso (or predict.cv.ptLasso), as a function of the \code{alpha} values used.}
+\title{Get the coefficients from a fitted ptLasso model.}
 \usage{
 \method{coef}{ptLasso}(fit, model = c("all", "individual", "overall", "pretrain"))
 }
@@ -12,7 +12,7 @@
 \item{model}{string indicating which coefficients to retrieve. Must be one of "all", "individual", "overall" or "pretrain".}
 }
 \description{
-A plot is produced, and nothing is returned.
+Get the coefficients from a fitted ptLasso model.
 }
 \seealso{
 \code{ptLasso}.

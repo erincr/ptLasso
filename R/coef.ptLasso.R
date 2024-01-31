@@ -57,9 +57,9 @@ get.overall.support <- function(fit, s="lambda.min"){
 }
 
 
-#' Plot the cross-validation (or validation) curve produced by cv.ptLasso (or predict.cv.ptLasso), as a function of the \code{alpha} values used. 
+#' Get the coefficients from a fitted ptLasso model.
 #'
-#' A plot is produced, and nothing is returned.
+#' 
 #'
 #' @aliases coef.ptLasso 
 #' @param fit fitted \code{"ptLasso"} object.
@@ -80,6 +80,48 @@ coef.ptLasso=function(fit, model = c("all", "individual", "overall", "pretrain")
     if((model == "all") | (model == "individual")) individual = lapply(fit$fitind, coef)
     if((model == "all") | (model == "pretrain"))   pretrain   = lapply(fit$fitpre, coef)
     if((model == "all") | (model == "overall"))    overall    = coef(fit$fitall)
+
+    if(model == "all")        return(list( individual = individual,  pretrain = pretrain, overall = overall))
+    if(model == "individual") return(individual)
+    if(model == "pretrain")   return(pretrain)
+    if(model == "overall")    return(overall)
+
+}
+
+
+#' Get the coefficients from a fitted cv.ptLasso model.
+#'
+#' 
+#'
+#' @aliases coef.cv.ptLasso 
+#' @param fit fitted \code{"cv.ptLasso"} object.
+#' @param model string indicating which coefficients to retrieve. Must be one of "all", "individual", "overall" or "pretrain".
+#' @param alpha value betweein 0 and 1, indicating which alpha to use. If \code{NULL}, return coefficients from all models.  Only impacts the results for model = "all" or model = "pretrain".
+#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
+#' @seealso \code{cv.ptLasso}, \code{ptLasso}.
+#' @keywords models regression classification
+#' @examples
+#'
+#'
+#' @method coef cv.ptLasso
+#' @export
+#'
+#'
+coef.cv.ptLasso=function(fit, model = c("all", "individual", "overall", "pretrain"), alpha = NULL){
+    model = match.arg(model)
+
+    if((model == "all") | (model == "individual")) individual = lapply(fit$fitind, coef)
+    if((model == "all") | (model == "overall"))    overall    = coef(fit$fitall)
+
+    if((model == "all") | (model == "pretrain")){
+        if(is.null(alpha)){
+            pretrain = lapply(fit$fitpre, function(model) lapply(model, coef))
+        } else {
+            which.alpha = which(alpha == fit$alphalist)
+            if(length(which.alpha) == 0) stop("Please choose alpha from fit$alphalist")
+            pretrain    = coef(fit$fitpre[[which.alpha]])
+        }
+    }
 
     if(model == "all")        return(list( individual = individual,  pretrain = pretrain, overall = overall))
     if(model == "individual") return(individual)

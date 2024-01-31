@@ -50,10 +50,6 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  ) {
     this.call = match.call()
 
-    for(argument in c("fit", "check.args", "offset", "intercept", "standardize.response")){
-        if(argument %in% names(list(...))) stop(paste0("ptLasso does not support the argument '", argument, "'."))
-    }
-
     family = match.arg(family)
     type.measure = match.arg(type.measure)
     useCase = match.arg(useCase, c("inputGroups","targetGroups"), several.ok=FALSE)
@@ -67,7 +63,12 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     ####################################################################################
     # Begin error checking:
     ####################################################################################
-    if((abs(alpha) > 1) | (alpha < 0)) stop("alpha must be between 0 and 1")
+
+    for(argument in c("fit", "check.args", "offset", "intercept", "standardize.response")){
+        if(argument %in% names(list(...))) stop(paste0("ptLasso does not support the argument '", argument, "'."))
+    }
+    
+    if((alpha > 1) | (alpha < 0)) stop("alpha must be between 0 and 1")
     
     # In the future, we want to be able to pass in just the predictions from the overall model.
     # This will be useful for settings where e.g. genentech has released a model (but maybe not as a glmnet object).

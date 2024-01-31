@@ -1,9 +1,9 @@
 #' Get the y axis label
 #' @noRd
-yaxis.name = function(x, prefix = "Cross validated"){
-    if(x == "class")      return("Misclassification Error")
-    if(x == "mse")        return("MSE")
-    if(x == "mae")        return("MAE")
+yaxis.name = function(x){
+    if(x == "class")      return("Misclassification error")
+    if(x == "mse")        return("Mean squared error")
+    if(x == "mae")        return("Mean absolute error")
     if(x == "deviance")   return("Deviance")
     if(x == "auc")        return("AUC")
     if(x == "C")          return("C-index")
@@ -30,8 +30,8 @@ yaxis.name = function(x, prefix = "Cross validated"){
 #'
 #'
 plot.cv.ptLasso = function(x, plot.alphahat = TRUE, ...){
-    if(x$fit[[1]]$useCase == "inputGroups")  ggplot.ptLasso.inputGroups(x,  plot.alphahat = plot.alphahat, y.label = yaxis.name(x$type.measure), ...)
-    if(x$fit[[1]]$useCase == "targetGroups") ggplot.ptLasso.targetGroups(x, plot.alphahat = plot.alphahat, y.label = yaxis.name(x$type.measure), ...)
+    if(x$useCase == "inputGroups")  ggplot.ptLasso.inputGroups(x,  plot.alphahat = plot.alphahat, y.label = yaxis.name(x$type.measure), ...)
+    if(x$useCase == "targetGroups") ggplot.ptLasso.targetGroups(x, plot.alphahat = plot.alphahat, y.label = yaxis.name(x$type.measure), ...)
 }
 
 
@@ -62,7 +62,7 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
 
     k = ncol(err.pre) - 2
 
-    ylim = range(c(err.pre[, "overallError"], err.pan["overallError"], err.ind["overallError"])) 
+    ylim = range(c(err.pre[, "overall"], err.pan["overall"], err.ind["overall"])) 
     nudge = .1 * (ylim[2] - ylim[1])
     ylim[2] = ylim[2] + nudge
 
@@ -70,7 +70,7 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
 
     forplot = data.frame(
         "alpha"   = c(err.pre[,"alpha"], err.pre[,"alpha"], err.pre[,"alpha"]),
-        "overall" = c(err.pre[, "overallError"], rep(err.ind["overallError"], n.alpha), rep(err.pan["overallError"], n.alpha)),
+        "overall" = c(err.pre[, "overall"], rep(err.ind["overall"], n.alpha), rep(err.pan["overall"], n.alpha)),
         "model"   = c(rep("Pretrain", n.alpha), rep("Individual", n.alpha), rep("Overall (grouped)", n.alpha))
     )
     ylims = range(forplot$overall)
@@ -79,8 +79,8 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
     
     plot1 <- ggplot(forplot) +
         geom_line(aes(x=alpha, y=overall, group = model, color = model)) +
-        geom_text(aes(x=.2, y=err.pan["overallError"], label=as.character(suppan), vjust=-1), size=3, color="#666666") +
-        geom_text(aes(x=.2, y=err.ind["overallError"], label=as.character(supind), vjust=-1), size=3, color="#666666") +
+        geom_text(aes(x=.2, y=err.pan["overall"], label=as.character(suppan), vjust=-1), size=3, color="#666666") +
+        geom_text(aes(x=.2, y=err.ind["overall"], label=as.character(supind), vjust=-1), size=3, color="#666666") +
         scale_x_continuous(sec.axis = dup_axis(breaks = err.pre[, "alpha"][c(TRUE, FALSE)], labels = as.character(suppre)[c(TRUE, FALSE)], name = "")) + 
         labs(x = expression(alpha), y = y.label, color = "", subtitle=paste0(as.character(k)," class problem")) +
         ylim(ylims[1], ylims[2]) +
@@ -114,8 +114,8 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
         plot2 = plot2 + geom_vline(aes(xintercept = x$alphahat), color = '#666666', lty=2)
     }
     
-    #gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.75, 1))
-    print(plot1 + plot2 + plot_layout(widths = c(9, 9)))
+    gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.75, 1))
+    #print(plot1 + plot2 + plot_layout(widths = c(9, 9)))
 
 }
 
@@ -128,8 +128,6 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
     err.pan = x$errall
     err.ind = x$errind
 
-    y.label = gsub("error", x$type.measure, y.label)
-
     suppre = sapply(x$fit, function(ff) length(get.pretrain.support(ff, commonOnly = FALSE)))
     supind = length(get.individual.support(x, commonOnly = FALSE))
     suppan = length(get.overall.support(x))
@@ -138,7 +136,7 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 
     forplot = data.frame(
         "alpha"   = c(err.pre[,"alpha"], err.pre[,"alpha"], err.pre[,"alpha"]),
-        "overall" = c(err.pre[, "overallError"], rep(err.ind["overallError"], n.alpha), rep(err.pan["overallError"], n.alpha)),
+        "overall" = c(err.pre[, "overall"], rep(err.ind["overall"], n.alpha), rep(err.pan["overall"], n.alpha)),
         "model"   = c(rep("Pretrain", n.alpha), rep("Individual", n.alpha), rep("Overall", n.alpha))
     )
     ylims = range(forplot$overall)
@@ -147,8 +145,8 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
     
     plot1 <- ggplot(forplot) +
         geom_line(aes(x=alpha, y=overall, group = model, color = model)) +
-        geom_text(aes(x=.2, y=err.pan["overallError"], label=as.character(suppan), vjust=-1), size=3, color="#666666") +
-        geom_text(aes(x=.2, y=err.ind["overallError"], label=as.character(supind), vjust=-1), size=3, color="#666666") +
+        geom_text(aes(x=.2, y=err.pan["overall"], label=as.character(suppan), vjust=-1), size=3, color="#666666") +
+        geom_text(aes(x=.2, y=err.ind["overall"], label=as.character(supind), vjust=-1), size=3, color="#666666") +
         scale_x_continuous(sec.axis = dup_axis(breaks = err.pre[, "alpha"][c(TRUE, FALSE)], labels = as.character(suppre)[c(TRUE, FALSE)], name = "")) + 
         labs(x = expression(alpha), y = y.label, color = "", title=paste0(as.character(k)," group problem")) +
         ylim(ylims[1], ylims[2]) +
@@ -158,7 +156,7 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 
     forplot = data.frame(
         "alpha"   = c(err.pre[,"alpha"], err.pre[,"alpha"], err.pre[,"alpha"]),
-        "overall" = c(err.pre[, "meanError"], rep(err.ind["meanError"], n.alpha), rep(err.pan["meanError"], n.alpha)),
+        "overall" = c(err.pre[, "mean"], rep(err.ind["mean"], n.alpha), rep(err.pan["mean"], n.alpha)),
         "model"   = c(rep("Pretrain", n.alpha), rep("Individual", n.alpha), rep("Overall", n.alpha))
     )
     ylims = range(forplot$overall)
@@ -166,8 +164,8 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
     ylims[2] = ylims[2] + nudge
     plot2 <- ggplot(forplot) +
          geom_line(aes(x=alpha, y=overall, group = model, color = model)) +
-         geom_text(aes(x=.2, y=err.pan["meanError"], label=as.character(suppan), vjust=-1), size=3, color="#666666") +
-         geom_text(aes(x=.2, y=err.ind["meanError"], label=as.character(supind), vjust=-1), size=3, color="#666666") +
+         geom_text(aes(x=.2, y=err.pan["mean"], label=as.character(suppan), vjust=-1), size=3, color="#666666") +
+         geom_text(aes(x=.2, y=err.ind["mean"], label=as.character(supind), vjust=-1), size=3, color="#666666") +
          scale_x_continuous(sec.axis = dup_axis(breaks = err.pre[, "alpha"][c(TRUE, FALSE)], labels = as.character(suppre)[c(TRUE, FALSE)], name = "")) + 
          labs(x = expression(alpha), y = y.label, color = "", title=paste0("Average of ", as.character(k)," individual problems")) +
          ylim(ylims[1], ylims[2]) +
@@ -179,8 +177,8 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
         plot2 <- plot2 + geom_vline(aes(xintercept = x$alphahat), color = '#666666', lty=2)
     }
 
-    #gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.8, 1))
-    print(plot1 + plot2 + plot_layout(widths = c(9, 9)))
+    gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.8, 1))
+    #print(plot1 + plot2 + plot_layout(widths = c(9, 9)))
 }
 
 
