@@ -17,99 +17,6 @@ require(pROC)
 
 test.tol = 1e-2
 
-#################################################################################
-# Helpers to make dummy data
-#################################################################################
-makedata=function(nn,p,k,scommon,sindiv,class.sizes,del,del2, means, sigma, outcome = c("gaussian", "binomial", "multinomial"),
-                  mult.classes = 3){
-  outcome=match.arg(outcome)
-    
-  #generates simulated data
-  x = matrix(rnorm(nn*p),nn,p)
-  y = mu=rep(NA,nn)
-
-  if(outcome %in% c("binomial", "gaussian")){
-      start.features = scommon + 1
-      start.groups = 1
-      
-      for(kk in 1:k){
-          end.features = start.features + sindiv[kk] - 1
-          end.groups   = start.groups + class.sizes[kk] - 1
-
-          beta0 = rep(0,p)
-          beta0[1:scommon] = del[kk]
-          
-          beta = rep(0,p)
-          beta[start.features:end.features] = del2[kk]
-          
-          mu[start.groups:end.groups] = x[start.groups:end.groups, ] %*% (beta0+beta) + means[kk]
-          
-          if(outcome == "gaussian"){
-              y[start.groups:end.groups]  = mu[start.groups:end.groups] + sigma*rnorm(class.sizes[kk])
-          } else {
-              y[start.groups:end.groups]  = rbinom(class.sizes[kk], 1, prob = 1/(1 + exp(-mu[start.groups:end.groups])))
-          }
-          
-          start.features = end.features + 1
-          start.groups = end.groups + 1
-      }
-      
-      snr=var(mu)/var(y-mu)
-  } else {
-      y = mu = matrix(NA, nrow=nn, ncol=mult.classes)
-      start.features = scommon + 1
-      for(cl in 1:mult.classes){
-          start.groups = 1
-          for(kk in 1:k){
-              beta0 = rep(0,p)
-              beta0[1:scommon] = del[kk]
-              
-              beta = rep(0, p)
-              end.features = start.features + sindiv[kk] - 1
-              end.groups   = start.groups + class.sizes[kk] - 1
-
-              beta[start.features:end.features] = del2[kk]      
-              
-              mu[start.groups:end.groups, cl] = x[start.groups:end.groups, ] %*% (beta0+beta) 
-              
-              y[start.groups:end.groups, cl]  = 1/(1 + exp(-mu[start.groups:end.groups, cl]))
-              
-              start.features = end.features + 1
-              start.groups = end.groups + 1
-          }
-      }
-      y = apply(y, 1, which.max)
-      snr=var(mu)/var(y-mu)
-  }
-  
-  
-  groups = c(unlist(sapply(1:k, function(i) rep(i, class.sizes[i]))))
-  
-  return(ptLasso:::enlist(x, y, snr, mu, groups))
-  
-}
-
-
-
-
-makedata.targetgroups=function(nn, p, class.sizes, del, del2, scommon=10, sindiv=10){  
-    x=matrix(rnorm(nn*p),nn,p)
-
-    y=c(sapply(1:length(class.sizes), function(i) rep(i, class.sizes[i])))
-   
-
-    start.features = scommon + 1
-    for(i in 1:length(class.sizes)){
-        end.features = start.features + sindiv - 1
-
-        x[y == i, 1:scommon] = x[y == i,1:scommon]+unlist(del[i])  #common features
-        x[y == i, start.features:end.features]  = x[y == i, start.features:end.features] + unlist(del2[i])  #  indiv features
-        
-        start.features = end.features + 1
-    }
-
-    return(list(x=x,y=y))
-}
 ##########################################################################################
 # Input groups, Gaussian response
 ##########################################################################################
@@ -127,9 +34,9 @@ del2=rep(5, k)
 means = sample(1:k)
 sigma=20
 
-out=makedata(nn=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
-             class.sizes=class.sizes, del=del, del2=del2,
-             means=means, sigma=sigma)
+out=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+             class.sizes=class.sizes, beta.common=del, beta.indiv=del2,
+             intercepts=means, sigma=sigma)
 
 x=out$x
 y=out$y
@@ -139,9 +46,9 @@ nfolds=5
 foldid = rep(1, nrow(x))  
 for(kk in 1:k) foldid[groups == kk] = sample(1:nfolds, class.sizes[kk], replace=TRUE)
 
-out2=makedata(nn=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
-             class.sizes=class.sizes, del=del, del2=del2,
-             means=means, sigma=sigma)
+out2=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+             class.sizes=class.sizes, beta.common=del, beta.indiv=del2,
+             intercepts=means, sigma=sigma)
 xtest=out2$x
 groupstest=out2$groups
 ytest=out2$y
@@ -239,17 +146,17 @@ del2=rep(5, k)
 means = rep(0, k)
 sigma=20
 
-out=makedata(nn=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
-             class.sizes=class.sizes, del=del, del2=del2,
-             means=means, sigma=sigma, outcome="binomial")
+out=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+             class.sizes=class.sizes, beta.common=del, beta.indiv=del2,
+             intercepts=means, sigma=sigma, outcome="binomial")
 
 x=out$x
 y=out$y
 groups=out$groups
 
-out2=makedata(nn=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
-             class.sizes=class.sizes, del=del, del2=del2,
-             means=means, sigma=sigma, outcome="binomial")
+out2=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+             class.sizes=class.sizes, beta.common=del, beta.indiv=del2,
+             intercepts=means, sigma=sigma, outcome="binomial")
 xtest=out2$x
 groupstest=out2$groups
 ytest=out2$y
@@ -369,17 +276,17 @@ del2=rep(5, k)
 means = rep(0, k)
 sigma=20
 
-out=makedata(nn=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
-             class.sizes=class.sizes, del=del, del2=del2,
-             means=means, sigma=sigma, outcome="multinomial", mult.classes=3)
+out=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+             class.sizes=class.sizes, beta.common=del, beta.indiv=del2,
+             intercepts=means, sigma=sigma, outcome="multinomial", mult.classes=3)
 
 x=out$x
 y=out$y
 groups=out$groups
 
-out2=makedata(nn=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
-             class.sizes=class.sizes, del=del, del2=del2,
-             means=means, sigma=sigma, outcome="multinomial", mult.classes=3)
+out2=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+             class.sizes=class.sizes, beta.common=del, beta.indiv=del2,
+             intercepts=means, sigma=sigma, outcome="multinomial", mult.classes=3)
 xtest=out2$x
 groupstest=out2$groups
 ytest=out2$y
@@ -390,19 +297,19 @@ cvfit=cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="class",fol
 
 test_that("input_groups_multinomial_errind", {
     expect_equal(unname(pred$errind),
-                 c(0.4611111, 0.4611111, 0.4611111, 0.4711111, 0.4511111),
+                 c(0.3877778, 0.3877778, 0.3877778, 0.4066667, 0.3688889),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_multinomial_errall_classes", {
     expect_equal(unname(pred$errall),
-                 c(0.5688889, 0.5688889, 0.5688889, 0.6066667, 0.5311111),
+                 c(0.5177778, 0.5177778, 0.5177778, 0.5466667, 0.4888889),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_multinomial_errpre", {
     expect_equal(unname(pred$errpre),
-                 c(0.4333333, 0.4333333, 0.4333333, 0.4555556, 0.4111111),
+                 c(0.3877778, 0.3877778, 0.3877778, 0.4066667, 0.3688889),
                  tolerance = test.tol)
 })
 
@@ -422,9 +329,9 @@ del2=rep(5, k)
 means = sample(1:k)
 sigma=20
 
-out=makedata(nn=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
-             class.sizes=class.sizes, del=del, del2=del2,
-             means=means, sigma=sigma, outcome="gaussian")
+out=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+             class.sizes=class.sizes, beta.common=del, beta.indiv=del2,
+             intercepts=means, sigma=sigma, outcome="gaussian")
 
 x=out$x
 y=out$y
@@ -436,9 +343,9 @@ colnames(y)=c("time","status")
 
 groups=out$groups
 
-out2=makedata(nn=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
-             class.sizes=class.sizes, del=del, del2=del2,
-             means=means, sigma=sigma, outcome="gaussian")
+out2=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+             class.sizes=class.sizes, beta.common=del, beta.indiv=del2,
+             intercepts=means, sigma=sigma, outcome="gaussian")
 xtest=out2$x
 groupstest=out2$groups
 ytest=out2$y
@@ -485,12 +392,12 @@ set.seed(2345)
 n=300
 p=140
 
-out=makedata.targetgroups(nn=n, p=p, class.sizes=c(100, 100, 100), del=rep(1, 3), del2=rep(1, 3))
+out=makedata.targetgroups(n=n, p=p, scommon = 10, sindiv = rep(10, 3), class.sizes=c(100, 100, 100), shift.common=rep(1, 3), shift.indiv=rep(1, 3))
 x=out$x
 y=out$y
 groups=y 
 
-out2=makedata.targetgroups(nn=n, p=p, class.sizes=c(100, 100, 100), del=rep(1, 3), del2=rep(1, 3))
+out2=makedata.targetgroups(n=n, p=p, scommon = 10, sindiv = rep(10, 3),  class.sizes=c(100, 100, 100), shift.common=rep(1, 3), shift.indiv=rep(1, 3))
 xtest=out2$x
 ytest=out2$y
 groupstest=ytest

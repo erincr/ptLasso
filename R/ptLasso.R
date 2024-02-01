@@ -21,7 +21,7 @@
 #' @param verbose If \code{verbose=1}, print a statement showing which model is currently being fit with \code{cv.glmnet}.
 #' @param trace.it If \code{trace.it=1}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit.
 #' @param weights observation weights. Can be total counts if responses are proportion matrices. Default is 1 for each observation.
-#' @param parallel If \code{TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. See the example below.
+#' @param parallel If \code{TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others.
 #' @param ... Additional arguments to be passed to the cv.glmnet function. Note that \code{ptLasso} does not support the arguments \code{intercept}, \code{offset}, \code{fit} and \code{check.args}.
 #'
 #' @return A ...

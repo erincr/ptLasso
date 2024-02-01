@@ -25,6 +25,8 @@
 predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NULL, alphatype = c("fixed", "varying"),
                             type = c("link", "response", "class"), s = "lambda.min"){
 
+    if(missing("xtest")) stop("Please supply xtest.")
+    
     alphatype = match.arg(alphatype)
     if(is.null(alpha)) {
         if(alphatype == "fixed"){
@@ -35,7 +37,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
     }
     
     if(length(alpha) == 1){
-        if(!(alpha %in% cvfit$errpre[, "alpha"])) stop("Not a valid choice of alpha. Please choose alpha from cvfit$errpre[, 'alpha'].")
+        if(!(alpha %in% cvfit$errpre[, "alpha"])) stop("Not a valid choice of alpha. Please choose alpha from cvfit$alphalist.")
         
         model.ix = which(cvfit$errpre[, "alpha"] == alpha)
         
@@ -45,7 +47,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 
         return(predict.ptLasso(fit, xtest, groupstest=groupstest, ytest=ytest, type = type, s = s))
     } else {
-        if(!all(sapply(alpha, function(x) x %in% cvfit$errpre[, "alpha"]))) stop("Includes at least one invalid choice of alpha. Please choose alpha from cvfit$res[, 'alpha'].")
+        if(!all(sapply(alpha, function(x) x %in% cvfit$errpre[, "alpha"]))) stop("Includes at least one invalid choice of alpha. Please choose alpha from cvfit$alphalist.")
         if(length(alpha) != cvfit$fit[[1]]$k) stop("Must have one alpha for each group.")
         
         model.ix = sapply(alpha, function(a) which(a == cvfit$errpre[, "alpha"]))

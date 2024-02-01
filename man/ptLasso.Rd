@@ -62,7 +62,7 @@ ptLasso(
 
 \item{trace.it}{If \code{trace.it=1}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit.}
 
-\item{parallel}{If \code{TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. See the example below.}
+\item{parallel}{If \code{TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others.}
 }
 \value{
 A ...

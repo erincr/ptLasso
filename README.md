@@ -2,6 +2,11 @@
 This README is very much a work-in-progress. Thank you for your patience!
 
 ## Installation 
+### Dependencies
+To use this package, you will need the following: `glmnet`, `Matrix`, `stats`, `ggplot2` and `gridExtra`.
+
+
+### Installation
 Installation is a little harder while this is a private repo:
 
 ```
@@ -9,9 +14,9 @@ credentials::set_github_pat() (enter your PAT into the popup)
 remotes::install_github("erincr/ptLasso")
 ```
 
-Alternatively, you can download or clone this repo, and use: 
+Alternatively, you can download or clone this repo, cd into the director containing it, and use: 
 
-```R CMD INSTALL --build```
+```R CMD build ptLasso``
 
 followed by
 
