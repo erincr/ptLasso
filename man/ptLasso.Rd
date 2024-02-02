@@ -11,7 +11,7 @@ ptLasso(
   alpha = 0.5,
   family = c("gaussian", "multinomial", "binomial", "cox"),
   type.measure = c("default", "mse", "mae", "auc", "deviance", "class", "C"),
-  useCase = c("inputGroups", "targetGroups"),
+  use.case = c("inputGroups", "targetGroups"),
   overall.lambda = "lambda.1se",
   fitall = NULL,
   fitind = NULL,
@@ -36,8 +36,6 @@ ptLasso(
 
 \item{family}{Either a character string representing one of the built-in families, or else a 'glm()' family object. For more information, see Details section below or the documentation for response type (above).}
 
-\item{useCase}{The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".}
-
 \item{overall.lambda}{The choice of lambda for the overall model. Will define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value.}
 
 \item{fitall}{An optional glmnet object specifying the overall model.}
@@ -59,6 +57,8 @@ ptLasso(
 \item{...}{Additional arguments to be passed to the cv.glmnet function. Note that \code{ptLasso} does not support the arguments \code{intercept}, \code{offset}, \code{fit} and \code{check.args}.}
 
 \item{type.measure:}{loss to use for cross-validation within each individual, overall, or pretrained lasso model. Currently five options, not all available for all models. The default is 'type.measure="deviance"', which uses squared-error for gaussian models (a.k.a 'type.measure="mse"' there), deviance for logistic and poisson regression, and partial-likelihood for the Cox model. 'type.measure="class"' applies to binomial and multinomial logistic regression only, and gives misclassification error. 'type.measure="auc"' is for two-class logistic regression only, and gives area under the ROC curve. 'type.measure="mse"' or 'type.measure="mae"' (mean absolute error) can be used by all models except the '"cox"'; they measure the deviation from the fitted mean to the response. 'type.measure="C"' is Harrel's concordance measure, only available for 'cox' models.}
+
+\item{useCase}{The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".}
 
 \item{trace.it}{If \code{trace.it=1}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit.}
 

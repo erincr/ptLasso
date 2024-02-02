@@ -46,7 +46,7 @@ subset.y <- function(y, ix, family) {
 #'
 #' @export
 cv.ptLasso <- function(x, y, w = rep(1,length(y)), alphalist=seq(0,1,length=11),
-                       groups = NULL, family = c("gaussian", "multinomial", "binomial","cox"),  useCase=c("inputGroups","targetGroups"),
+                       groups = NULL, family = c("gaussian", "multinomial", "binomial","cox"),  use.case=c("inputGroups","targetGroups"),
                        type.measure=c("default", "mse", "mae", "auc","deviance","class", "C"),
                        nfolds = 10, foldid = NULL, keep = FALSE, verbose=FALSE, fitall=NULL, fitind=NULL,
                        trace.it = FALSE, weights = NULL,
@@ -55,22 +55,22 @@ cv.ptLasso <- function(x, y, w = rep(1,length(y)), alphalist=seq(0,1,length=11),
                        parallel = FALSE,
                        ...) { #TODO: confirm that all ... args are OK
      
-    useCase = match.arg(useCase, c("inputGroups","targetGroups"), several.ok=FALSE)
+    use.case = match.arg(use.case, c("inputGroups","targetGroups"), several.ok=FALSE)
     family = match.arg(family)
     type.measure = match.arg(type.measure)
         
     this.call <- match.call()
 
-    family=match.arg(family)
-    type.measure=match.arg(type.measure)
-    useCase=match.arg(useCase)
+    if(!(family %in% names(this.call))) this.call$family = family
+    if(!(type.measure %in% names(this.call))) this.call$type.measure = type.measure
+    if(!(use.case %in% names(this.call))) this.call$use.case = use.case
 
     # Warnings
-    if((useCase == "inputGroups") & is.null(groups)) stop("For the input grouped setting, groups must be supplied.")
+    if((use.case == "inputGroups") & is.null(groups)) stop("For the input grouped setting, groups must be supplied.")
     if(!is.null(groups)) k = length(table(groups))
     if(is.null(groups))  k = length(table(y))
        
-    if(useCase == "targetGroups" & !(family %in% c("binomial", "multinomial"))){
+    if(use.case == "targetGroups" & !(family %in% c("binomial", "multinomial"))){
         stop("Only the multinomial and binomial families are available for target grouped data.")
     }
 
@@ -98,7 +98,7 @@ cv.ptLasso <- function(x, y, w = rep(1,length(y)), alphalist=seq(0,1,length=11),
         which.f = function(x){which.max(x)}
     }
     
-    if(useCase == "targetGroups"){ # The input groups case is handled directly by glmnet   
+    if(use.case == "targetGroups"){ # The input groups case is handled directly by glmnet   
         mult.perf = function(predmat,y,type.measure){
             predmat.expanded=predmat
             dim(predmat.expanded) <- c(dim(predmat.expanded), 1)
@@ -119,7 +119,7 @@ cv.ptLasso <- function(x, y, w = rep(1,length(y)), alphalist=seq(0,1,length=11),
             cat(c("alpha=",alpha),fill=TRUE)
         }
 
-        fit[[ii]]<- ptLasso(x,y,groups,alpha=alpha,family=family,type.measure=type.measure, useCase=useCase, foldid=NULL, nfolds=nfolds,
+        fit[[ii]]<- ptLasso(x,y,groups,alpha=alpha,family=family,type.measure=type.measure, use.case=use.case, foldid=NULL, nfolds=nfolds,
                             fitall = fitall, fitind = fitind, verbose = verbose, trace.it = trace.it, weights = weights,
                             overall.lambda =  overall.lambda,
                             parallel = parallel, ...)
@@ -128,14 +128,14 @@ cv.ptLasso <- function(x, y, w = rep(1,length(y)), alphalist=seq(0,1,length=11),
         if(is.null(fitind)) fitind = fit[[ii]]$fitind
         fitpre[[ii]] = fit[[ii]]$fitpre
 
-        if(useCase == "targetGroups"){
+        if(use.case == "targetGroups"){
             # Get cross-validated predictions from all of the models, so we can compute a cross-validated performance measure
             phat = do.call(cbind, lapply(fit[[ii]]$fitpre, function(m) m$fit.preval[, m$lambda == get.lamhat(m, s)]))
             err  = sapply(fit[[ii]]$fitpre, function(m) m$cvm[m$lambda == get.lamhat(m, s)])
             err  = c(mult.perf(phat, y, type.measure), mean(err), err) # weighted.mean(err, w = table(groups)/length(groups)),
         }
 
-        if(useCase == "inputGroups"){
+        if(use.case == "inputGroups"){
             err=NULL
             pre.preds = rep(NA, nrow(x))
             if(family == "multinomial") pre.preds = matrix(NA, nrow = nrow(x), ncol = length(table(y)))
@@ -161,13 +161,13 @@ cv.ptLasso <- function(x, y, w = rep(1,length(y)), alphalist=seq(0,1,length=11),
 
     res=cbind(alphalist, errcvm)
     
-    if(fit[[1]]$useCase=="inputGroups") colnames(res)=c("alpha","overall","mean", "wtdMean", paste("group", as.character(1:length(class.sizes)),sep=""))
-    if(fit[[1]]$useCase=="targetGroups") colnames(res)=c("alpha","overall","mean", paste("group", as.character(1:length(class.sizes)),sep=""))
+    if(fit[[1]]$use.case=="inputGroups") colnames(res)=c("alpha","overall","mean", "wtdMean", paste("group", as.character(1:length(class.sizes)),sep=""))
+    if(fit[[1]]$use.case=="targetGroups") colnames(res)=c("alpha","overall","mean", paste("group", as.character(1:length(class.sizes)),sep=""))
     
     alphahat=alphalist[which.f(res[, "overall"])]
     varying.alphahat = sapply(1:k, function(kk) alphalist[which.f(res[, paste0("group", kk)])])
     
-    if(useCase == "targetGroups"){
+    if(use.case == "targetGroups"){
         # Individual models
         phat = do.call(cbind, lapply(fit[[1]]$fitind, function(m) m$fit.preval[, m$lambda == get.lamhat(m, s)]))
         err.ind = sapply(fit[[1]]$fitind, function(m) f(m$cvm)) 
@@ -226,7 +226,7 @@ cv.ptLasso <- function(x, y, w = rep(1,length(y)), alphalist=seq(0,1,length=11),
                varying.alphahat, 
                alphalist,
                call=this.call,
-               useCase = useCase,
+               use.case = use.case,
                family,
                type.measure,
                fit)

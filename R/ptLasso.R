@@ -37,7 +37,7 @@
 # Note: cv doesn't have to check everything that ptLasso checks
 ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binomial","cox"),
                  type.measure=c("default", "mse", "mae", "auc","deviance","class", "C"),
-                 useCase=c("inputGroups","targetGroups"),
+                 use.case=c("inputGroups","targetGroups"),
                  overall.lambda = "lambda.1se",
                  fitall=NULL, fitind=NULL,
                  lambda=NULL, foldid=NULL,
@@ -52,8 +52,12 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
 
     family = match.arg(family)
     type.measure = match.arg(type.measure)
-    useCase = match.arg(useCase, c("inputGroups","targetGroups"), several.ok=FALSE)
+    use.case = match.arg(use.case, c("inputGroups","targetGroups"), several.ok=FALSE)
 
+    if(!(family %in% names(this.call))) this.call$family = family
+    if(!(type.measure %in% names(this.call))) this.call$type.measure = type.measure
+    if(!(use.case %in% names(this.call))) this.call$use.case = use.case
+    
     np=dim(x)
     ##check dims
     if(is.null(np)|(np[2]<=1))stop("x should be a matrix with 2 or more columns")
@@ -77,7 +81,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
      }
     if(!is.null(fitind) & !(all(sapply(fitind, function(mm) "cv.glmnet" %in% class(mm))))) stop("fitind must be a list of cv.glmnet objects.")
 
-    if(useCase == "targetGroups" & !(family %in% c("binomial", "multinomial"))){
+    if(use.case == "targetGroups" & !(family %in% c("binomial", "multinomial"))){
         stop("Only the multinomial and binomial families are available for target grouped data.")
     }
 
@@ -111,7 +115,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     if(family=="cox") intercept=FALSE
 
     group.levels = NULL
-    if(useCase == "inputGroups") {
+    if(use.case == "inputGroups") {
         group.levels = sort(unique(groups))
         groups = factor(groups, levels=group.levels)
         onehot.groups = model.matrix(~groups - 1)
@@ -126,10 +130,10 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         
     }
 
-    if(useCase=="inputGroups"){
+    if(use.case=="inputGroups"){
         foldid2=vector("list", k)
         for(kk in 1:k) foldid2[[kk]] = sample(rep(1:nfolds,trunc(class.sizes[kk]/nfolds)+1))[1:class.sizes[kk]]
-    } else if(useCase=="targetGroups"){
+    } else if(use.case=="targetGroups"){
         foldid2=NULL
     }
 
@@ -159,7 +163,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
 
     xx = x
     overall.pf = penalty.factor
-    if(useCase == "inputGroups") {
+    if(use.case == "inputGroups") {
         xx = cbind(onehot.groups, xx)
         overall.pf = c(rep(0, k), overall.pf)
     }
@@ -169,11 +173,11 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         if(verbose) cat("Fitting overall model",fill=TRUE)
 
         #strangely, ( gets upset if you do intercept=FALSE for cox
-        if( family!="cox" & useCase == "inputGroups"){
+        if( family!="cox" & use.case == "inputGroups"){
             fitall = cv.glmnet(xx,y,
                                family=family,
                                foldid=foldid, 
-                               intercept=intercept, 
+                               intercept=FALSE,
                                lambda=lambda,
                                type.measure=type.measure,
                                standardize=FALSE,
@@ -192,7 +196,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                keep=TRUE,
                                weights=weights,
                                ...)     
-        } else if(useCase == "targetGroups") {
+        } else if(use.case == "targetGroups") {
             type.multinomial = "grouped"
             if("type.multinomial" %in% names(list(...))) type.multinomial = list(...)$type.multinomial
             fitall = cv.glmnet(x,y,
@@ -213,7 +217,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     if(overall.lambda == "lambda.1se") lamhat = fitall$lambda.1se
     if(is.numeric(overall.lambda)) lamhat = overall.lambda
 
-    if(useCase=="inputGroups"){
+    if(use.case=="inputGroups"){
         if(family == "multinomial"){
             preval.offset = fitall$fit.preval[, , fitall$lambda == lamhat]
             bhatall=coef(fitall, s=lamhat, exact=FALSE)
@@ -227,7 +231,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
             if(family!="cox") supall=which(bhatall[-(1:(k+1))]!=0)
             if(family=="cox") supall=which(bhatall[-(1:k)]!=0) 
         }
-    } else if(useCase=="targetGroups"){
+    } else if(use.case=="targetGroups"){
         preval.offset=vector("list",k)
         bhatall.orig=coef(fitall, s=lamhat, exact=FALSE)
         bhatall=vector("list", k)
@@ -247,7 +251,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
 
     if(verbose & fitind.is.null) cat("Fitting individual models",fill=TRUE)
     
-    if(useCase=="inputGroups"){
+    if(use.case=="inputGroups"){
         if(fitind.is.null) fitind=vector("list",k) #bhatInd
         
         for(kk in 1:k){
@@ -280,7 +284,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         }
     }
    
-    if(useCase=="targetGroups"){
+    if(use.case=="targetGroups"){
         #if(fitind.is.null) fitind=bhatInd=vector("list",k)
         #supind=matrix(NA,k,p)
         
@@ -313,7 +317,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     if(alpha == 1){
         fitpre = fitind
     } else {
-         if(useCase=="inputGroups"){
+         if(use.case=="inputGroups"){
              for(kk in 1:k){ 
                  train.ix = groups == kk
 
@@ -358,7 +362,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                                             weights=weights[train.ix],
                                                             ...)
              }
-         } else if(useCase=="targetGroups"){
+         } else if(use.case=="targetGroups"){
              for(kk in 1:k){ 
                  
                  myoffset = (1-alpha) * preval.offset[[kk]]
@@ -396,14 +400,14 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         fitind.unscaled = fitind;
 
         if(fitall.is.null){
-            if( (useCase == "inputGroups") & (family != "multinomial") ){
+            if( (use.case == "inputGroups") & (family != "multinomial") ){
                 beta <- fitall$glmnet.fit$beta; a0 <- fitall$glmnet.fit$a0;
 
                 beta[(k+1):(k+p), ] <- beta[(k+1):(k+p), ]/x.sds
                 a0 <- a0 - Matrix::colSums( beta[(k+1):(k+p), ] * x.mean )
 
                 fitall$glmnet.fit$beta <- beta; fitall$glmnet.fit$a0 <- a0
-            } else if( (useCase == "inputGroups") & (family == "multinomial") ) {
+            } else if( (use.case == "inputGroups") & (family == "multinomial") ) {
                 for(kk in 1:length(fitall$glmnet.fit$beta)){
                     beta <- fitall$glmnet.fit$beta[[kk]]; a0 <- fitall$glmnet.fit$a0[kk, ];
                     
@@ -412,7 +416,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
 
                     fitall$glmnet.fit$beta[[kk]] <- beta; fitall$glmnet.fit$a0[kk, ] <- a0
                 }
-            } else if(useCase == "targetGroups") {
+            } else if(use.case == "targetGroups") {
                 for(kk in 1:k){
                     beta <- fitall$glmnet.fit$beta[[kk]]; a0 <- fitall$glmnet.fit$a0[kk, ];
                     
@@ -425,7 +429,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         }
 
         # Now, the individual and pretrained models:
-        if( (useCase == "inputGroups") & (family == "multinomial") ){
+        if( (use.case == "inputGroups") & (family == "multinomial") ){
             for(kk in 1:k){
                 # Individual
                 if(fitind.is.null){
@@ -480,10 +484,10 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
 
     
     
-    out=enlist(useCase, alpha, k, class.sizes,
+    out=enlist(use.case, alpha, k, class.sizes,
                groups, type.measure, family,
                y.mean,
-               fitall, lamhat, supall,
+               fitall, lamhat, #supall,
                fitind, 
                fitpre, 
                group.levels,

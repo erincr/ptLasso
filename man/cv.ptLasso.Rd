@@ -11,7 +11,7 @@ cv.ptLasso(
   alphalist = seq(0, 1, length = 11),
   groups = NULL,
   family = c("gaussian", "multinomial", "binomial", "cox"),
-  useCase = c("inputGroups", "targetGroups"),
+  use.case = c("inputGroups", "targetGroups"),
   type.measure = c("default", "mse", "mae", "auc", "deviance", "class", "C"),
   nfolds = 10,
   foldid = NULL,

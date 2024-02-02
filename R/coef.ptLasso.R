@@ -1,12 +1,17 @@
 
-get.pretrain.support <- function(fit, s="lambda.min",  commonOnly = FALSE) get.pretrain.or.individual.support(fit, s=s, commonOnly=commonOnly, model="pretrain")
-get.individual.support <- function(fit, s="lambda.min", commonOnly = FALSE) get.pretrain.or.individual.support(fit, s=s, commonOnly=commonOnly, model="individual")
-
+get.pretrain.support <- function(fit, s="lambda.min",  commonOnly = FALSE) {
+    if(class(fit) == "cv.ptLasso") return(lapply(fit$fit, function(model) get.pretrain.or.individual.support(model, s=s, commonOnly=commonOnly, model="pretrain"))) 
+    get.pretrain.or.individual.support(fit, s=s, commonOnly=commonOnly, model="pretrain")
+}
+get.individual.support <- function(fit, s="lambda.min", commonOnly = FALSE) {
+    if(class(fit) == "cv.ptLasso") return(get.pretrain.or.individual.support(fit$fit[[1]], s=s, commonOnly=commonOnly, model="individual")) 
+    return(get.pretrain.or.individual.support(fit, s=s, commonOnly=commonOnly, model="individual"))
+}
 get.pretrain.or.individual.support <- function(fit, s="lambda.min", model="pretrain", commonOnly = FALSE){
     
     include.these = c()
     if(model == "pretrain"){
-        if(fit$alpha < 1) include.these = fit$supall
+        if(fit$alpha < 1) include.these = get.overall.support(fit, s=fit$lamhat)
     }
 
     model = if(model == "pretrain") {fit$fitpre} else {fit$fitind}
@@ -16,22 +21,22 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", model="pretr
     suppre=vector("list",k)
     bhatpre=vector("list",k)
     for(kk in 1:k){
-        if(fit$useCase == "inputGroups"){
-            if(fit$family == "multinomial"){
+        if(fit$call$use.case == "inputGroups"){
+            if(fit$call$family == "multinomial"){
                 bhatpre[[kk]] = coef(model[[kk]], s=s, exact=FALSE)
                 bhatpre[[kk]] = do.call(cbind, bhatpre[[kk]])[-1, ]
                 
                 suppre[[kk]] = which(apply(bhatpre[[kk]], 1, function(x) sum(x != 0) > 0))
                 suppre[[kk]] = sort(unique(c(suppre[[kk]], include.these)))
             } else {
-                if(fit$family=="cox"){
+                if(fit$call$family=="cox"){
                     bhatpre[[kk]] = as.numeric(coef(model[[kk]], s=s, exact=F))
                 } else {
                     bhatpre[[kk]] = as.numeric(coef(model[[kk]], s=s, exact=F)[-1])
                 }
                 suppre[[kk]]=sort(unique(c(which(bhatpre[[kk]]!=0), include.these)))
             }
-        } else  if(fit$useCase == "targetGroups"){
+        } else  if(fit$call$use.case == "targetGroups"){
             # This should always be a binomial (one vs. rest) model:
             bhatpre[[kk]] = as.numeric(coef(model[[kk]], s=s, exact=F)[-1])
             suppre[[kk]] = sort(unique(c(which(bhatpre[[kk]]!=0), include.these)))
@@ -47,13 +52,26 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", model="pretr
 
 get.overall.support <- function(fit, s="lambda.min"){
 
+    if(class(fit) == "cv.ptLasso") return(get.overall.support(fit$fit[[1]]))
+
     coefs = coef(fit$fitall, s=s)
+    k = length(fit$k)
     
     # multinomial
-    if(is.list(coefs)) return(unique(unlist(lapply(coefs, function(cc) which(cc[-1] != 0)))))
+    if(is.list(coefs)){
+        if(fit$call$use.case == "inputGroups"){
+            if(fit$call$family == "cox"){
+                return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-(1:k)] != 0))))))
+             } else {
+                 return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-(1:(k+1))] != 0))))))
+             }
+        } else if(fit$call$use.case == "targetGroups") {
+            return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-1] != 0))))))
+        }
+    }
     
     # other
-    return(which(coef(fit$fitall, s=s)[-1] != 0))
+    return(which(coefs[-(1:(k+1))] != 0))
 }
 
 

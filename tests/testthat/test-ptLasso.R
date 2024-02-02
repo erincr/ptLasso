@@ -309,7 +309,7 @@ test_that("input_groups_multinomial_errall_classes", {
 
 test_that("input_groups_multinomial_errpre", {
     expect_equal(unname(pred$errpre),
-                 c(0.3877778, 0.3877778, 0.3877778, 0.4066667, 0.3688889),
+                 c(0.4222222, 0.4222222, 0.4222222, 0.4066667, 0.4377778),
                  tolerance = test.tol)
 })
 
@@ -403,14 +403,14 @@ ytest=out2$y
 groupstest=ytest
 
 
-fit=ptLasso(x,y,groups=groups,alpha=0.222,family="multinomial",useCase="targetGroups", type.measure="class",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
+fit=ptLasso(x,y,groups=groups,alpha=0.222,family="multinomial",use.case="targetGroups", type.measure="class",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
 pred=predict(fit,xtest,groupstest=groupstest, ytest=ytest)
 
-fit2=ptLasso(x,y,groups=groups,alpha=0.222,family="multinomial",useCase="targetGroups", type.measure="deviance",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
+fit2=ptLasso(x,y,groups=groups,alpha=0.222,family="multinomial",use.case="targetGroups", type.measure="deviance",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
 pred2=predict.ptLasso(fit2,xtest,groupstest=groupstest, ytest=ytest)
 
-cvfit = cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="class", useCase="targetGroups", foldid=NULL, nfolds=3, overall.lambda="lambda.min")
-cvfit2 = cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="deviance", useCase="targetGroups", foldid=NULL, nfolds=3, overall.lambda="lambda.min")
+cvfit = cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="class", use.case="targetGroups", foldid=NULL, nfolds=3, overall.lambda="lambda.min")
+cvfit2 = cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="deviance", use.case="targetGroups", foldid=NULL, nfolds=3, overall.lambda="lambda.min")
 
 test_that("target_groups_misclassification_alphahat", {
     expect_equal(cvfit$alphahat,

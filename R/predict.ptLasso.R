@@ -105,7 +105,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
             supall = results[[1]]$supall,
             supind = results[[1]]$supind,
 
-            useCase = cvfit$fit[[1]]$useCase,
+            use.case = cvfit$fit[[1]]$call$use.case,
 
             type.measure = cvfit$fit[[1]]$type.measure,
 
@@ -175,8 +175,8 @@ predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL, offset = NULL,
         }
     }
     
-    if(fit$useCase=="inputGroups") out=predict.ptLasso.inputGroups(fit, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, s=s)
-    if(fit$useCase=="targetGroups") out=predict.ptLasso.targetGroups(fit, xtest, ytest=ytest, errFun=errFun, type=type, call=this.call, s=s)
+    if(fit$call$use.case=="inputGroups") out=predict.ptLasso.inputGroups(fit, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, s=s)
+    if(fit$call$use.case=="targetGroups") out=predict.ptLasso.targetGroups(fit, xtest, ytest=ytest, errFun=errFun, type=type, call=this.call, s=s)
     class(out)="predict.ptLasso"
     return(out)
 }
