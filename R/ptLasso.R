@@ -37,11 +37,41 @@
 #' \item{y.mean}{Gaussian outcome only; mean of y for the training data, used for prediction.}
 #' 
 #' @examples
+#' # Gaussian
+#' 
+#' scommon     = 10                  # Number of common important  features
+#' sindiv      = c(50,40,20,10,10)   # Number of individual important features for each group
+#' class.sizes = c(100,80,60,30,30)  # Size of each group
+#' k           = length(class.sizes) # Number of groups
+#' n           = sum(class.sizes)    # Total dataset size
+#' p           = 200                 # Number of features 
+#' beta.common = rep(2.5, k)         # common coefficients 
+#' beta.indiv  = rep(1, k)           # individual coefficients
+#' intercepts  = rep(0, k)           # group-specific intercepts
+#' sigma       = 20                  # size of noise added
+#'
+#' # Train data
+#' out=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+#'              class.sizes=class.sizes, beta.common=beta.common, beta.indiv=beta.indiv,
+#'              intercepts=intercepts, sigma=sigma, outcome="gaussian")
+#' 
+#' x=out$x; y=out$y; groups=out$groups
+#'
+#' # Test data
+#' outtest=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+#'                  class.sizes=class.sizes, beta.common=beta.common, beta.indiv=beta.indiv,
+#'                  intercepts=intercepts, sigma=sigma, outcome="gaussian")
+#' xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
+#' 
+#' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
+#' # plot(fit) to see all of the cv.glmnet models trained
+#' predict(fit, xtest, groupstest, ytest=ytest)
 #' 
 #' @import glmnet Matrix
 #' @export
-#' @seealso \code{\link{glmnet}}
+#' @seealso \code{\link{glmnet}, \link{sparsenet}}
 #' @references Friedman, J., Hastie, T., & Tibshirani, R. (2010). Regularization paths for generalized linear models via coordinate descent. Journal of Statistical Software, 33(1), 1-22.
+#' Mazumder, Rahul, Jerome H. Friedman, and Trevor Hastie. "Sparsenet: Coordinate descent with nonconvex penalties." Journal of the American Statistical Association 106.495 (2011): 1125-1138.
 #'
 #' 
 # Note: cv doesn't have to check everything that ptLasso checks
@@ -49,6 +79,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  type.measure=c("default", "mse", "mae", "auc","deviance","class", "C"),
                  use.case=c("inputGroups","targetGroups"),
                  overall.lambda = "lambda.1se",
+                 #fit.method = c("glmnet", "sparsenet"),
                  lambda=NULL, foldid=NULL,
                  nfolds=10,
                  standardize = TRUE,
@@ -81,6 +112,8 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     # Begin error checking:
     ####################################################################################
 
+    #if((fit.method == "sparsenet") & (family != "gaussian")) stop("sparsenet is only available for the Gaussian family.")
+    
     if(min(groups) != 1) stop("Groups should be coded from 1 to k.")
     if(length(unique(groups)) < 2) stop("Need to have at least two groups.")
     if(length(unique(groups)) != k) stop(paste0("Expected ", k, " groups, found ", length(unique(groups)), "."))
@@ -123,6 +156,8 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     # End error checking:
     ####################################################################################
 
+    model = cv.glmnet
+    #if(fit.method == "sparsenet") model = cv.sparsenet
         
     p = ncol(x)
 
@@ -184,7 +219,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
 
         #strangely, gets upset if you do intercept=FALSE for cox
         if( family!="cox" & use.case == "inputGroups"){
-            fitall = cv.glmnet(cbind(onehot.groups, x), y,
+            fitall = model(cbind(onehot.groups, x), y,
                                family=family,
                                foldid=foldid, 
                                intercept=TRUE,
@@ -196,7 +231,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                weights=weights,
                                ...)
         } else if(family == "cox") {
-            fitall = cv.glmnet(cbind(onehot.groups, x), y,
+            fitall = model(cbind(onehot.groups, x), y,
                                family=family,
                                foldid=foldid,  
                                lambda=lambda,
@@ -209,7 +244,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         } else if(use.case == "targetGroups") {
             type.multinomial = "grouped"
             if("type.multinomial" %in% names(list(...))) type.multinomial = list(...)$type.multinomial
-            fitall = cv.glmnet(x,y,
+            fitall = model(x,y,
                                family=family,
                                foldid=foldid,  
                                lambda=lambda,
@@ -270,7 +305,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
             # individual model predictions
             if(fitind.is.null){
                 if(family!="cox") { 
-                    fitind[[kk]]=cv.glmnet(x[train.ix,], y[train.ix],
+                    fitind[[kk]]=model(x[train.ix,], y[train.ix],
                                            family=family,
                                            standardize = FALSE,
                                            type.measure=type.measure,
@@ -281,7 +316,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                            weights=weights[train.ix],
                                            ...)
                 } else if(family=="cox") {
-                    fitind[[kk]]=cv.glmnet(x[train.ix,], y[train.ix, ],
+                    fitind[[kk]]=model(x[train.ix,], y[train.ix, ],
                                            family=family,
                                            standardize = FALSE,
                                            type.measure=type.measure,
@@ -303,7 +338,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                 yy = rep(0, nrow(x))
                 yy[y == kk]=1
                 
-                fitind[[kk]] = cv.glmnet(x,yy,
+                fitind[[kk]] = model(x,yy,
                                          family="binomial",
                                          foldid=foldid,
                                          type.measure=type.measure,
@@ -348,7 +383,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                      pf = penalty.factor * fac
                  }
 
-                 if(family!="cox") fitpre[[kk]] = cv.glmnet(x[train.ix,],
+                 if(family!="cox") fitpre[[kk]] = model(x[train.ix,],
                                                             y[train.ix],
                                                             family=family, 
                                                             offset=offset,
@@ -360,7 +395,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                                             penalty.factor=pf,
                                                             weights=weights[train.ix],
                                                             ...)
-                 if(family=="cox") fitpre[[kk]] = cv.glmnet(x[train.ix,],
+                 if(family=="cox") fitpre[[kk]] = model(x[train.ix,],
                                                             y[train.ix,],
                                                             family=family, 
                                                             offset=offset,
@@ -384,7 +419,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  yy=rep(0,nrow(x)) 
                  yy[y==kk]=1  
 
-                 fitpre[[kk]] = cv.glmnet(x,yy,
+                 fitpre[[kk]] = model(x,yy,
                                           family="binomial", 
                                           offset=myoffset,
                                           penalty.factor=pf,

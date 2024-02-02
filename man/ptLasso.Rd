@@ -80,9 +80,42 @@ Fits a pretrained lasso model using the glmnet package, for a fixed choice of th
 \details{
 Importantly, ptLasso performs cross validation to select the lasso hyperparameter lambda via cv.glmnet. To choose the pretrained hyperparameter alpha, please use cv.ptLasso.
 }
+\examples{
+# Gaussian
+
+scommon     = 10                  # Number of common important  features
+sindiv      = c(50,40,20,10,10)   # Number of individual important features for each group
+class.sizes = c(100,80,60,30,30)  # Size of each group
+k           = length(class.sizes) # Number of groups
+n           = sum(class.sizes)    # Total dataset size
+p           = 200                 # Number of features 
+beta.common = rep(2.5, k)         # common coefficients 
+beta.indiv  = rep(1, k)           # individual coefficients
+intercepts  = rep(0, k)           # group-specific intercepts
+sigma       = 20                  # size of noise added
+
+# Train data
+out=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+             class.sizes=class.sizes, beta.common=beta.common, beta.indiv=beta.indiv,
+             intercepts=intercepts, sigma=sigma, outcome="gaussian")
+
+x=out$x; y=out$y; groups=out$groups
+
+# Test data
+outtest=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+                 class.sizes=class.sizes, beta.common=beta.common, beta.indiv=beta.indiv,
+                 intercepts=intercepts, sigma=sigma, outcome="gaussian")
+xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
+
+fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
+# plot(fit) to see all of the cv.glmnet models trained
+predict(fit, xtest, groupstest, ytest=ytest)
+
+}
 \references{
 Friedman, J., Hastie, T., & Tibshirani, R. (2010). Regularization paths for generalized linear models via coordinate descent. Journal of Statistical Software, 33(1), 1-22.
+Mazumder, Rahul, Jerome H. Friedman, and Trevor Hastie. "Sparsenet: Coordinate descent with nonconvex penalties." Journal of the American Statistical Association 106.495 (2011): 1125-1138.
 }
 \seealso{
-\code{\link{glmnet}}
+\code{\link{glmnet}, \link{sparsenet}}
 }
