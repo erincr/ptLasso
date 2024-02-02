@@ -61,12 +61,12 @@ get.overall.support <- function(fit, s="lambda.min"){
     if(is.list(coefs)){
         if(fit$call$use.case == "inputGroups"){
             if(fit$call$family == "cox"){
-                return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-(1:k)] != 0))))))
+                return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-(1:k)] != 0)))))) # first k are group indicators
              } else {
-                 return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-(1:(k+1))] != 0))))))
+                 return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-(1:k)] != 0)))))) # first is intercept, next k-1 are indicators
              }
         } else if(fit$call$use.case == "targetGroups") {
-            return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-1] != 0))))))
+            return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-1] != 0)))))) # no group indicators, only an intercept
         }
     }
     
@@ -76,8 +76,6 @@ get.overall.support <- function(fit, s="lambda.min"){
 
 
 #' Get the coefficients from a fitted ptLasso model.
-#'
-#' 
 #'
 #' @aliases coef.ptLasso 
 #' @param fit fitted \code{"ptLasso"} object.
@@ -110,7 +108,6 @@ coef.ptLasso=function(fit, model = c("all", "individual", "overall", "pretrain")
 #' Get the coefficients from a fitted cv.ptLasso model.
 #'
 #' 
-#'
 #' @aliases coef.cv.ptLasso 
 #' @param fit fitted \code{"cv.ptLasso"} object.
 #' @param model string indicating which coefficients to retrieve. Must be one of "all", "individual", "overall" or "pretrain".

@@ -71,7 +71,7 @@ pred3=predict(fit3,xtest,groupstest=groupstest, ytest=ytest)
 
 test_that("input_groups_gaussian_varying_alpha", {
     expect_equal(pred.cv$alpha,
-                 c(0.2, 1.0, 0.8, 0.4, 0.8),
+                 c(1.0, 1.0, 0.8, 1.0, 0.2),
                  tolerance = test.tol)
 })
 
@@ -114,27 +114,25 @@ test_that("input_groups_gaussian_errall_classes_mae", {
 
 test_that("input_groups_gaussian_errpre", {
     expect_equal(unname(pred$errpre),
-                 c(1231.9946, 1113.9405, 1231.9946, 1478.0702, 1292.9492, 1146.4981,  759.9986, 892.1862),
+                 c(1222.1575, 1106.0599, 1222.1575, 1397.8030, 1360.9186, 1161.5376, 723.2822, 886.7580),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_errpre_mae", {
     expect_equal(unname(pred2$errpre),
-                 c(27.17871, 25.87724, 27.17871, 28.97823, 29.85613, 25.02517, 21.50050, 24.02635),
+                 c(27.13339, 25.76140, 27.13339, 29.19958, 29.80528, 24.71907, 21.05672, 24.02635),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_cvfit", {
     expect_equal(unname(cvfit$errpre[, "mean"]),
-                 c(1078.2883, 1113.6082, 1045.0445, 1048.0911, 1012.7833,  947.6540,  940.9555,
-                   911.3491,  961.1960,  944.3964,  925.0839),
+                 c(1219.8457, 1191.9438, 1076.0812, 1165.0411, 1061.4593, 1088.6896, 1017.7979, 998.3846, 1040.0013,  963.7354,  925.0839),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_cvfit_mae", {
     expect_equal(unname(cvfit2$errpre[, "mean"]),
-                 c(26.04082, 26.67820, 25.52361, 25.58128, 25.12847, 24.36098, 24.18239, 23.69399,
-                   24.15136, 24.13376, 23.67217),
+                 c(27.31231, 26.84761, 25.42703, 26.26976, 25.26297, 26.01384, 24.87154, 25.07562, 24.89512, 24.38719, 23.67217),
                  tolerance = test.tol)
 })
 
@@ -169,9 +167,6 @@ xtest=out2$x
 groupstest=out2$groups
 ytest=out2$y
 
-# Erin: check this works if indexed at 0 - just error and message
-# CV alpha: choose best performance e.g. just for one group
-# check size of glmnet objects
 fit=ptLasso(x,y,groups=groups,alpha=0.9,family="binomial",type.measure="auc",foldid=NULL, nfolds=3, overall.lambda="lambda.min")
 pred=predict(fit,xtest,groupstest=groupstest, ytest=ytest)
 
@@ -191,23 +186,21 @@ cvfit3=cv.ptLasso(x,y,groups=groups,family="binomial",type.measure="class",foldi
 
 test_that("input_groups_binomial_cvfit_varying_results", {
     expect_equal(unname(pred.cv$errpre),
-                 c(0.8152516, 0.7919240, 0.8153424, 0.8314066,
-                   0.8616323, 0.8178013, 0.7233333, 0.7254464),
+                 c(0.8039364, 0.8032907, 0.8200603, 0.8140153, 0.8714822, 0.8323103, 0.8033333, 0.6953125),
                  tolerance = test.tol
                  )
 })
 
 test_that("input_groups_binomial_cvfit_varying_results", {
     expect_equal(unname(pred.cv.fixed$errpre),
-                 c(0.7982510, 0.7677278, 0.7992814, 0.8243478,
-                   0.8616323, 0.7946429, 0.8044444, 0.5535714),
+                 c(0.8236407, 0.8091339, 0.8263174, 0.8274169, 0.8727330, 0.8323103, 0.7911111, 0.7220982),
                  tolerance = test.tol
                  )
 })
 
 test_that("input_groups_binomial_alphahat", {
     expect_equal(cvfit$alphahat,
-                 1,
+                 0.8,
                  tolerance = test.tol)
 })
 
@@ -255,15 +248,13 @@ test_that("input_groups_binomial_errall_deviance", {
 
 test_that("input_groups_binomial_errpre", {
     expect_equal(unname(pred$errpre),
-                 c(0.8115244, 0.7890837, 0.8138182, 0.8268031,
-                   0.8716385, 0.8108259, 0.8022222, 0.6339286),
+                 c(0.8164532, 0.7944248, 0.8162005, 0.8268031, 0.8724203, 0.8066406, 0.8077778, 0.6584821),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_binomial_errpre_deviance", {
     expect_equal(unname(pred2$errpre),
-                 c(1.1619427, 1.2193784, 1.1619427, 1.1523452,
-                   0.9970854, 1.1719199, 1.3465990, 1.4289426),
+                 c(1.168425, 1.227096, 1.168425, 1.161033, 1.010871, 1.154915, 1.341117, 1.467543),
                  tolerance = test.tol)
 })
 
@@ -317,7 +308,7 @@ test_that("input_groups_multinomial_errall_classes", {
 
 test_that("input_groups_multinomial_errpre", {
     expect_equal(unname(pred$errpre),
-                 c(0.4222222, 0.4222222, 0.4222222, 0.4066667, 0.4377778),
+                 c(0.3900000, 0.3900000, 0.3900000, 0.3955556, 0.3844444),
                  tolerance = test.tol)
 })
 
@@ -383,7 +374,7 @@ test_that("input_groups_cox_errind", {
 
 test_that("input_groups_cox_errall_classes", {
     expect_equal(unname(pred$errall),
-                 c(0.5032823, 0.4824847, 0.4957748, 0.5314010, 0.4237710, 0.5991041, 0.3709677, 0.4871795),
+                 c(0.5033228, 0.4824847, 0.4957748, 0.5314010, 0.4237710, 0.5991041, 0.3709677, 0.4871795),
                  tolerance = test.tol)
 })
 

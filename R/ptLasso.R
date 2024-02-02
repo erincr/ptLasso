@@ -174,7 +174,8 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         group.levels = sort(unique(groups))
         groups = factor(groups, levels=group.levels)
         onehot.groups = model.matrix(~groups - 1)
-        overall.pf = c(rep(0, k), overall.pf)
+        if(family != "cox") onehot.groups = onehot.groups[, 2:k, drop=FALSE]
+        overall.pf = c(rep(0, ncol(onehot.groups)), overall.pf)
     }
     
     fitall.is.null = is.null(fitall)
@@ -186,7 +187,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
             fitall = cv.glmnet(cbind(onehot.groups, x), y,
                                family=family,
                                foldid=foldid, 
-                               intercept=FALSE,
+                               intercept=TRUE,
                                lambda=lambda,
                                type.measure=type.measure,
                                standardize=FALSE,
@@ -407,17 +408,20 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         if(fitall.is.null){
             if( (use.case == "inputGroups") & (family != "multinomial") ){
                 beta <- fitall$glmnet.fit$beta; a0 <- fitall$glmnet.fit$a0;
-
-                beta[(k+1):(k+p), ] <- beta[(k+1):(k+p), ]/x.sds
-                a0 <- a0 - Matrix::colSums( beta[(k+1):(k+p), ] * x.mean )
+                ix <- k:(k+p-1)                  # the first k-1 are group indicators...
+                if(family == "cox") ix = ix + 1  # except for the cox model, which has k group indicators.
+                
+                beta[ix, ] <- beta[ix, ]/x.sds
+                a0 <- a0 - Matrix::colSums( beta[ix, ] * x.mean )
 
                 fitall$glmnet.fit$beta <- beta; fitall$glmnet.fit$a0 <- a0
             } else if( (use.case == "inputGroups") & (family == "multinomial") ) {
+                ix <- k:(k+p-1)
                 for(kk in 1:length(fitall$glmnet.fit$beta)){
                     beta <- fitall$glmnet.fit$beta[[kk]]; a0 <- fitall$glmnet.fit$a0[kk, ];
                     
-                    beta[(k+1):(k+p), ] <- beta[(k+1):(k+p), ]/x.sds
-                    a0 <- a0 - Matrix::colSums(beta[(k+1):(k+p), ] * x.mean)
+                    beta[ix, ] <- beta[ix, ]/x.sds
+                    a0 <- a0 - Matrix::colSums(beta[ix, ] * x.mean)
 
                     fitall$glmnet.fit$beta[[kk]] <- beta; fitall$glmnet.fit$a0[kk, ] <- a0
                 }

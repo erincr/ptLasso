@@ -165,7 +165,7 @@ predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL,
     type = match.arg(type)
     family = fit$call$family
     type.measure = fit$call$type.measure
-
+    
     if(type == "class" & !(family %in% c("binomial", "multinomial")) ){
         stop("Class prediction is only valid for binomial and multinomial models.")
     }
@@ -200,16 +200,18 @@ predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL,
 predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, type.measure, type, call, return.link=FALSE, ytest=NULL, s="lambda.min"){
 
     if(is.null(groupstest)) stop("Need group IDs for test data.")
+        
+    k=fit$k
     
     predgroups = sort(unique(groupstest))
     
     groupstest = factor(groupstest, levels=fit$group.levels)
     onehot.test = model.matrix(~groupstest - 1)
+    if(family != "cox") onehot.test = onehot.test[, 2:k, drop=FALSE]
     
     ytest.mean= 0
     if(family=="gaussian") ytest.mean = fit$y.mean
-    
-    k=fit$k
+
     
     phatall = predict(fit$fitall, cbind(onehot.test, xtest), type="link", s=s) 
     if(family=="gaussian")  phatall = phatall+ytest.mean
