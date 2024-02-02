@@ -30,8 +30,8 @@ yaxis.name = function(x){
 #'
 #'
 plot.cv.ptLasso = function(x, plot.alphahat = TRUE, ...){
-    if(x$useCase == "inputGroups")  ggplot.ptLasso.inputGroups(x,  plot.alphahat = plot.alphahat, y.label = yaxis.name(x$type.measure), ...)
-    if(x$useCase == "targetGroups") ggplot.ptLasso.targetGroups(x, plot.alphahat = plot.alphahat, y.label = yaxis.name(x$type.measure), ...)
+    if(x$call$use.case == "inputGroups")  ggplot.ptLasso.inputGroups(x,  plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
+    if(x$call$use.case == "targetGroups") ggplot.ptLasso.targetGroups(x, plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
 }
 
 

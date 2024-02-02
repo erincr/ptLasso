@@ -5,27 +5,37 @@
 #' Importantly, ptLasso performs cross validation to select the lasso hyperparameter lambda via cv.glmnet. To choose the pretrained hyperparameter alpha, please use cv.ptLasso.
 #'
 #' @param x input matrix, of dimension nobs x nvars; each row is an observation vector. Can be in sparse matrix format (inherit from class '"sparseMatrix"' as in package 'Matrix'). Requirement: 'nvars >1'; in other words, 'x' should have 2 or more columns.
-#' @param y response variable. Quantitative for 'family="gaussian"', or 'family="poisson"' (non-negative counts). For 'family="binomial"' should be either a factor with two levels, or a two-column matrix of counts or proportions (the second column is treated as the target class; for a factor, the last level in alphabetical order is the target class). For 'family="multinomial"', can be a 'nc>=2' level factor, or a matrix with 'nc' columns of counts or proportions. For either '"binomial"' or '"multinomial"', if 'y' is presented as a vector, it will be coerced into a factor. For 'family="cox"', preferably a 'Surv' object from the survival package: see Detail section for more information. For 'family="mgaussian"', 'y' is a matrix of quantitative responses.
+#' @param y response variable. Quantitative for 'family="gaussian"'. For 'family="binomial"' should be either a factor with two levels, or a two-column matrix of counts or proportions (the second column is treated as the target class; for a factor, the last level in alphabetical order is the target class). For 'family="multinomial"', can be a 'nc>=2' level factor, or a matrix with 'nc' columns of counts or proportions. For either '"binomial"' or '"multinomial"', if 'y' is presented as a vector, it will be coerced into a factor. For 'family="cox"', preferably a 'Surv' object from the survival package: see Detail section for more information. For 'family="mgaussian"', 'y' is a matrix of quantitative responses.
 #' @param groups A vector of length nobs indicating to which group each observation belongs. For data with k groups, groups should be coded as integers 1 through k. 
 #' @param alpha The pretrained lasso hyperparameter, with \eqn{0\le\alpha\le 1}.
 #' @param family Either a character string representing one of the built-in families, or else a 'glm()' family object. For more information, see Details section below or the documentation for response type (above).
 #' @param type.measure: loss to use for cross-validation within each individual, overall, or pretrained lasso model. Currently five options, not all available for all models. The default is 'type.measure="deviance"', which uses squared-error for gaussian models (a.k.a 'type.measure="mse"' there), deviance for logistic and poisson regression, and partial-likelihood for the Cox model. 'type.measure="class"' applies to binomial and multinomial logistic regression only, and gives misclassification error. 'type.measure="auc"' is for two-class logistic regression only, and gives area under the ROC curve. 'type.measure="mse"' or 'type.measure="mae"' (mean absolute error) can be used by all models except the '"cox"'; they measure the deviation from the fitted mean to the response. 'type.measure="C"' is Harrel's concordance measure, only available for 'cox' models.
-#' @param useCase The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".
-#' @param overall.lambda The choice of lambda for the overall model. Will define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value.
-#' @param fitall An optional glmnet object specifying the overall model.
-#' @param fitind An optional list of glmnet objects specifying the individual models.
+#' @param use.case The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".
+#' @param overall.lambda The choice of lambda to be used by the overall model when defining the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value.
+#' @param fitall An optional cv.glmnet object specifying the overall model.
+#' @param fitind An optional list of cv.glmnet objects specifying the individual models.
 #' @param lambda Optional user-supplied lambda sequence; default is 'NULL', and 'glmnet' chooses its own sequence. Note that this is done for the full model (master sequence), and separately for each fold. The fits are then alligned using the master sequence (see the 'alignment' argument for additional details). Adapting 'lambda' for each fold leads to better convergence. When 'lambda' is supplied, the same sequence is used everywhere, but in some GLMs can lead to convergence issues.
 #' @param nfolds Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.
 #' @param foldid An optional vector of values between 1 and \code{nfold} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.
 #' @param standardize Should the predictors be standardized before fitting (default is TRUE).
 #' @param verbose If \code{verbose=1}, print a statement showing which model is currently being fit with \code{cv.glmnet}.
-#' @param trace.it If \code{trace.it=1}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit.
 #' @param weights observation weights. Can be total counts if responses are proportion matrices. Default is 1 for each observation.
-#' @param parallel If \code{TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others.
-#' @param ... Additional arguments to be passed to the cv.glmnet function. Note that \code{ptLasso} does not support the arguments \code{intercept}, \code{offset}, \code{fit} and \code{check.args}.
+#' @param penalty.factor Separate penalty factors can be applied to each coefficient. This is a number that multiplies 'lambda' to allow differential shrinkage. Can be 0 for some variables,  which implies no shrinkage, and that variable is always included in the model. Default is 1 for all variables (and implicitly infinity for variables listed in 'exclude'). For more information, see \code{?glmnet}. For pretraining, the user-supplied penalty.factor will be multiplied by the penalty.factor computed by the overall model.
+#' @param ... Additional arguments to be passed to the cv.glmnet function. Some notable choices are \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.
 #'
-#' @return A ...
+#' 
 #'
+#' @return An object of class \code{"ptLasso"}, which is a list with the ingredients of the cross-validation fit.
+#' \item{call}{The call that produced this object.}
+#' \item{k}{The number of groups.}
+#' \item{alpha}{The value of alpha used for pretraining.}
+#' \item{group.levels}{IDs for all of the groups used in training.}
+#' \item{fitall}{A fitted \code{cv.glmnet} object trained using the full data.}
+#' \item{fitpre}{A list of fitted (pretrained) \code{cv.glmnet} objects, one trained with each data group.}
+#' \item{fitind}{A list of fitted \code{cv.glmnet} objects, one trained with each group.}
+#' \item{fitall.lambda}{Lambda used with fitall, to compute the offset for pretraining. Used for prediction.}
+#' \item{y.mean}{Gaussian outcome only; mean of y for the training data, used for prediction.}
+#' 
 #' @examples
 #' 
 #' @import glmnet Matrix
@@ -39,19 +49,20 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  type.measure=c("default", "mse", "mae", "auc","deviance","class", "C"),
                  use.case=c("inputGroups","targetGroups"),
                  overall.lambda = "lambda.1se",
-                 fitall=NULL, fitind=NULL,
                  lambda=NULL, foldid=NULL,
                  nfolds=10,
                  standardize = TRUE,
                  verbose=FALSE,
                  weights=NULL,
                  penalty.factor = rep(1, nvars),
+                 fitall=NULL, fitind=NULL,
                  ...
                  ) {
     this.call = match.call()
 
     family = match.arg(family)
     type.measure = match.arg(type.measure)
+    if(type.measure == "default") type.measure = if(family == "gaussian") { "mse" } else { "deviance" }
     use.case = match.arg(use.case, c("inputGroups","targetGroups"), several.ok=FALSE)
 
     if(!(family %in% names(this.call))) this.call$family = family
@@ -85,10 +96,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         stop("Only the multinomial and binomial families are available for target grouped data.")
     }
 
-   # Check type.measure
-    if(type.measure == "default") {
-        type.measure = if(family == "gaussian") { "mse" } else { "deviance" }
-    }
+   
     
     if(!(type.measure %in% c("class", "deviance")) & family == "multinomial"){
         type.measure = "class"
@@ -395,10 +403,6 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     # Return coefficients to original scale.
     # Start with the overall model.
     if(standardize){
-        fitall.unscaled = fitall;
-        fitpre.unscaled = fitpre;
-        fitind.unscaled = fitind;
-
         if(fitall.is.null){
             if( (use.case == "inputGroups") & (family != "multinomial") ){
                 beta <- fitall$glmnet.fit$beta; a0 <- fitall$glmnet.fit$a0;
@@ -484,15 +488,16 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
 
     
     
-    out=enlist(use.case, alpha, k, class.sizes,
-               groups, type.measure, family,
-               y.mean,
-               fitall, lamhat, #supall,
-               fitind, 
-               fitpre, 
-               group.levels,
-               call=this.call
-               )
+    out=enlist(
+               # Info about the initial call:
+               call=this.call,
+               k, alpha, group.levels,
+               
+               # Fitted models
+               fitall, lamhat, 
+               fitind, fitpre
+    )
+    if(family == "gaussian") out$y.mean = y.mean
     class(out)="ptLasso"
     return(out)
 

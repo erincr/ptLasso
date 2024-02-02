@@ -110,6 +110,7 @@ cv.ptLasso <- function(x, y, w = rep(1,length(y)), alphalist=seq(0,1,length=11),
     fitpre = list()
     
     class.sizes=table(groups)
+    
     errcvm=NULL
     ii=0
     for(alpha in alphalist){
@@ -161,8 +162,8 @@ cv.ptLasso <- function(x, y, w = rep(1,length(y)), alphalist=seq(0,1,length=11),
 
     res=cbind(alphalist, errcvm)
     
-    if(fit[[1]]$use.case=="inputGroups") colnames(res)=c("alpha","overall","mean", "wtdMean", paste("group", as.character(1:length(class.sizes)),sep=""))
-    if(fit[[1]]$use.case=="targetGroups") colnames(res)=c("alpha","overall","mean", paste("group", as.character(1:length(class.sizes)),sep=""))
+    if(fit[[1]]$call$use.case=="inputGroups") colnames(res)=c("alpha","overall","mean", "wtdMean", paste("group", as.character(1:length(class.sizes)),sep=""))
+    if(fit[[1]]$call$use.case=="targetGroups") colnames(res)=c("alpha","overall","mean", paste("group", as.character(1:length(class.sizes)),sep=""))
     
     alphahat=alphalist[which.f(res[, "overall"])]
     varying.alphahat = sapply(1:k, function(kk) alphalist[which.f(res[, paste0("group", kk)])])

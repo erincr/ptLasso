@@ -72,7 +72,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
             pre.link[groupstest == kk] = results[[kk]]$linkpre
             ind.link[groupstest == kk] = results[[kk]]$linkind
         }
-
+        
         if(!is.null(ytest)){
             group.weights = table(groupstest)/length(groupstest)
             errall = sapply(results, function(r) r$errall[grepl("group", names(r$errall))])
@@ -151,20 +151,22 @@ predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL, offset = NULL,
     this.call <- match.call()
     
     type = match.arg(type)
+    family = fit$call$family
+    type.measure = fit$call$type.measure
 
-    if(type == "class" & !(fit$family %in% c("binomial", "multinomial")) ){
+    if(type == "class" & !(family %in% c("binomial", "multinomial")) ){
         stop("Class prediction is only valid for binomial and multinomial models.")
     }
 
     errFun = function(y, predmat){
             predmat.expanded = predmat
-            dims = if(fit$family == "multinomial") { dim(predmat) } else { length(predmat) }
+            dims = if(family == "multinomial") { dim(predmat) } else { length(predmat) }
             dim(predmat.expanded) <- c(dims, 1)
-            as.numeric(assess.glmnet(predmat.expanded, newy=y, family=fit$family)[fit$type.measure])
+            as.numeric(assess.glmnet(predmat.expanded, newy=y, family=family)[type.measure])
          }
 
     if(!is.null(ytest)){
-        if(fit$family == "cox") {
+        if(family == "cox") {
             if(!is.matrix(ytest) | (is.matrix(ytest) & ncol(ytest) != 2)) stop("For survival models, ytest must be a matrix with columns 'time' (>0) and 'status', or a Surv object.")
             if(!("Surv" %in% class(ytest))) {
                 if(is.null(colnames(ytest))) {
@@ -175,15 +177,15 @@ predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL, offset = NULL,
         }
     }
     
-    if(fit$call$use.case=="inputGroups") out=predict.ptLasso.inputGroups(fit, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, s=s)
-    if(fit$call$use.case=="targetGroups") out=predict.ptLasso.targetGroups(fit, xtest, ytest=ytest, errFun=errFun, type=type, call=this.call, s=s)
+    if(fit$call$use.case=="inputGroups") out=predict.ptLasso.inputGroups(fit, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s)
+    if(fit$call$use.case=="targetGroups") out=predict.ptLasso.targetGroups(fit, xtest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s)
     class(out)="predict.ptLasso"
     return(out)
 }
 
 #' Predict function for input grouped data
 #' @noRd
-predict.ptLasso.inputGroups=function(fit, xtest, groupstest, ytest=NULL, errFun=NULL, type=NULL, call=NULL, s="lambda.min"){
+predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, type.measure, type, call, ytest=NULL, s="lambda.min"){
 
     if(is.null(groupstest)) stop("Need group IDs for test data.")
     
@@ -193,30 +195,28 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, ytest=NULL, errFun=
     onehot.test = model.matrix(~groupstest - 1)
     
     ytest.mean= 0
-    if(fit$family=="gaussian") ytest.mean = fit$y.mean
+    if(family=="gaussian") ytest.mean = fit$y.mean
     
     k=fit$k
     
-    class.sizes=table(fit$groups)
-    class.sizes.test=table(groupstest)
-
     phatall = predict(fit$fitall, cbind(onehot.test, xtest), type="link", s=s) 
-    if(fit$family=="gaussian")  phatall = phatall+ytest.mean
+    if(family=="gaussian")  phatall = phatall+ytest.mean
 
     yhatall = predict(fit$fitall, cbind(onehot.test, xtest), type=type, s=s) 
-    if(fit$family=="gaussian")  yhatall = yhatall+ytest.mean
+    if(family=="gaussian")  yhatall = yhatall+ytest.mean
 
     
     if(!is.null(ytest)){
-        if(fit$family == "multinomial") {
-            if(fit$type.measure == "class"){
+        if(family == "multinomial") {
+            if(type.measure == "class"){
                 errall=errFun(ytest, phatall[, , 1])
                 errall.classes=sapply(predgroups, function(kk) errFun(ytest[groupstest == kk], phatall[groupstest == kk, , 1]))  
             } 
-        } else if( fit$family=="cox") {
+        } else if(family=="cox") {
             errall=errFun(ytest, as.numeric(phatall))
             errall.classes=sapply(predgroups, function(kk) errFun(ytest[groupstest == kk,], phatall[groupstest == kk]))
         } else {
+            #browser()
             errall=errFun(ytest, as.numeric(phatall))
             errall.classes=sapply(predgroups, function(kk) errFun(ytest[groupstest == kk], phatall[groupstest == kk]))
         }
@@ -225,8 +225,8 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, ytest=NULL, errFun=
     
     errpre=errind=rep(NA,k)
     
-    if(fit$family == "multinomial") ncolumns = length(fit$fitall$glmnet.fit$beta)
-    if((fit$family == "binomial") | (fit$family == "gaussian") | (fit$family == "cox")) ncolumns = 1
+    if(family == "multinomial") ncolumns = length(fit$fitall$glmnet.fit$beta)
+    if((family == "binomial") | (family == "gaussian") | (family == "cox")) ncolumns = 1
     phatpre=yhatpre=matrix(NA,nrow(xtest), ncolumns)
     phatind=yhatind=matrix(NA,nrow(xtest), ncolumns)
 
@@ -242,19 +242,19 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, ytest=NULL, errFun=
         test.ix  = groupstest == kk
 
         phatind[test.ix, ] = predict(fit$fitind[[kk]], xtest[test.ix,], type="link", s=s) 
-        if(fit$family=="gaussian")  phatind[test.ix, ] = phatind[test.ix, ] + ytest.mean
+        if(family=="gaussian")  phatind[test.ix, ] = phatind[test.ix, ] + ytest.mean
 
         if(type == "class"){
             yhatind[test.ix] = predict(fit$fitind[[kk]], xtest[test.ix,], type=type, s=s)
         } else {
             yhatind[test.ix, ] = predict(fit$fitind[[kk]], xtest[test.ix,], type=type, s=s) 
-            if(fit$family=="gaussian")  yhatind[test.ix, ] = yhatind[test.ix, ] + ytest.mean
+            if(family=="gaussian")  yhatind[test.ix, ] = yhatind[test.ix, ] + ytest.mean
         }
 
         if(!is.null(ytest)){
-            if( fit$family == "multinomial" ){
+            if( family == "multinomial" ){
                 errind[kk]=errFun(ytest[test.ix], phatind[test.ix, ])
-            } else if(fit$family == "cox")   {
+            } else if(family == "cox")   {
                 errind[kk]=errFun(ytest[test.ix,], phatind[test.ix, ,drop=FALSE] ) 
             } else {
                 errind[kk]=errFun(ytest[test.ix], phatind[test.ix]) 
@@ -271,7 +271,7 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, ytest=NULL, errFun=
         
         # Pretraining predictions
         offsetTest = (1-fit$alpha) * predict(fit$fitall, cbind(onehot.test[test.ix, ], xtest[test.ix,]), s=fit$lamhat, type="link") 
-        if(fit$family == "multinomial") offsetTest = offsetTest[, , 1]                             
+        if(family == "multinomial") offsetTest = offsetTest[, , 1]                             
         phatpre[test.ix, ] = predict(fit$fitpre[[kk]], xtest[test.ix,], newoffset=offsetTest,type="link", s=s) 
 
         # Individual model predictions
@@ -283,7 +283,7 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, ytest=NULL, errFun=
         } else {
             yhatpre[test.ix, ] = predict(fit$fitpre[[kk]], xtest[test.ix,], newoffset=offsetTest, type=type, s=s)
             yhatind[test.ix, ] = predict(fit$fitind[[kk]], xtest[test.ix,], type=type, s=s) 
-            if(fit$family=="gaussian") {
+            if(family=="gaussian") {
                 phatpre[test.ix, ] = phatpre[test.ix, ] + ytest.mean
                 phatind[test.ix, ] = phatind[test.ix, ] + ytest.mean
 
@@ -293,10 +293,10 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, ytest=NULL, errFun=
         }
 
         if(!is.null(ytest)){
-            if( fit$family == "multinomial" ){
+            if( family == "multinomial" ){
                 errpre[kk]=errFun(ytest[test.ix], phatpre[test.ix, ])
                 errind[kk]=errFun(ytest[test.ix], phatind[test.ix, ])
-            } else if(fit$family == "cox")   {
+            } else if(family == "cox")   {
                 errpre[kk] = errFun(ytest[test.ix,], phatpre[test.ix, ])
                 errind[kk]=errFun(ytest[test.ix,], phatind[test.ix, ,drop=FALSE] ) 
             } else {
@@ -331,7 +331,7 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, ytest=NULL, errFun=
                  supind  = get.individual.support(fit, s=s),
                  supall  = get.overall.support(fit, s=s),
                  alpha = fit$alpha,
-                 type.measure = fit$type.measure,
+                 type.measure = type.measure,
                  call)
     
     if(!is.null(ytest)) {
@@ -351,11 +351,10 @@ binomial.measure = function(newy, one.phat.column, measure = "deviance"){
 
 #' Predict function for target grouped data
 #' @noRd
-predict.ptLasso.targetGroups=function(fit, xtest, s="lambda.min", ytest=NULL, errFun=NULL, type=NULL, call=NULL){
+predict.ptLasso.targetGroups=function(fit, xtest,  errFun, family, type.measure, type, call, ytest=NULL, s="lambda.min"){
    
     k=fit$k
     groups=fit$y
-    measure = fit$type.measure
 
     phatind=phatpre=matrix(NA, nrow=nrow(xtest), ncol=k)
     yhatind=yhatpre=matrix(NA, nrow=nrow(xtest), ncol=k)
@@ -382,8 +381,8 @@ predict.ptLasso.targetGroups=function(fit, xtest, s="lambda.min", ytest=NULL, er
             yytest = rep(0, length(ytest))
             yytest[ytest==kk]=1
          
-            errind[kk] = binomial.measure(newy = yytest, one.phat.column = phatind[, kk], measure=measure)
-            errpre[kk] = binomial.measure(newy = yytest, one.phat.column = phatpre[, kk], measure=measure)
+            errind[kk] = binomial.measure(newy = yytest, one.phat.column = phatind[, kk], measure=type.measure)
+            errpre[kk] = binomial.measure(newy = yytest, one.phat.column = phatpre[, kk], measure=type.measure)
         }
     }
     
@@ -408,7 +407,7 @@ predict.ptLasso.targetGroups=function(fit, xtest, s="lambda.min", ytest=NULL, er
                      supind = get.individual.support(fit, s=s),
                      supall = get.overall.support(fit, s=s),
                      alpha = fit$alpha,
-                     type.measure = measure,
+                     type.measure = type.measure,
                      call)
     } else {
         out = enlist(yhatall, yhatind, yhatpre,
@@ -416,7 +415,7 @@ predict.ptLasso.targetGroups=function(fit, xtest, s="lambda.min", ytest=NULL, er
                      supind = get.individual.support(fit, s=s),
                      supall = get.overall.support(fit, s=s),
                      alpha = fit$alpha,
-                     type.measure = measure,
+                     type.measure = type.measure,
                      call)
     }
     class(out) = "predict.ptLasso"
