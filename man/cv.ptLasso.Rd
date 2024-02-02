@@ -19,11 +19,9 @@ cv.ptLasso(
   verbose = FALSE,
   fitall = NULL,
   fitind = NULL,
-  trace.it = FALSE,
   weights = NULL,
   overall.lambda = "lambda.1se",
   s = "lambda.min",
-  parallel = FALSE,
   ...
 )
 }
@@ -32,32 +30,37 @@ cv.ptLasso(
 
 \item{y}{\code{y} matrix as in \code{ptLasso}.}
 
-\item{groups}{\code{groups} vector as in \code{ptLasso}}
+\item{alphalist}{A vector of values of the pretraining hyperparameter alpha. Defaults to \code{seq(0, 1, length.out=11)}.}
+
+\item{groups}{A vector of length nobs indicating to which group each observation belongs. For data with k groups, groups should be coded as integers 1 through k.}
 
 \item{family}{Response type as in \code{ptLasso}.}
 
+\item{use.case}{The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".}
+
 \item{type.measure}{Measure computed in \code{cv.glmnet}, as in \code{ptLasso}.}
+
+\item{nfolds}{Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.}
+
+\item{foldid}{An optional vector of values between 1 and \code{nfold} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.}
 
 \item{verbose}{If \code{verbose=1}, print a statement showing which model is currently being fit.}
 
-\item{...}{Other arguments that can be passed to \code{ptLasso}.}
+\item{overall.lambda}{The choice of lambda to be used by the overall model when defining the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value.}
 
-\item{alpha}{A vector of values of the pretraining hyperparameter alpha. Defaults to \code{seq(0, 1, length.out=11)}.}
+\item{s}{The choice of lambda to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "lambda.min". May be "lambda.1se", or a numeric value. (Use caution when supplying a numeric value: the same lambda will be used for all models.)}
+
+\item{...}{Additional arguments to be passed to the cv.glmnet function. Some notable choices are \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.}
 }
 \value{
 An object of class \code{"cv.ptLasso"}, which is a list with the ingredients of the cross-validation fit.
-\item{fitall}{A fitted \code{cv.glmnet} object trained using the full data.}
-\item{fitpre}{A list of fitted (pretrained) \code{cv.glmnet} objects, one trained with each group.}
-\item{fitind}{A list of fitted \code{cv.glmnet} objects, one trained with each group.}
+\item{call}{The call that produced this object.}
 \item{alphahat}{Value of \code{alpha} that optimizes CV performance on all data.}
 \item{varying.alphahat}{Vector of values of \code{alpha}, the kth of which optimizes performance for group k.}
 \item{alphalist}{Vector of all alphas that were compared.}
 \item{errall}{CV performance for the overall model.}
 \item{errpre}{CV performance for the pretrained models (one for each \code{alpha} tried).}
 \item{errind}{CV performance for the individual model.}
-\item{useCase}{Whether the objective is "inputGroups" or "targetGroups".}
-\item{type.measure}{Measure computed in \code{cv.glmnet}.}
-\item{family}{Response type.}
 \item{fit}{List of \code{ptLasso} objects, one for each \code{alpha} tried.}
 }
 \description{

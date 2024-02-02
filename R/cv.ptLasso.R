@@ -18,23 +18,26 @@ subset.y <- function(y, ix, family) {
 #'
 #' @param x \code{x} matrix as in \code{ptLasso}.
 #' @param y \code{y} matrix as in \code{ptLasso}.
-#' @param groups \code{groups} vector as in \code{ptLasso}
-#' @param alpha A vector of values of the pretraining hyperparameter alpha. Defaults to \code{seq(0, 1, length.out=11)}.
+#' @param groups A vector of length nobs indicating to which group each observation belongs. For data with k groups, groups should be coded as integers 1 through k. 
+#' @param alphalist A vector of values of the pretraining hyperparameter alpha. Defaults to \code{seq(0, 1, length.out=11)}.
 #' @param family Response type as in \code{ptLasso}.
 #' @param type.measure Measure computed in \code{cv.glmnet}, as in \code{ptLasso}.
+#' @param nfolds Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.
+#' @param foldid An optional vector of values between 1 and \code{nfold} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.
+#' @param overall.lambda The choice of lambda to be used by the overall model when defining the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value.
+#' @param s The choice of lambda to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "lambda.min". May be "lambda.1se", or a numeric value. (Use caution when supplying a numeric value: the same lambda will be used for all models.)
+#' @param use.case The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".
 #' @param verbose If \code{verbose=1}, print a statement showing which model is currently being fit.
-#' @param ... Other arguments that can be passed to \code{ptLasso}.
-#'
+#' @param ... Additional arguments to be passed to the cv.glmnet function. Some notable choices are \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.
+#' 
 #' @return An object of class \code{"cv.ptLasso"}, which is a list with the ingredients of the cross-validation fit.
+#' \item{call}{The call that produced this object.}
 #' \item{alphahat}{Value of \code{alpha} that optimizes CV performance on all data.}
 #' \item{varying.alphahat}{Vector of values of \code{alpha}, the kth of which optimizes performance for group k.}
 #' \item{alphalist}{Vector of all alphas that were compared.}
 #' \item{errall}{CV performance for the overall model.}
 #' \item{errpre}{CV performance for the pretrained models (one for each \code{alpha} tried).}
 #' \item{errind}{CV performance for the individual model.}
-#' \item{useCase}{Whether the objective is "inputGroups" or "targetGroups".}
-#' \item{type.measure}{Measure computed in \code{cv.glmnet}.}
-#' \item{family}{Response type.}
 #' \item{fit}{List of \code{ptLasso} objects, one for each \code{alpha} tried.}
 #'
 #' @seealso \code{\link{ptLasso}} and \code{\link{plot.cv.ptLasso}}.
@@ -46,10 +49,9 @@ cv.ptLasso <- function(x, y, w = rep(1,length(y)), alphalist=seq(0,1,length=11),
                        groups = NULL, family = c("gaussian", "multinomial", "binomial","cox"),  use.case=c("inputGroups","targetGroups"),
                        type.measure=c("default", "mse", "mae", "auc","deviance","class", "C"),
                        nfolds = 10, foldid = NULL, keep = FALSE, verbose=FALSE, fitall=NULL, fitind=NULL,
-                       trace.it = FALSE, weights = NULL,
+                       weights = NULL,
                        overall.lambda = "lambda.1se",
                        s = "lambda.min",
-                       parallel = FALSE,
                        ...) { 
      
     use.case = match.arg(use.case, c("inputGroups","targetGroups"), several.ok=FALSE)
@@ -118,9 +120,8 @@ cv.ptLasso <- function(x, y, w = rep(1,length(y)), alphalist=seq(0,1,length=11),
         }
 
         fit[[ii]]<- ptLasso(x,y,groups,alpha=alpha,family=family,type.measure=type.measure, use.case=use.case, foldid=NULL, nfolds=nfolds,
-                            fitall = fitall, fitind = fitind, verbose = verbose, trace.it = trace.it, weights = weights,
-                            overall.lambda =  overall.lambda,
-                            parallel = parallel, ...)
+                            fitall = fitall, fitind = fitind, verbose = verbose, weights = weights,
+                            overall.lambda =  overall.lambda, ...)
 
         if(is.null(fitall)) fitall = fit[[ii]]$fitall
         if(is.null(fitind)) fitind = fit[[ii]]$fitind

@@ -1,10 +1,10 @@
 
 get.pretrain.support <- function(fit, s="lambda.min",  commonOnly = FALSE) {
-    if(class(fit) == "cv.ptLasso") return(lapply(fit$fit, function(model) get.pretrain.or.individual.support(model, s=s, commonOnly=commonOnly, model="pretrain"))) 
+    if(inherits(fit, "cv.ptLasso")) return(lapply(fit$fit, function(model) get.pretrain.or.individual.support(model, s=s, commonOnly=commonOnly, model="pretrain"))) 
     get.pretrain.or.individual.support(fit, s=s, commonOnly=commonOnly, model="pretrain")
 }
 get.individual.support <- function(fit, s="lambda.min", commonOnly = FALSE) {
-    if(class(fit) == "cv.ptLasso") return(get.pretrain.or.individual.support(fit$fit[[1]], s=s, commonOnly=commonOnly, model="individual")) 
+    if(inherits(fit, "cv.ptLasso")) return(get.pretrain.or.individual.support(fit$fit[[1]], s=s, commonOnly=commonOnly, model="individual")) 
     return(get.pretrain.or.individual.support(fit, s=s, commonOnly=commonOnly, model="individual"))
 }
 get.pretrain.or.individual.support <- function(fit, s="lambda.min", model="pretrain", commonOnly = FALSE){
@@ -52,7 +52,7 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", model="pretr
 
 get.overall.support <- function(fit, s="lambda.min"){
 
-    if(class(fit) == "cv.ptLasso") return(get.overall.support(fit$fit[[1]]))
+    if(inherits(fit, "cv.ptLasso")) return(get.overall.support(fit$fit[[1]]))
 
     coefs = coef(fit$fitall, s=s)
     k = length(fit$k)

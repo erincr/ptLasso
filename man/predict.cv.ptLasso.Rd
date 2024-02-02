@@ -22,6 +22,8 @@
 
 \item{groupstest}{A vector indicating to which group each observation belongs. Coding should match that used for model training. Will be NULL for target grouped data.}
 
+\item{ytest}{Response variable. Optional. If included, \code{"predict"} will compute performance measures for xtest using code{"type.measure"} from the cvfit object.}
+
 \item{alpha}{The chosen alpha to use for prediction. If NULL, this will rely on the choice of "alphatype".}
 
 \item{alphatype}{Choice of '"fixed"' or '"varying"'. If '"fixed"', use the alpha that achieved best cross-validated performance. If '"varying"', each group uses the alpha that optimized the group-specific cross-validated performance.}
