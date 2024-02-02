@@ -31,15 +31,12 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
     
     alphatype = match.arg(alphatype)
     if(is.null(alpha)) {
-        if(alphatype == "fixed"){
-            alpha = cvfit$alphahat
-        } else if(alphatype == "varying") {
-            alpha = cvfit$varying.alphahat
-       }
+        if(alphatype == "fixed")   alpha = cvfit$alphahat
+        if(alphatype == "varying") alpha = cvfit$varying.alphahat
     }
     
-    if(length(alpha) == 1){
-        close.enough = 1e-6
+    close.enough = 1e-6
+    if(length(alpha) == 1){      
         if(all(abs(alpha - cvfit$errpre[, "alpha"]) > close.enough)) stop("Not a valid choice of alpha. Please choose alpha from cvfit$alphalist.")
         
         model.ix = which(abs(cvfit$errpre[, "alpha"] - alpha) < close.enough)    
@@ -49,10 +46,10 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 
         return(predict.ptLasso(fit, xtest, groupstest=groupstest, ytest=ytest, type = type, s = s))
     } else {
-        if(!all(sapply(alpha, function(x) x %in% cvfit$errpre[, "alpha"]))) stop("Includes at least one invalid choice of alpha. Please choose alpha from cvfit$alphalist.")
+        if(!all(sapply(alpha, function(x) any(abs(x - cvfit$errpre[, "alpha"]) < close.enough)))) stop("Includes at least one invalid choice of alpha. Please choose alpha from cvfit$alphalist.")
         if(length(alpha) != cvfit$fit[[1]]$k) stop("Must have one alpha for each group.")
-        
-        model.ix = sapply(alpha, function(a) which(a == cvfit$errpre[, "alpha"]))
+
+        model.ix = sapply(alpha, function(a) which(abs(a - cvfit$errpre[, "alpha"]) < close.enough))
         model.ix = unname(model.ix)
 
         predgroups = sort(unique(groupstest))
@@ -102,8 +99,8 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
       
         out = enlist(            
             yhatall = all.preds,
-            yhatind = pre.preds,
-            yhatpre = ind.preds,
+            yhatind = ind.preds, 
+            yhatpre = pre.preds,
 
             suppre = sort(unique(unlist(lapply(results, function(x) x$suppre)))), #lapply(results, function(x) x$suppre),
             supall = results[[1]]$supall,

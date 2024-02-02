@@ -176,6 +176,10 @@ pred.cv.fixed=predict(cvfit,xtest,groupstest=groupstest, ytest=ytest, alphatype=
 
 pred.test=predict(cvfit,xtest,groupstest=groupstest, ytest=ytest,alpha=.6)
 
+method.0=predict(cvfit$fit[[4]], xtest[groupstest == 2, ], groupstest=groupstest[groupstest == 2])$yhatpre
+method.1=predict(cvfit, xtest[groupstest == 2,], groupstest=groupstest[groupstest == 2], alpha = cvfit$varying.alphahat[2])$yhatpre
+method.2=predict(cvfit, xtest[groupstest == 2,], groupstest=groupstest[groupstest == 2], alphatype='varying')$yhatpre
+
 fit2=ptLasso(x,y,groups=groups,alpha=0.9,family="binomial",type.measure="deviance",foldid=NULL, nfolds=3, overall.lambda="lambda.min")
 pred2=predict.ptLasso(fit2,xtest,groupstest=groupstest, ytest=ytest)
 cvfit2=cv.ptLasso(x,y,groups=groups,family="binomial",type.measure="deviance",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
@@ -184,6 +188,20 @@ cvfit2=cv.ptLasso(x,y,groups=groups,family="binomial",type.measure="deviance",fo
 fit3=ptLasso(x,y,groups=groups,alpha=0.9,family="binomial",type.measure="class",foldid=NULL, nfolds=3, overall.lambda="lambda.min")
 pred3=predict.ptLasso(fit3,xtest,groupstest=groupstest, ytest=ytest)
 cvfit3=cv.ptLasso(x,y,groups=groups,family="binomial",type.measure="class",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
+
+test_that("input_groups_binomial_two_prediction_methods", {
+    expect_equal(method.1,
+                 method.2,
+                 tolerance = test.tol
+                 )
+})
+
+test_that("input_groups_binomial_two_prediction_methods", {
+    expect_equal(method.0,
+                 method.1,
+                 tolerance = test.tol
+                 )
+})
 
 test_that("input_groups_binomial_alpha_6", {
     expect_equal(unname(pred.test$errpre),
