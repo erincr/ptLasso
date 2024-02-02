@@ -74,10 +74,17 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     if(is.null(np)|(np[2]<=1))stop("x should be a matrix with 2 or more columns")
     nobs=as.integer(np[1])
     nvars=as.integer(np[2])
+
+    k = length(table(groups))
     
     ####################################################################################
     # Begin error checking:
     ####################################################################################
+
+    if(min(groups) != 1) stop("Groups should be coded from 1 to k.")
+    if(length(unique(groups)) < 2) stop("Need to have at least two groups.")
+    if(length(unique(groups)) != k) stop(paste0("Expected ", k, " groups, found ", length(unique(groups)), "."))
+    if(all(sort(unique(groups)) != (1:k))) stop("Groups should be coded from 1 to k.")
 
     for(argument in c("fit", "check.args", "offset", "intercept", "standardize.response")){
         if(argument %in% names(list(...))) stop(paste0("ptLasso does not support the argument '", argument, "'."))
@@ -121,17 +128,9 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
 
     intercept=TRUE   
     if(family=="cox") intercept=FALSE
-
-    group.levels = NULL
-    if(use.case == "inputGroups") {
-        group.levels = sort(unique(groups))
-        groups = factor(groups, levels=group.levels)
-        onehot.groups = model.matrix(~groups - 1)
-    }
     
     class.sizes=table(groups)
-    k=length(class.sizes)
-
+    
     if(is.null(foldid)){ 
         foldid = rep(1, nrow(x))  
         for(kk in 1:k) foldid[groups == kk] = sample(1:nfolds, class.sizes[kk], replace=TRUE)
@@ -169,20 +168,22 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     # Fit overall model 
     ####################################################################################
 
-    xx = x
+    group.levels = NULL
     overall.pf = penalty.factor
     if(use.case == "inputGroups") {
-        xx = cbind(onehot.groups, xx)
+        group.levels = sort(unique(groups))
+        groups = factor(groups, levels=group.levels)
+        onehot.groups = model.matrix(~groups - 1)
         overall.pf = c(rep(0, k), overall.pf)
     }
-
+    
     fitall.is.null = is.null(fitall)
     if(fitall.is.null){
         if(verbose) cat("Fitting overall model",fill=TRUE)
 
-        #strangely, ( gets upset if you do intercept=FALSE for cox
+        #strangely, gets upset if you do intercept=FALSE for cox
         if( family!="cox" & use.case == "inputGroups"){
-            fitall = cv.glmnet(xx,y,
+            fitall = cv.glmnet(cbind(onehot.groups, x), y,
                                family=family,
                                foldid=foldid, 
                                intercept=FALSE,
@@ -194,7 +195,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                weights=weights,
                                ...)
         } else if(family == "cox") {
-            fitall = cv.glmnet(xx,y,
+            fitall = cv.glmnet(cbind(onehot.groups, x), y,
                                family=family,
                                foldid=foldid,  
                                lambda=lambda,
