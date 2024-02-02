@@ -39,10 +39,10 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
     }
     
     if(length(alpha) == 1){
-        if(!(alpha %in% cvfit$errpre[, "alpha"])) stop("Not a valid choice of alpha. Please choose alpha from cvfit$alphalist.")
+        close.enough = 1e-6
+        if(all(abs(alpha - cvfit$errpre[, "alpha"]) > close.enough)) stop("Not a valid choice of alpha. Please choose alpha from cvfit$alphalist.")
         
-        model.ix = which(cvfit$errpre[, "alpha"] == alpha)
-        
+        model.ix = which(abs(cvfit$errpre[, "alpha"] - alpha) < close.enough)    
         if(length(model.ix) > 1) model.ix = model.ix[1]
         
         fit = cvfit$fit[[model.ix]]

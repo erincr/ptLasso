@@ -174,6 +174,7 @@ cvfit=cv.ptLasso(x,y,groups=groups,family="binomial",type.measure="auc",foldid=N
 pred.cv=predict(cvfit,xtest,groupstest=groupstest, ytest=ytest, alphatype="varying")
 pred.cv.fixed=predict(cvfit,xtest,groupstest=groupstest, ytest=ytest, alphatype="fixed")
 
+pred.test=predict(cvfit,xtest,groupstest=groupstest, ytest=ytest,alpha=.6)
 
 fit2=ptLasso(x,y,groups=groups,alpha=0.9,family="binomial",type.measure="deviance",foldid=NULL, nfolds=3, overall.lambda="lambda.min")
 pred2=predict.ptLasso(fit2,xtest,groupstest=groupstest, ytest=ytest)
@@ -183,6 +184,13 @@ cvfit2=cv.ptLasso(x,y,groups=groups,family="binomial",type.measure="deviance",fo
 fit3=ptLasso(x,y,groups=groups,alpha=0.9,family="binomial",type.measure="class",foldid=NULL, nfolds=3, overall.lambda="lambda.min")
 pred3=predict.ptLasso(fit3,xtest,groupstest=groupstest, ytest=ytest)
 cvfit3=cv.ptLasso(x,y,groups=groups,family="binomial",type.measure="class",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
+
+test_that("input_groups_binomial_alpha_6", {
+    expect_equal(unname(pred.test$errpre),
+                 c(0.8120918, 0.7965475, 0.8208155, 0.8262916, 0.8827392, 0.8261719, 0.7522222, 0.6953125),
+                 tolerance = test.tol
+                 )
+})
 
 test_that("input_groups_binomial_cvfit_varying_results", {
     expect_equal(unname(pred.cv$errpre),

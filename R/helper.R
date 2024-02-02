@@ -78,7 +78,7 @@ print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
     cat("\nCall: ", deparse(x$call), "\n\n")
 
     if("errpre" %in% names(x)){
-        cat("type.measure: ", x$call$type.measure, "\n\n")
+        cat("type.measure: ", x$type.measure, "\n\n")
         disp = rbind(x$errall, rbind(x$errpre,x$errind))
         rownames(disp) = c("Overall", "Pretrain", "Individual")
 
