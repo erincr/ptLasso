@@ -3,7 +3,7 @@
 #'
 #'
 #' @aliases print.cv.ptLasso 
-#' @param x fitted \code{"cv.ptLasso"} or \code{"predict.cv.ptLasso"} object.
+#' @param x fitted \code{"cv.ptLasso"} object.
 #' @param digits number of digits to display.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer:
 #' Erin Craig <erincr@@stanford.edu>
@@ -16,12 +16,12 @@
 #' @export
 #'
 #'
-print.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3), ...) 
+print.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3)) 
 {
     cat("\nCall: ", deparse(x$call), "\n\n")
     
     if("errpre" %in% names(x)){
-        cat("type.measure: ", x$type.measure, "\n\n")
+        cat("type.measure: ", x$call$type.measure, "\n\n")
         disp = rbind(c(NA, x$errall), rbind(x$errpre, c(NA, x$errind)))
         rownames(disp) = c("Overall", rep("Pretrain", nrow(x$errpre)), "Individual")
         colnames(disp)[1] = "alpha"
@@ -34,9 +34,24 @@ print.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3), ...)
     
 }
 
-# TODO!
-# What to print?
-print.ptLasso=function (x, digits = max(3, getOption("digits") - 3), ...) 
+#
+#' Print the ptLasso object. 
+#'
+#'
+#' @aliases print.ptLasso 
+#' @param x fitted \code{"ptLasso"} object.
+#' @author Erin Craig and Rob Tibshirani\cr Maintainer:
+#' Erin Craig <erincr@@stanford.edu>
+#' @seealso \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
+#' @keywords models regression classification
+#' @examples
+#'
+#'
+#' @method print ptLasso
+#' @export
+#'
+#'
+print.ptLasso=function (x) 
 {
     cat("\nCall: ", deparse(x$call), "\n\n")
 }
@@ -58,12 +73,12 @@ print.ptLasso=function (x, digits = max(3, getOption("digits") - 3), ...)
 #'
 #' @method print predict.ptLasso
 #' @export
-print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3), ...) 
+print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3)) 
 {
     cat("\nCall: ", deparse(x$call), "\n\n")
 
     if("errpre" %in% names(x)){
-        cat("type.measure: ", x$type.measure, "\n\n")
+        cat("type.measure: ", x$call$type.measure, "\n\n")
         disp = rbind(x$errall, rbind(x$errpre,x$errind))
         rownames(disp) = c("Overall", "Pretrain", "Individual")
 
@@ -98,7 +113,7 @@ print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3), ...
 #' @method print predict.cv.ptLasso
 #' @export
 #'
-print.predict.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3), ...) 
+print.predict.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3)) 
 {
     cat("\nCall: ", deparse(x$call), "\n\n")
 
@@ -120,7 +135,7 @@ print.predict.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3), 
 }
 
 
-
+#' @noRd
 enlist <-
 function (...) 
 {

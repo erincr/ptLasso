@@ -28,7 +28,10 @@ subset.y <- function(y, ix, family) {
 #' @param s The choice of lambda to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "lambda.min". May be "lambda.1se", or a numeric value. (Use caution when supplying a numeric value: the same lambda will be used for all models.)
 #' @param use.case The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".
 #' @param verbose If \code{verbose=1}, print a statement showing which model is currently being fit.
-#' @param ... Additional arguments to be passed to the cv.glmnet function. Some notable choices are \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.
+#' @param fitall An optional cv.glmnet object specifying the overall model.
+#' @param fitind An optional list of cv.glmnet objects specifying the individual models.
+#' @param weights observation weights. Default is 1 for each observation.
+#' @param \dots Additional arguments to be passed to the cv.glmnet function. Some notable choices are \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.
 #' 
 #' @return An object of class \code{"cv.ptLasso"}, which is a list with the ingredients of the cross-validation fit.
 #' \item{call}{The call that produced this object.}
@@ -45,10 +48,10 @@ subset.y <- function(y, ix, family) {
 #' 1+1
 #'
 #' @export
-cv.ptLasso <- function(x, y, w = rep(1,length(y)), alphalist=seq(0,1,length=11),
-                       groups = NULL, family = c("gaussian", "multinomial", "binomial","cox"),  use.case=c("inputGroups","targetGroups"),
+cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
+                       family = c("gaussian", "multinomial", "binomial","cox"),  use.case=c("inputGroups","targetGroups"),
                        type.measure=c("default", "mse", "mae", "auc","deviance","class", "C"),
-                       nfolds = 10, foldid = NULL, keep = FALSE, verbose=FALSE, fitall=NULL, fitind=NULL,
+                       nfolds = 10, foldid = NULL, verbose=FALSE, fitall=NULL, fitind=NULL,
                        weights = NULL,
                        overall.lambda = "lambda.1se",
                        s = "lambda.min",

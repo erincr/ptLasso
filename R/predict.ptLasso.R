@@ -12,6 +12,7 @@
 #' @param alphatype Choice of '"fixed"' or '"varying"'. If '"fixed"', use the alpha that achieved best cross-validated performance. If '"varying"', each group uses the alpha that optimized the group-specific cross-validated performance.
 #' @param type Type of prediction required. Type '"link"' gives the linear predictors for '"binomial", '"multinomial"' or '"cox"' models; for '"gaussian"' models it gives the fitted values. Type '"response"' gives the fitted probabilities for '"binomial"' or '"multinomial"', and the fitted relative-risk for '"cox"'; for '"gaussian"' type '"response"' is equivalent to type '"link"'. Note that for '"binomial"' models, results are returned only for the class corresponding to the second level of the factor response. Type '"class"' applies only to '"binomial"' or '"multinomial"' models, and produces the class label corresponding to the maximum probability.
 #' @param s Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.
+#' @param return.link If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkall}, \code{linkpre} and \code{linkind}.
 #' @return A ...
 #'
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer:
@@ -24,7 +25,7 @@
 #' @method predict cv.ptLasso
 #' @export
 predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NULL, alphatype = c("fixed", "varying"),
-                            type = c("link", "response", "class"), s = "lambda.min"){
+                            type = c("link", "response", "class"), s = "lambda.min", return.link = FALSE){
 
     if(missing("xtest")) stop("Please supply xtest.")
     
@@ -61,7 +62,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
                                                       xtest[groupstest == ix, ],
                                                       groupstest=groupstest[groupstest == ix],
                                                       ytest=ytest[groupstest == ix],
-                                                      type = type, s = s)}
+                                                      type = type, s = s, return.link=TRUE)}
                          )
         
         all.preds = pre.preds = ind.preds = rep(NA, nrow(xtest))
@@ -115,6 +116,12 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
             alpha,
             call
         )
+
+        if(return.link){
+            out$linkall = all.link
+            out$linkind = ind.link
+            out$linkpre = pre.link
+        }
         
         if(!is.null(ytest)){
             out$errpre = errpre
@@ -137,19 +144,21 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 #' Return predictions and performance measures for a test set. 
 #' 
 #' @aliases predict.ptLasso
-#' @param cvfit Fitted \code{"ptLasso"} object.
+#' @param fit Fitted \code{"ptLasso"} object.
 #' @param xtest Input matrix, matching the form used by \code{"ptLasso"} for model training.
 #' @param groupstest  A vector indicating to which group each observation belongs. Coding should match that used for model training. Will be NULL for target grouped data.
+#' @param ytest Response variable. Optional. If included, \code{"predict"} will compute performance measures for xtest using code{"type.measure"} from the cvfit object.
 #' @param type Type of prediction required. Type '"link"' gives the linear predictors for '"binomial", '"multinomial"' or '"cox"' models; for '"gaussian"' models it gives the fitted values. Type '"response"' gives the fitted probabilities for '"binomial"' or '"multinomial"', and the fitted relative-risk for '"cox"'; for '"gaussian"' type '"response"' is equivalent to type '"link"'. Note that for '"binomial"' models, results are returned only for the class corresponding to the second level of the factor response. Type '"class"' applies only to '"binomial"' or '"multinomial"' models, and produces the class label corresponding to the maximum probability.
 #' @param s Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.
+#' @param return.link If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkall}, \code{linkpre} and \code{linkind}.
 #' @return A ..
 #' @examples
 #'
 #' @import glmnet
 #' @method predict ptLasso
 #' @export
-predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL, offset = NULL,
-                         type = c("link", "response", "class"), s="lambda.min"){
+predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL, 
+                         type = c("link", "response", "class"), s="lambda.min", return.link=FALSE){
 
     this.call <- match.call()
     
@@ -180,15 +189,15 @@ predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL, offset = NULL,
         }
     }
     
-    if(fit$call$use.case=="inputGroups") out=predict.ptLasso.inputGroups(fit, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s)
-    if(fit$call$use.case=="targetGroups") out=predict.ptLasso.targetGroups(fit, xtest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s)
+    if(fit$call$use.case=="inputGroups") out=predict.ptLasso.inputGroups(fit, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s, return.link=return.link)
+    if(fit$call$use.case=="targetGroups") out=predict.ptLasso.targetGroups(fit, xtest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s, return.link=return.link)
     class(out)="predict.ptLasso"
     return(out)
 }
 
 #' Predict function for input grouped data
 #' @noRd
-predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, type.measure, type, call, ytest=NULL, s="lambda.min"){
+predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, type.measure, type, call, return.link=FALSE, ytest=NULL, s="lambda.min"){
 
     if(is.null(groupstest)) stop("Need group IDs for test data.")
     
@@ -219,7 +228,6 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
             errall=errFun(ytest, as.numeric(phatall))
             errall.classes=sapply(predgroups, function(kk) errFun(ytest[groupstest == kk,], phatall[groupstest == kk]))
         } else {
-            #browser()
             errall=errFun(ytest, as.numeric(phatall))
             errall.classes=sapply(predgroups, function(kk) errFun(ytest[groupstest == kk], phatall[groupstest == kk]))
         }
@@ -326,8 +334,7 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
         names(errall) = names(errpre) = names(errind) = c("overall", "mean", "wtdMean", paste0("group", sort(unique(groupstest))))
     }
 
-    out = enlist(linkall = phatall, linkind = phatind, linkpre = phatpre, # These are needed for assess.glmnet.
-                 yhatall = as.numeric(yhatall),
+    out = enlist(yhatall = as.numeric(yhatall),
                  yhatind = as.numeric(yhatind),
                  yhatpre = as.numeric(yhatpre), 
                  suppre  = get.pretrain.support(fit, s=s),
@@ -336,6 +343,12 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
                  alpha = fit$alpha,
                  type.measure = type.measure,
                  call)
+
+    if(return.link){
+        out$linkall = phatall
+        out$linkind = phatind
+        out$linkpre = phatpre 
+    }
     
     if(!is.null(ytest)) {
         out$errall = errall
@@ -354,7 +367,7 @@ binomial.measure = function(newy, one.phat.column, measure = "deviance"){
 
 #' Predict function for target grouped data
 #' @noRd
-predict.ptLasso.targetGroups=function(fit, xtest,  errFun, family, type.measure, type, call, ytest=NULL, s="lambda.min"){
+predict.ptLasso.targetGroups=function(fit, xtest,  errFun, family, type.measure, type, call, return.link=FALSE, ytest=NULL, s="lambda.min"){
    
     k=fit$k
     groups=fit$y
@@ -403,24 +416,26 @@ predict.ptLasso.targetGroups=function(fit, xtest,  errFun, family, type.measure,
         yhatpre = apply(yhatpre, 1, which.max)
     }
 
+    out = enlist(yhatall, yhatind, yhatpre,
+                 suppre = get.pretrain.support(fit, s=s),
+                 supind = get.individual.support(fit, s=s),
+                 supall = get.overall.support(fit, s=s),
+                 alpha = fit$alpha,
+                 type.measure = type.measure,
+                 call)
+    
     if(!is.null(ytest)) {
-        out = enlist(yhatall, yhatind, yhatpre,
-                     errind, errpre, errall,
-                     suppre = get.pretrain.support(fit, s=s),
-                     supind = get.individual.support(fit, s=s),
-                     supall = get.overall.support(fit, s=s),
-                     alpha = fit$alpha,
-                     type.measure = type.measure,
-                     call)
-    } else {
-        out = enlist(yhatall, yhatind, yhatpre,
-                     suppre = get.pretrain.support(fit, s=s),
-                     supind = get.individual.support(fit, s=s),
-                     supall = get.overall.support(fit, s=s),
-                     alpha = fit$alpha,
-                     type.measure = type.measure,
-                     call)
+        out$errind = errind
+        out$errpre = errpre
+        out$errall = errall
     }
+
+    if(return.link){
+        out$linkall = phatall
+        out$linkpre = phatpre
+        out$linkind = phatind
+    }
+    
     class(out) = "predict.ptLasso"
     return(out)
 }
