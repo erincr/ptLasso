@@ -53,8 +53,10 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
         
         model.ix = sapply(alpha, function(a) which(a == cvfit$errpre[, "alpha"]))
         model.ix = unname(model.ix)
+
+        predgroups = sort(unique(groupstest))
         
-        results = lapply(1:length(model.ix),
+        results = lapply(predgroups,
                          function(ix) {predict.ptLasso(cvfit$fit[[model.ix[ix]]],
                                                       xtest[groupstest == ix, ],
                                                       groupstest=groupstest[groupstest == ix],
@@ -64,14 +66,14 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
         
         all.preds = pre.preds = ind.preds = rep(NA, nrow(xtest))
         all.link = pre.link = ind.link = rep(NA, nrow(xtest))
-        for(kk in 1:length(model.ix)){
-            all.preds[groupstest == kk] = results[[kk]]$yhatall
-            pre.preds[groupstest == kk] = results[[kk]]$yhatpre
-            ind.preds[groupstest == kk] = results[[kk]]$yhatind
+        for(kk in 1:length(predgroups)){
+            all.preds[groupstest == predgroups[kk]] = results[[kk]]$yhatall
+            pre.preds[groupstest == predgroups[kk]] = results[[kk]]$yhatpre
+            ind.preds[groupstest == predgroups[kk]] = results[[kk]]$yhatind
 
-            all.link[groupstest == kk] = results[[kk]]$linkall
-            pre.link[groupstest == kk] = results[[kk]]$linkpre
-            ind.link[groupstest == kk] = results[[kk]]$linkind
+            all.link[groupstest == predgroups[kk]] = results[[kk]]$linkall
+            pre.link[groupstest == predgroups[kk]] = results[[kk]]$linkpre
+            ind.link[groupstest == predgroups[kk]] = results[[kk]]$linkind
         }
         
         if(!is.null(ytest)){
@@ -97,7 +99,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
             names(errall) = names(errpre) = names(errind) = c("overall", "mean", "wtdMean", paste0("group", 1:length(results)))
          }
       
-        out = enlist(
+        out = enlist(            
             yhatall = all.preds,
             yhatind = pre.preds,
             yhatpre = ind.preds,
@@ -324,7 +326,7 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
         names(errall) = names(errpre) = names(errind) = c("overall", "mean", "wtdMean", paste0("group", sort(unique(groupstest))))
     }
 
-    out = enlist(linkall = phatall, linkind = phatind, linkpre = phatpre,
+    out = enlist(linkall = phatall, linkind = phatind, linkpre = phatpre, # These are needed for assess.glmnet.
                  yhatall = as.numeric(yhatall),
                  yhatind = as.numeric(yhatind),
                  yhatpre = as.numeric(yhatpre), 

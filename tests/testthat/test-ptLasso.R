@@ -59,6 +59,8 @@ set.seed(1234)
 cvfit=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5, overall.lambda = "lambda.min")
 pred.cv=predict(cvfit,xtest,groupstest=groupstest, ytest=ytest, alphatype="varying")
 
+pred.cv.gp2=predict(cvfit,xtest[groupstest == 2, ],groupstest=groupstest[groupstest == 2], ytest=ytest[groupstest == 2], alphatype="varying")
+
 fit2=ptLasso(x,y,groups=groups,alpha=0.9,family="gaussian",type.measure="mae",foldid=NULL, nfolds=5, overall.lambda = "lambda.min")
 pred2=predict.ptLasso(fit2,xtest,groupstest=groupstest, ytest=ytest)
 set.seed(1234)
@@ -70,6 +72,12 @@ pred3=predict(fit3,xtest,groupstest=groupstest, ytest=ytest)
 test_that("input_groups_gaussian_varying_alpha", {
     expect_equal(pred.cv$alpha,
                  c(0.2, 1.0, 0.8, 0.4, 0.8),
+                 tolerance = test.tol)
+})
+
+test_that("input_groups_gaussian_varying_alpha_group2", {
+    expect_equal(pred.cv.gp2$yhatpre,
+                 pred.cv$yhatpre[groupstest == 2],
                  tolerance = test.tol)
 })
 
