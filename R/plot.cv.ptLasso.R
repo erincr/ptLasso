@@ -123,7 +123,7 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
 #' Plot function for input grouped data
 #' @noRd
 ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
-    k = length(x$fitind)
+    k = length(x$fit[[1]]$fitind)
     err.pre = x$errpre
     err.pan = x$errall
     err.ind = x$errind

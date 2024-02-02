@@ -26,9 +26,6 @@ subset.y <- function(y, ix, family) {
 #' @param ... Other arguments that can be passed to \code{ptLasso}.
 #'
 #' @return An object of class \code{"cv.ptLasso"}, which is a list with the ingredients of the cross-validation fit.
-#' \item{fitall}{A fitted \code{cv.glmnet} object trained using the full data.}
-#' \item{fitpre}{A list of fitted (pretrained) \code{cv.glmnet} objects, one trained with each group.}
-#' \item{fitind}{A list of fitted \code{cv.glmnet} objects, one trained with each group.}
 #' \item{alphahat}{Value of \code{alpha} that optimizes CV performance on all data.}
 #' \item{varying.alphahat}{Vector of values of \code{alpha}, the kth of which optimizes performance for group k.}
 #' \item{alphalist}{Vector of all alphas that were compared.}
@@ -53,7 +50,7 @@ cv.ptLasso <- function(x, y, w = rep(1,length(y)), alphalist=seq(0,1,length=11),
                        overall.lambda = "lambda.1se",
                        s = "lambda.min",
                        parallel = FALSE,
-                       ...) { #TODO: confirm that all ... args are OK
+                       ...) { 
      
     use.case = match.arg(use.case, c("inputGroups","targetGroups"), several.ok=FALSE)
     family = match.arg(family)
@@ -221,7 +218,7 @@ cv.ptLasso <- function(x, y, w = rep(1,length(y)), alphalist=seq(0,1,length=11),
 
     
     
-    out=enlist(fitall, fitind, fitpre,
+    out=enlist(
                errpre = res, errind = err.ind, errall = err.all,
                alphahat,
                varying.alphahat, 
