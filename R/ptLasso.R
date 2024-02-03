@@ -440,92 +440,56 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     # Return coefficients to original scale.
     # Start with the overall model.
     if(standardize){
+        # Overall model
         if(fitall.is.null){
             if( (use.case == "inputGroups") & (family != "multinomial") ){
-                beta <- fitall$glmnet.fit$beta; a0 <- fitall$glmnet.fit$a0;
                 ix <- k:(k+p-1)                  # the first k-1 are group indicators...
                 if(family == "cox") ix = ix + 1  # except for the cox model, which has k group indicators.
                 
-                beta[ix, ] <- beta[ix, ]/x.sds
-                a0 <- a0 - Matrix::colSums( beta[ix, ] * x.mean )
-
-                fitall$glmnet.fit$beta <- beta; fitall$glmnet.fit$a0 <- a0
+                fitall$glmnet.fit$beta[ix, ] = adjust.beta(fitall$glmnet.fit$beta[ix, ], x.sds)
+                fitall$glmnet.fit$a0         = adjust.intercept(fitall$glmnet.fit$a0, fitall$glmnet.fit$beta[ix, ], x.mean)
             } else if( (use.case == "inputGroups") & (family == "multinomial") ) {
                 ix <- k:(k+p-1)
                 for(kk in 1:length(fitall$glmnet.fit$beta)){
-                    beta <- fitall$glmnet.fit$beta[[kk]]; a0 <- fitall$glmnet.fit$a0[kk, ];
-                    
-                    beta[ix, ] <- beta[ix, ]/x.sds
-                    a0 <- a0 - Matrix::colSums(beta[ix, ] * x.mean)
-
-                    fitall$glmnet.fit$beta[[kk]] <- beta; fitall$glmnet.fit$a0[kk, ] <- a0
+                    fitall$glmnet.fit$beta[[kk]][ix, ] = adjust.beta(fitall$glmnet.fit$beta[[kk]][ix, ], x.sds)
+                    fitall$glmnet.fit$a0[kk, ]         = adjust.intercept(fitall$glmnet.fit$a0[kk, ], fitall$glmnet.fit$beta[[kk]][ix, ], x.mean)
                 }
             } else if(use.case == "targetGroups") {
                 for(kk in 1:k){
-                    beta <- fitall$glmnet.fit$beta[[kk]]; a0 <- fitall$glmnet.fit$a0[kk, ];
-                    
-                    beta <- beta/x.sds
-                    a0 <- a0 - Matrix::colSums(beta * x.mean)
-
-                    fitall$glmnet.fit$beta[[kk]] <- beta; fitall$glmnet.fit$a0[kk, ] <- a0
+                    fitall$glmnet.fit$beta[[kk]] = adjust.beta(fitall$glmnet.fit$beta[[kk]], x.sds)
+                    fitall$glmnet.fit$a0[kk, ]   = adjust.intercept(fitall$glmnet.fit$a0[kk, ], fitall$glmnet.fit$beta[[kk]], x.mean)
                 }
             }
         }
-
         # Now, the individual and pretrained models:
         if( (use.case == "inputGroups") & (family == "multinomial") ){
             for(kk in 1:k){
                 # Individual
                 if(fitind.is.null){
                     for(oc in 1:length(table(y))){
-                        beta <- fitind[[kk]]$glmnet.fit$beta[[oc]];
-                        a0   <- fitind[[kk]]$glmnet.fit$a0[oc, ];
-
-                        beta <- beta/x.sds
-                        a0   <- a0 - Matrix::colSums(beta * x.mean)
-
-                        fitind[[kk]]$glmnet.fit$beta[[oc]] = beta
-                        fitind[[kk]]$glmnet.fit$a0[oc, ]   = a0
+                        fitind[[kk]]$glmnet.fit$beta[[oc]] = adjust.beta(fitind[[kk]]$glmnet.fit$beta[[oc]], x.sds)
+                        fitind[[kk]]$glmnet.fit$a0[oc, ]   = adjust.intercept(fitind[[kk]]$glmnet.fit$a0[oc, ], fitind[[kk]]$glmnet.fit$beta[[oc]], x.mean)
                     }
                 }
                 # Pretrained:
                 for(oc in 1:length(table(y))){
-                    beta <- fitpre[[kk]]$glmnet.fit$beta[[oc]];
-                    a0   <- fitpre[[kk]]$glmnet.fit$a0[oc, ];
-
-                    beta <- beta/x.sds
-                    a0   <- a0 - Matrix::colSums(beta * x.mean)
-
-                    fitpre[[kk]]$glmnet.fit$beta[[oc]] = beta
-                    fitpre[[kk]]$glmnet.fit$a0[oc, ]   = a0
+                    fitpre[[kk]]$glmnet.fit$beta[[oc]] = adjust.beta(fitpre[[kk]]$glmnet.fit$beta[[oc]], x.sds)
+                    fitpre[[kk]]$glmnet.fit$a0[oc, ]   = adjust.intercept( fitpre[[kk]]$glmnet.fit$a0[oc, ], fitpre[[kk]]$glmnet.fit$beta[[oc]], x.mean)
                 }
             }
         } else {
             for(kk in 1:k){
                 # Individual
                 if(fitind.is.null){
-                    beta <- fitind[[kk]]$glmnet.fit$beta;
-                    a0   <- fitind[[kk]]$glmnet.fit$a0;
-
-                    beta <- beta/x.sds
-                    a0   <- a0 - Matrix::colSums(beta * x.mean)
-
-                    fitind[[kk]]$glmnet.fit$beta = beta
-                    fitind[[kk]]$glmnet.fit$a0   = a0
+                    fitind[[kk]]$glmnet.fit$beta = adjust.beta(fitind[[kk]]$glmnet.fit$beta, x.sds)
+                    fitind[[kk]]$glmnet.fit$a0   = adjust.intercept(fitind[[kk]]$glmnet.fit$a0, fitind[[kk]]$glmnet.fit$beta, x.mean)
                 }
                 # Pretrained:
-                beta <- fitpre[[kk]]$glmnet.fit$beta;
-                a0   <- fitpre[[kk]]$glmnet.fit$a0;
-
-                beta <- beta/x.sds
-                a0   <- a0 - Matrix::colSums(beta * x.mean)
-
-                fitpre[[kk]]$glmnet.fit$beta = beta
-                fitpre[[kk]]$glmnet.fit$a0   = a0
+                fitpre[[kk]]$glmnet.fit$beta = adjust.beta(fitpre[[kk]]$glmnet.fit$beta, x.sds)
+                fitpre[[kk]]$glmnet.fit$a0   = adjust.intercept(fitpre[[kk]]$glmnet.fit$a0, fitpre[[kk]]$glmnet.fit$beta, x.mean)
             }
         }
     }
-
     
     
     out=enlist(
@@ -544,7 +508,5 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
 }
 
 
-    
-
-  
- 
+adjust.beta <- function(beta, x.sds) return(beta/x.sds)
+adjust.intercept <- function(a0, beta, x.mean) return(a0 - Matrix::colSums(beta * x.mean))
