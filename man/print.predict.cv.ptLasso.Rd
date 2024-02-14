@@ -2,7 +2,7 @@
 % Please edit documentation in R/helper.R
 \name{print.predict.cv.ptLasso}
 \alias{print.predict.cv.ptLasso}
-\title{Print the predict.ptLasso object.}
+\title{Print the predict.cv.ptLasso object.}
 \usage{
 \method{print}{predict.cv.ptLasso}(x, digits = max(3, getOption("digits") - 3))
 }
@@ -12,7 +12,25 @@
 \item{digits}{number of digits to display.}
 }
 \description{
-Print the predict.ptLasso object.
+Print the predict.cv.ptLasso object.
+}
+\examples{
+# Train data
+out = gaussian.example.data()
+x = out$x; y=out$y; groups = out$group;
+
+# Test data
+outtest = gaussian.example.data()
+xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
+
+cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+pred = predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")
+print(pred)
+
+# If ytest is not supplied, just prints the pretrained predictions.
+pred = predict(fit, xtest, groupstest, s="lambda.min")
+print(pred)
+
 }
 \seealso{
 \code{cv.ptLasso} and \code{predict.cv.ptLasso}.

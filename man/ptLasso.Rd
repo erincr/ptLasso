@@ -13,7 +13,8 @@ ptLasso(
   type.measure = c("default", "mse", "mae", "auc", "deviance", "class", "C"),
   use.case = c("inputGroups", "targetGroups"),
   overall.lambda = "lambda.1se",
-  lambda = NULL,
+  overall.parms = c("parms.1se", "parms.min"),
+  fit.method = c("glmnet", "sparsenet"),
   foldid = NULL,
   nfolds = 10,
   standardize = TRUE,
@@ -40,15 +41,17 @@ ptLasso(
 
 \item{use.case}{The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".}
 
-\item{overall.lambda}{The choice of lambda to be used by the overall model when defining the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value.}
+\item{overall.lambda}{For 'fit.method = "glmnet"' only. The choice of lambda to be used by the overall model when defining the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value.}
 
-\item{lambda}{Optional user-supplied lambda sequence; default is 'NULL', and 'glmnet' chooses its own sequence. Note that this is done for the full model (master sequence), and separately for each fold. The fits are then alligned using the master sequence (see the 'alignment' argument for additional details). Adapting 'lambda' for each fold leads to better convergence. When 'lambda' is supplied, the same sequence is used everywhere, but in some GLMs can lead to convergence issues.}
+\item{overall.parms}{For 'fit.method = "sparsenet"' only. The choice of lambda and gamma to be used by the overall model when defining the offset and penalty factor for pretrained lasso. Can be "parms.1se" or "parms.min". Defaults to "parms.1se".}
+
+\item{fit.method}{"glmnet" or "sparsenet". Defaults to "glmnet". If 'fit.method = "glmnet"', then \code{"cv.glmnet"} will be used to train models. If 'fit.method = "sparsenet"', \code{"cv.sparsenet"} will be used. The use of sparsenet is available only when 'family = "gaussian"'.}
 
 \item{foldid}{An optional vector of values between 1 and \code{nfold} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.}
 
 \item{nfolds}{Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.}
 
-\item{standardize}{Should the predictors be standardized before fitting (default is TRUE).}
+\item{standardize}{Should the predictors be standardized before fitting (default is TRUE). If \code{fit.method = "sparsenet"}, standardize must be TRUE.}
 
 \item{verbose}{If \code{verbose=1}, print a statement showing which model is currently being fit with \code{cv.glmnet}.}
 
@@ -56,55 +59,49 @@ ptLasso(
 
 \item{penalty.factor}{Separate penalty factors can be applied to each coefficient. This is a number that multiplies 'lambda' to allow differential shrinkage. Can be 0 for some variables,  which implies no shrinkage, and that variable is always included in the model. Default is 1 for all variables (and implicitly infinity for variables listed in 'exclude'). For more information, see \code{?glmnet}. For pretraining, the user-supplied penalty.factor will be multiplied by the penalty.factor computed by the overall model.}
 
-\item{fitall}{An optional cv.glmnet object specifying the overall model.}
+\item{fitall}{An optional cv.glmnet (or cv.sparsenet) object specifying the overall model.}
 
-\item{fitind}{An optional list of cv.glmnet objects specifying the individual models.}
+\item{fitind}{An optional list of cv.glmnet (or cv.sparsenet) objects specifying the individual models.}
 
-\item{\dots}{Additional arguments to be passed to the cv.glmnet function. Some notable choices are \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.}
+\item{\dots}{Additional arguments to be passed to the cv.glmnet (or cv.sparsenet) functions. Notable choices include \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{"cv.glmnet"}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. ptLasso does not support the arguments \code{intercept}, \code{offset}, \code{fit} and \code{check.args}.}
 }
 \value{
-An object of class \code{"ptLasso"}, which is a list with the ingredients of the cross-validation fit.
+An object of class \code{"ptLasso"}, which is a list with the ingredients of the fitted models.
 \item{call}{The call that produced this object.}
 \item{k}{The number of groups.}
 \item{alpha}{The value of alpha used for pretraining.}
 \item{group.levels}{IDs for all of the groups used in training.}
-\item{fitall}{A fitted \code{cv.glmnet} object trained using the full data.}
-\item{fitpre}{A list of fitted (pretrained) \code{cv.glmnet} objects, one trained with each data group.}
-\item{fitind}{A list of fitted \code{cv.glmnet} objects, one trained with each group.}
-\item{fitall.lambda}{Lambda used with fitall, to compute the offset for pretraining. Used for prediction.}
+\item{fitall}{A fitted \code{cv.glmnet} or \code{cv.sparsenet} object trained using the full data.}
+\item{fitpre}{A list of fitted (pretrained) \code{cv.glmnet} or \code{cv.sparsenet} objects, one trained with each data group.}
+\item{fitind}{A list of fitted \code{cv.glmnet} or \code{cv.sparsenet} objects, one trained with each group.}
+\item{fitall.lambda}{For 'fit.method = "glmnet"'. Lambda used with fitall, to compute the offset for pretraining.}
+\item{fitall.which}{For 'fit.method = "sparsenet"' only. Gamma and lambda choices used with fitall, to compute the offset for pretraining.}
 \item{y.mean}{Gaussian outcome only; mean of y for the training data, used for prediction.}
 }
 \description{
-Fits a pretrained lasso model using the glmnet package, for a fixed choice of the pretraining hyperparameter alpha. Additionally fits an "overall" model (using all data) and "individual" models (use each individual group). Can fit input-grouped data with Gaussian, multinomial, binomial or Cox outcomes, and target-grouped data, which necessarily has a multinomial outcome. Many ptLasso arguments are passed directly to glmnet, and therefore the glmnet documentation is another good reference for ptLasso.
-}
-\details{
-Importantly, ptLasso performs cross validation to select the lasso hyperparameter lambda via cv.glmnet. To choose the pretrained hyperparameter alpha, please use cv.ptLasso.
+Fits a pretrained lasso model using the glmnet package, for a fixed choice of the pretraining hyperparameter alpha. Additionally fits an "overall" model (using all data) and "individual" models (use each individual group). Can fit input-grouped data with Gaussian, multinomial, binomial or Cox outcomes, and target-grouped data, which necessarily has a multinomial outcome. Many ptLasso arguments are passed directly to glmnet (or sparsenet), and therefore the glmnet (sparsenet) documentation is another good reference for ptLasso.
 }
 \examples{
-# Gaussian
+# Gaussian example
 
-scommon     = 10                  # Number of common important  features
-sindiv      = c(50,40,20,10,10)   # Number of individual important features for each group
-class.sizes = c(100,80,60,30,30)  # Size of each group
-k           = length(class.sizes) # Number of groups
-n           = sum(class.sizes)    # Total dataset size
-p           = 200                 # Number of features 
-beta.common = rep(2.5, k)         # common coefficients 
-beta.indiv  = rep(1, k)           # individual coefficients
-intercepts  = rep(0, k)           # group-specific intercepts
-sigma       = 20                  # size of noise added
-
-# Train data
-out=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
-             class.sizes=class.sizes, beta.common=beta.common, beta.indiv=beta.indiv,
-             intercepts=intercepts, sigma=sigma, outcome="gaussian")
-
-x=out$x; y=out$y; groups=out$groups
+out = gaussian.example.data()
+x = out$x; y=out$y; groups = out$group
 
 # Test data
-outtest=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
-                 class.sizes=class.sizes, beta.common=beta.common, beta.indiv=beta.indiv,
-                 intercepts=intercepts, sigma=sigma, outcome="gaussian")
+outtest = gaussian.example.data()
+xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
+
+fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
+# plot(fit) to see all of the cv.glmnet models trained
+predict(fit, xtest, groupstest, ytest=ytest)
+
+# Binomial example
+
+out = binomial.example.data()
+x = out$x; y=out$y; groups = out$group
+
+# Test data
+outtest = binomial.example.data()
 xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 
 fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
@@ -117,5 +114,5 @@ Friedman, J., Hastie, T., & Tibshirani, R. (2010). Regularization paths for gene
 Mazumder, Rahul, Jerome H. Friedman, and Trevor Hastie. "Sparsenet: Coordinate descent with nonconvex penalties." Journal of the American Statistical Association 106.495 (2011): 1125-1138.
 }
 \seealso{
-\code{\link{glmnet}, \link{sparsenet}}
+\code{\link{glmnet}}, \code{\link{sparsenet}}
 }

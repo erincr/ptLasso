@@ -19,4 +19,9 @@ Imports:
     glmnet,
     gridExtra,
     Matrix,
-    stats
+    stats,
+    sparsenet
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

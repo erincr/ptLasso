@@ -55,6 +55,25 @@ A list:
 \description{
 Simulate input grouped data for testing with ptLasso.
 }
+\examples{
+
+# Data with a binary outcome:
+k = 3
+class.sizes = rep(100, k)
+n = sum(class.sizes)
+scommon = 5
+sindiv = rep(5, k) 
+p = 2*(sum(sindiv) + scommon)
+beta.common = lapply(1:k, function(i)  c(-.5, .5, .3, -.9, .1))
+beta.indiv = lapply(1:k, function(i)  0.9 * beta.common[[i]])
+
+out = makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+               beta.common=beta.common, beta.indiv=beta.indiv,
+               class.sizes=class.sizes, outcome="binomial")
+x = out$x; y=out$y; groups = out$group
+
+
+}
 \seealso{
 \code{cv.ptLasso}, \code{ptLasso}.
 }

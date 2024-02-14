@@ -1,4 +1,4 @@
-#
+
 #' Print the cv.ptLasso object. 
 #'
 #'
@@ -10,12 +10,14 @@
 #' @seealso \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
+#' out = gaussian.example.data()
+#' x = out$x; y=out$y; groups = out$group;
 #'
+#' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+#' print(cvfit)
 #'
 #' @method print cv.ptLasso
 #' @export
-#'
-#'
 print.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3)) 
 {
     cat("\nCall: ", deparse(x$call), "\n\n")
@@ -34,7 +36,6 @@ print.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
     
 }
 
-#
 #' Print the ptLasso object. 
 #'
 #'
@@ -45,16 +46,20 @@ print.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
 #' @seealso \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
+#' out = gaussian.example.data()
+#' x = out$x; y=out$y; groups = out$group;
 #'
+#' fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+#' print(fit)
 #'
 #' @method print ptLasso
 #' @export
-#'
 #'
 print.ptLasso=function (x) 
 {
     cat("\nCall: ", deparse(x$call), "\n\n")
 }
+
 
 
 
@@ -69,8 +74,22 @@ print.ptLasso=function (x)
 #' @seealso \code{ptLasso} and \code{predict.ptLasso}.
 #' @keywords models regression classification
 #' @examples
+#' # Train data
+#' out = gaussian.example.data()
+#' x = out$x; y=out$y; groups = out$group;
 #'
+#' # Test data
+#' outtest = gaussian.example.data()
+#' xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 #'
+#' fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+#' pred = predict(fit, xtest, groupstest, ytest=ytest, s="lambda.min")
+#' print(pred)
+#'
+#' # If ytest is not supplied, just prints the pretrained predictions.
+#' pred = predict(fit, xtest, groupstest, s="lambda.min")
+#' print(pred)
+#' 
 #' @method print predict.ptLasso
 #' @export
 print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3)) 
@@ -97,8 +116,7 @@ print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
 }
 
 
-#' Print the predict.ptLasso object. 
-#'
+#' Print the predict.cv.ptLasso object. 
 #'
 #' @aliases print.predict.cv.ptLasso 
 #' @param x output of predict called with a ptLasso object.
@@ -108,11 +126,24 @@ print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
 #' @seealso \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
+#' # Train data
+#' out = gaussian.example.data()
+#' x = out$x; y=out$y; groups = out$group;
 #'
+#' # Test data
+#' outtest = gaussian.example.data()
+#' xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
+#'
+#' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+#' pred = predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")
+#' print(pred)
+#'
+#' # If ytest is not supplied, just prints the pretrained predictions.
+#' pred = predict(fit, xtest, groupstest, s="lambda.min")
+#' print(pred)
 #'
 #' @method print predict.cv.ptLasso
 #' @export
-#'
 print.predict.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3)) 
 {
     cat("\nCall: ", deparse(x$call), "\n\n")

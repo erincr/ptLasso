@@ -21,8 +21,11 @@ yaxis.name = function(x){
 #' @seealso \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
-#' 2+2
-#'
+#' out = gaussian.example.data()
+#' x = out$x; y=out$y; groups = out$group
+#' 
+#' cvfit = cv.ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
+#' plot(cvfit) 
 #'
 #' @import ggplot2 gridExtra
 #' @method plot cv.ptLasso
@@ -182,7 +185,6 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 }
 
 
-#'
 #' Plot the models trained by a ptLasso object
 #'
 #' A plot is produced, and nothing is returned.
@@ -193,14 +195,14 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 #' @seealso \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
-#' 2+2
+#' out = gaussian.example.data()
+#' x = out$x; y=out$y; groups = out$group
+#' 
+#' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
+#' plot(fit) 
 #'
-#'
-#' @import ggplot2 gridExtra
 #' @method plot ptLasso
 #' @export
-#'
-#'
 plot.ptLasso = function(fit){
     lo = matrix(
         c(rep(1, fit$k),                      # Title: "Overall model"
@@ -217,16 +219,19 @@ plot.ptLasso = function(fit){
     plot.new(); text(0.5,0.5,"Overall model", font=2, cex=1.5);
     plot(fit$fitall); for(kk in 1:(fit$k - 1)) plot.new()
 
+    line.nudge = -1
+    if(inherits(fit$fitall, "cv.sparsenet")) line.nudge = -1.5
+    
     plot.new(); text(0.5,0.5,"Pretrained models", font=2, cex=1.5);
     for(kk in 1:fit$k){
         plot(fit$fitpre[[kk]]);
-        title(paste0("Group ", kk), line=-1)
+        title(paste0("Group ", kk), line=line.nudge)
     }
 
     plot.new(); text(0.5,0.5,"Individual models", font=2, cex=1.5);
     for(kk in 1:fit$k){
         plot(fit$fitind[[kk]]);
-        title(paste0("Group ", kk), line=-1)
+        title(paste0("Group ", kk), line=line.nudge)
     }
     
 }

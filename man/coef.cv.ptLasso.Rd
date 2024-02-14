@@ -11,10 +11,24 @@
 
 \item{model}{string indicating which coefficients to retrieve. Must be one of "all", "individual", "overall" or "pretrain".}
 
-\item{alpha}{value betweein 0 and 1, indicating which alpha to use. If \code{NULL}, return coefficients from all models.  Only impacts the results for model = "all" or model = "pretrain".}
+\item{alpha}{value between 0 and 1, indicating which alpha to use. If \code{NULL}, return coefficients from all models.  Only impacts the results for model = "all" or model = "pretrain".}
 }
 \description{
 Get the coefficients from a fitted cv.ptLasso model.
+}
+\examples{
+# Train data
+out = gaussian.example.data()
+x = out$x; y=out$y; groups = out$group;
+
+cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+# Get all model coefficients.
+coef(cvfit)
+
+coef(cvfit, model = "overall") # Overall model only
+coef(cvfit, model = "individual") # List of coefficients for each group model
+coef(cvfit, model = "pretrain", alpha = .5) # List of coefficients for each group model
+
 }
 \seealso{
 \code{cv.ptLasso}, \code{ptLasso}.

@@ -11,6 +11,7 @@
   ytest = NULL,
   type = c("link", "response", "class"),
   s = "lambda.min",
+  which = "parms.min",
   return.link = FALSE
 )
 }
@@ -25,13 +26,45 @@
 
 \item{type}{Type of prediction required. Type '"link"' gives the linear predictors for '"binomial", '"multinomial"' or '"cox"' models; for '"gaussian"' models it gives the fitted values. Type '"response"' gives the fitted probabilities for '"binomial"' or '"multinomial"', and the fitted relative-risk for '"cox"'; for '"gaussian"' type '"response"' is equivalent to type '"link"'. Note that for '"binomial"' models, results are returned only for the class corresponding to the second level of the factor response. Type '"class"' applies only to '"binomial"' or '"multinomial"' models, and produces the class label corresponding to the maximum probability.}
 
-\item{s}{Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.}
+\item{s}{For use with 'fit.method = "glmnet"' only. Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.}
+
+\item{which}{For use with 'fit.method = "sparsenet"' only. Either the paramaters of the minimum of the CV curves (default "parms.min" or the parameters corresponding to the one standard-error rule "parms.1se"). Default is "parms.min".}
 
 \item{return.link}{If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkall}, \code{linkpre} and \code{linkind}.}
 }
 \value{
-A ..
+A list containing the requested predictions. If \code{ytest} is included, will also return error measures.
+\item{call} The call that produced this object.
+\item{alpha} The value(s) of alpha used to generate predictions. Will be the same alpha used to in model training.
+\item{yhatall} Predictions from the overall model.
+\item{yhatind} Predictions from the individual models.
+\item{yhatpre} Predictions from the pretrained models.
+\item{supall} Indices of the features selected by the overall model.
+\item{supind} Union of the indices of the features selected by the individual models.
+\item{suppre} Union of the indices of the features selected by the pretrained models. Includes features selected in the first stage of pretraining.
+\item{type.measure} If \code{ytest} is supplied, the performance measure computed.
+\item{errall} If \code{ytest} is supplied, performance for the overall model. This is a named vector containing performance for (1) the entire dataset, (2) the average performance across groups, (3) the average performance across groups weighted by group size and (4) group-specific performance.
+\item{errind} If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.
+\item{errpre} If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.
+\item{linkall} If\code{return.link} is TRUE, return the linear link from the overall model.
+\item{linkind} If\code{return.link} is TRUE, return the linear link from the individual models.
+\item{linkpre} If\code{return.link} is TRUE, return the linear link from the pretrained models.
 }
 \description{
 Return predictions and performance measures for a test set.
+}
+\examples{
+# Gaussian example
+
+out = gaussian.example.data()
+x = out$x; y=out$y; groups = out$group
+
+# Test data
+outtest = gaussian.example.data()
+xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
+
+fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
+pred = predict(fit, xtest, groupstest, ytest=ytest)
+pred
+
 }

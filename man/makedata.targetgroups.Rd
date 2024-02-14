@@ -37,6 +37,24 @@ A list:
 \description{
 Simulate target grouped data for testing with ptLasso.
 }
+\examples{
+
+k = 5
+class.sizes = rep(50, k)
+n = sum(class.sizes)
+scommon = 3
+sindiv = rep(3, k)
+p = 3*(sum(sindiv) + scommon)
+shift.common  = lapply(seq(-.1, .1, length.out = k), function(i) rep(i, scommon))
+shift.indiv = lapply(1:k, function(i) -shift.common[[i]])
+
+out = makedata.targetgroups(n=n, p=p, scommon=scommon,
+                            sindiv=sindiv, class.sizes=class.sizes,
+                            shift.common=shift.common, shift.indiv=shift.indiv)
+x = out$x; y=out$y
+
+
+}
 \seealso{
 \code{cv.ptLasso}, \code{ptLasso}.
 }

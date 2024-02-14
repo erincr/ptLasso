@@ -12,6 +12,14 @@
 \description{
 Print the ptLasso object.
 }
+\examples{
+out = gaussian.example.data()
+x = out$x; y=out$y; groups = out$group;
+
+fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+print(fit)
+
+}
 \seealso{
 \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 }

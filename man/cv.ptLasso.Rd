@@ -17,9 +17,9 @@ cv.ptLasso(
   verbose = FALSE,
   fitall = NULL,
   fitind = NULL,
-  weights = NULL,
-  overall.lambda = "lambda.1se",
   s = "lambda.min",
+  which = "parms.min",
+  alphahat.choice = "overall",
   ...
 )
 }
@@ -44,15 +44,15 @@ cv.ptLasso(
 
 \item{verbose}{If \code{verbose=1}, print a statement showing which model is currently being fit.}
 
-\item{fitall}{An optional cv.glmnet object specifying the overall model.}
+\item{fitall}{An optional cv.glmnet (or cv.sparsenet) object specifying the overall model.}
 
-\item{fitind}{An optional list of cv.glmnet objects specifying the individual models.}
+\item{fitind}{An optional list of cv.glmnet (or cv.sparsenet) objects specifying the individual models.}
 
-\item{weights}{observation weights. Default is 1 for each observation.}
+\item{s}{For \code{fit.method = "glmnet"} only. The choice of lambda to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "lambda.min". May be "lambda.1se", or a numeric value. (Use caution when supplying a numeric value: the same lambda will be used for all models.)}
 
-\item{overall.lambda}{The choice of lambda to be used by the overall model when defining the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value.}
+\item{which}{For \code{fit.method = "sparsenet"} only. The choice of lambda and gamma to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "parms.min". May also be "parms.1se".}
 
-\item{s}{The choice of lambda to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "lambda.min". May be "lambda.1se", or a numeric value. (Use caution when supplying a numeric value: the same lambda will be used for all models.)}
+\item{alphahat.choice}{When choosing alphahat, we may prefer the best performance using all data (\code{alphahat.choice = "overall"}) or the best average performance across groups (\code{alphahat.choice = "mean"}). This is particularly useful when \code{type.measure} is "auc" or "C". These measures look at pairwise comparisons, and therefore are likely to be quite different when using the entire dataset (all pairwise comparisons) and individual groups (comparisons within groups only).}
 
 \item{\dots}{Additional arguments to be passed to the cv.glmnet function. Some notable choices are \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.}
 }
@@ -71,10 +71,48 @@ An object of class \code{"cv.ptLasso"}, which is a list with the ingredients of 
 Cross-validation for \code{ptLasso}.
 }
 \details{
-This function runs \code{ptLasso} once for each choice of alpha, and returns the cross-validated performance computed by cv.glmnet within each call to ptLasso.
+This function runs \code{ptLasso} once for each requested choice of alpha, and returns the cross validated performance.
 }
 \examples{
-1+1
+#### Gaussian example
+# Train data
+out = gaussian.example.data()
+x = out$x; y=out$y; groups = out$group;
+
+# Test data
+outtest = gaussian.example.data()
+xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
+
+# Model fitting
+cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+cvfit
+# plot(cvfit) # to see CV performance as a function of alpha 
+predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")
+
+#### Binomial example
+# Train data
+out = binomial.example.data()
+x = out$x; y=out$y; groups = out$group
+
+# Test data
+outtest = binomial.example.data()
+xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
+
+# Model fitting
+cvfit = cv.ptLasso(x, y, groups = groups, family = "binomial",
+                   type.measure = "auc", nfolds=3, verbose=TRUE, alphahat.choice="mean")
+cvfit
+# plot(cvfit) # to see CV performance as a function of alpha 
+predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.1se")
+
+\dontrun{
+### Model fitting with parallel = TRUE
+require(doMC)
+registerDoMC(cores = 4)
+outtest = binomial.example.data()
+xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
+cvfit = cv.ptLasso(x, y, groups = groups, family = "binomial", type.measure = "mse", parallel=TRUE)
+}
 
 }
 \seealso{

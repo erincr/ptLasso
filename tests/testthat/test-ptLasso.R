@@ -70,8 +70,8 @@ fit3=ptLasso(x,y,groups=groups,alpha=0.9,family="gaussian",foldid=foldid, overal
 pred3=predict(fit3,xtest,groupstest=groupstest, ytest=ytest)
 
 test_that("input_groups_gaussian_varying_alpha", {
-    expect_equal(pred.cv$alpha,
-                 c(1.0, 1.0, 0.8, 1.0, 0.2),
+    expect_equal(cvfit$varying.alphahat,
+                 c(0.7, 1.0, 0.8, 0.9, 0.9),
                  tolerance = test.tol)
 })
 
@@ -89,7 +89,7 @@ test_that("input_groups_gaussian_default_typemeasure", {
 
 test_that("input_groups_gaussian_errind", {
     expect_equal(unname(pred$errind),
-                 c(1220.0722, 1108.2213, 1220.0722, 1397.8612, 1344.5456, 1157.0300,  755.8094, 885.8602),
+                 c(1244.7535, 1112.2134, 1244.7535, 1474.2703, 1375.4495, 1154.0878, 684.8444, 872.4152),
                  tolerance = test.tol)
 })
 
@@ -114,25 +114,187 @@ test_that("input_groups_gaussian_errall_classes_mae", {
 
 test_that("input_groups_gaussian_errpre", {
     expect_equal(unname(pred$errpre),
-                 c(1222.1575, 1106.0599, 1222.1575, 1397.8030, 1360.9186, 1161.5376, 723.2822, 886.7580),
+                 c(1266.0932, 1127.9857, 1266.0932, 1517.4517, 1391.3365, 1161.3888,  683.1710, 886.5804),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_errpre_mae", {
     expect_equal(unname(pred2$errpre),
-                 c(27.13339, 25.76140, 27.13339, 29.19958, 29.80528, 24.71907, 21.05672, 24.02635),
+                 c(26.91595, 25.52184, 26.91595, 29.18884, 29.32310, 24.57115, 20.49902, 24.02710),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_cvfit", {
     expect_equal(unname(cvfit$errpre[, "mean"]),
-                 c(1219.8457, 1191.9438, 1076.0812, 1165.0411, 1061.4593, 1088.6896, 1017.7979, 998.3846, 1040.0013,  963.7354,  925.0839),
+                 c(1220.9146, 1188.0768, 1095.7855, 1154.4937, 1063.4857, 1077.6350, 1028.0313, 1003.9437, 1052.5944, 990.6146, 948.4639),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_cvfit_mae", {
     expect_equal(unname(cvfit2$errpre[, "mean"]),
-                 c(27.31231, 26.84761, 25.42703, 26.26976, 25.26297, 26.01384, 24.87154, 25.07562, 24.89512, 24.38719, 23.67217),
+                 c(27.16340, 26.95087, 26.12019, 26.37963, 25.15874, 26.13136, 25.23187, 24.98620, 25.28564, 24.60671, 24.00805),
+                 tolerance = test.tol)
+})
+
+##########################################################################################
+# (my) sparsenet vs glmnet
+##########################################################################################
+set.seed(1234)
+x = matrix(rnorm(200 * 100), nrow=200, ncol=100)
+beta = rnorm(100)
+y = x %*% beta + rnorm(100)
+
+# Fit a glmnet model and a sparsenet model.
+# Compare coefficients from both using the smallest lambda.
+gl = glmnet(x, y)
+gl.beta = coef(gl, s=min(gl$lambda))[-1] 
+
+sn = ptLasso:::my.cv.sparsenet(x, y)
+sn.beta = sn$sparsenet.fit$coefficients$g1$beta
+sn.beta = sn.beta[, ncol(sn.beta)]
+
+test_that("glmnet_sparsenet_base", {
+    expect_equal(gl.beta, unname(sn.beta),
+                 tolerance = 5e-2)
+})
+
+##########################################################################################
+# Input groups, Gaussian response, sparsenet
+##########################################################################################
+
+set.seed(1234)
+n=300
+k=5  # of classes
+p=140
+
+scommon=10 # # of common important  features
+sindiv=c(50,40,20,10,10)  #of individual important features
+class.sizes=c(100,80,60,30,30)
+del=rep(2.5,k)
+del2=rep(5, k)
+means = sample(1:k)
+sigma=20
+
+out=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+             class.sizes=class.sizes, beta.common=del, beta.indiv=del2,
+             intercepts=means, sigma=sigma)
+
+x=out$x
+y=out$y
+groups=out$groups
+
+nfolds=5
+foldid = rep(1, nrow(x))  
+for(kk in 1:k) foldid[groups == kk] = sample(1:nfolds, class.sizes[kk], replace=TRUE)
+
+out2=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+             class.sizes=class.sizes, beta.common=del, beta.indiv=del2,
+             intercepts=means, sigma=sigma)
+xtest=out2$x
+groupstest=out2$groups
+ytest=out2$y
+
+fit=ptLasso(x,y,groups=groups,alpha=0.9,fit.method="sparsenet",family="gaussian",type.measure="mse")
+pred=predict.ptLasso(fit,xtest,groupstest=groupstest, ytest=ytest)
+set.seed(1234)
+cvfit.gl=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5, overall.lambda = "lambda.1se")
+cvfit.sn=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5, fit.method="sparsenet", overall.parms = "parms.1se")
+pred.cv.gl=predict(cvfit.gl,xtest,groupstest=groupstest, ytest=ytest, alphatype="varying")
+pred.cv.sn=predict(cvfit.sn,xtest,groupstest=groupstest, ytest=ytest, alphatype="varying")
+
+pred.cv.gp2=predict(cvfit.sn,xtest[groupstest == 2, ],groupstest=groupstest[groupstest == 2], ytest=ytest[groupstest == 2], alphatype="varying")
+
+fit2=ptLasso(x,y,groups=groups,alpha=0.9,family="gaussian",type.measure="mae",foldid=NULL, nfolds=5, overall.parms = "parms.1se", fit.method = "sparsenet")
+pred2=predict.ptLasso(fit2,xtest,groupstest=groupstest, ytest=ytest)
+set.seed(1234)
+cvfit2=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mae",foldid=NULL, nfolds=5, overall.parms = "parms.1se", fit.method = "sparsenet")
+
+fit3=ptLasso(x,y,groups=groups,alpha=0.9,family="gaussian",foldid=foldid, overall.parms = "parms.1se", fit.method = "sparsenet") # should be mse
+pred3=predict(fit3,xtest,groupstest=groupstest, ytest=ytest)
+
+
+test_that("overall_support_glmnet", {
+    expect_equal(get.overall.support(cvfit.gl),
+                 get.overall.support(cvfit.gl$fit[[1]], s="lambda.1se"),
+                 tolerance = test.tol)
+})
+
+test_that("overall_support_sparsenet", {
+    expect_equal(get.overall.support(cvfit.sn),
+                 get.overall.support(cvfit.sn$fit[[1]], which="parms.1se"),
+                 tolerance = test.tol)
+})
+
+test_that("overall_support_sparsenet_matches_expected", {
+    expect_equal(get.overall.support(cvfit.sn, which="parms.min"),
+                 which((coef(cvfit.sn$fitall, which="parms.min") != 0)[-(1:5)]),
+                 tolerance = test.tol)
+})
+
+test_that("input_groups_gaussian_varying_alpha_sparsenet", {
+    expect_equal(pred.cv.sn$alpha,
+                 c(0.6, 0.6, 0.6, 0.2, 0.8),
+                 tolerance = test.tol)
+})
+
+test_that("input_groups_gaussian_varying_alpha_group2_sparsenet", {
+    expect_equal(pred.cv.gp2$yhatpre,
+                 pred.cv.sn$yhatpre[groupstest == 2],
+                 tolerance = test.tol)
+})
+
+test_that("input_groups_gaussian_default_typemeasure_sparsenet", {
+    expect_equal(pred3$errall,
+                 pred$errall,
+                 tolerance = test.tol)
+})
+
+test_that("input_groups_gaussian_errind_sparsenet", {
+    expect_equal(unname(pred$errind),
+                 c(1435.1853, 1220.2440, 1435.1853, 2115.2101, 1329.5889, 1099.1612,  684.8444,  872.4152),
+                 tolerance = test.tol)
+})
+
+test_that("input_groups_gaussian_errind_mae_sparsenet", {
+    expect_equal(unname(pred2$errind),
+                 c(26.54637, 25.40687, 26.54637, 28.14299, 28.82122, 24.72705, 20.94634, 24.39674),
+                 tolerance = test.tol)
+})
+
+
+test_that("input_groups_gaussian_errall_classes_sparsenet", {
+    expect_equal(unname(pred$errall),
+                 c(1539.3788, 1369.1626, 1539.3788, 1796.0633, 1792.2451, 1370.0848,  767.1935, 1120.2264),
+                 tolerance = test.tol)
+})
+
+test_that("input_groups_gaussian_errall_classes_mae_sparsenet", {
+    expect_equal(unname(pred2$errall),
+                 c(30.72768, 28.94636, 30.72768, 33.33252, 34.41040, 27.41851, 22.34286, 27.22750),
+                 tolerance = test.tol)
+})
+
+test_that("input_groups_gaussian_errpre", {
+    expect_equal(unname(pred$errpre),
+                 c(1446.8827, 1230.5545, 1446.8827, 2115.1859, 1351.8901, 1127.4709,  681.2481, 876.9777),
+                 tolerance = test.tol)
+})
+
+test_that("input_groups_gaussian_errpre_mae_sparsenet", {
+    expect_equal(unname(pred2$errpre),
+                 c(26.54058, 25.40164, 26.54058, 28.15902, 28.78011, 24.72639, 20.90221, 24.44045),
+                 tolerance = test.tol)
+})
+
+test_that("input_groups_gaussian_cvfit_sparsenet", {
+    expect_equal(unname(cvfit.sn$errpre[, "mean"]),
+                 c(993.6405, 1008.8463, 1021.692, 1008.1434,  996.0697,  982.1198,  893.4019, 969.6016,  976.5475,  960.7719,  968.8789),
+                 tolerance = test.tol)
+})
+
+test_that("input_groups_gaussian_cvfit_mae_sparsenet", {
+    expect_equal(unname(cvfit2$errpre[, "mean"]),
+                 c(23.77678, 24.98565, 24.49300, 24.88571, 25.02098, 24.70496, 24.44037, 24.07632, 24.77588, 24.47634, 23.89125),
                  tolerance = test.tol)
 })
 
@@ -212,21 +374,21 @@ test_that("input_groups_binomial_alpha_6", {
 
 test_that("input_groups_binomial_cvfit_varying_results", {
     expect_equal(unname(pred.cv$errpre),
-                 c(0.8039364, 0.8032907, 0.8200603, 0.8140153, 0.8714822, 0.8323103, 0.8033333, 0.6953125),
+                 c(0.8017334, 0.7746317, 0.8026978, 0.8080818, 0.8669481, 0.8233817, 0.8066667, 0.5680804),
                  tolerance = test.tol
                  )
 })
 
 test_that("input_groups_binomial_cvfit_varying_results", {
     expect_equal(unname(pred.cv.fixed$errpre),
-                 c(0.8236407, 0.8091339, 0.8263174, 0.8274169, 0.8727330, 0.8323103, 0.7911111, 0.7220982),
+                 c(0.7971495, 0.7627188, 0.7942565, 0.8140153, 0.8638211, 0.7898996, 0.7777778, 0.5680804),
                  tolerance = test.tol
                  )
 })
 
 test_that("input_groups_binomial_alphahat", {
     expect_equal(cvfit$alphahat,
-                 0.8,
+                 1,
                  tolerance = test.tol)
 })
 
@@ -238,21 +400,19 @@ test_that("input_groups_binomial_alphahat_dev", {
 
 test_that("input_groups_binomial_alphahat_class", {
     expect_equal(cvfit3$alphahat,
-                 0.9,
+                 0.6,
                  tolerance = test.tol)
 })
 
 test_that("input_groups_binomial_errind", {
     expect_equal(unname(pred$errind),
-                 c(0.8014108, 0.7691570, 0.8001212, 0.8150384,
-                   0.8631957, 0.8150112, 0.7811111, 0.5714286),
+                 c(0.7946016, 0.7644985, 0.7946722, 0.8066496, 0.8647592, 0.8007812, 0.7822222, 0.5680804),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_binomial_errind_deviance", {
     expect_equal(as.numeric(pred2$errind),
-                 c(1.169316, 1.229123, 1.169316, 1.162724,
-                   0.998955, 1.169598, 1.332257, 1.482081),
+                 c(1.183702, 1.238977, 1.183702, 1.168604, 1.036093, 1.188568, 1.341514, 1.460107),
                  tolerance = test.tol)
 })
 
@@ -274,13 +434,13 @@ test_that("input_groups_binomial_errall_deviance", {
 
 test_that("input_groups_binomial_errpre", {
     expect_equal(unname(pred$errpre),
-                 c(0.8164532, 0.7944248, 0.8162005, 0.8268031, 0.8724203, 0.8066406, 0.8077778, 0.6584821),
+                 c(0.8083980, 0.7777321, 0.8084310, 0.8298721, 0.8747655, 0.8013393, 0.7788889, 0.6037946),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_binomial_errpre_deviance", {
     expect_equal(unname(pred2$errpre),
-                 c(1.168425, 1.227096, 1.168425, 1.161033, 1.010871, 1.154915, 1.341117, 1.467543),
+                 c(1.187135, 1.256267, 1.187135, 1.160557, 1.023357, 1.176455, 1.398885, 1.522081),
                  tolerance = test.tol)
 })
 
@@ -322,7 +482,7 @@ cvfit=cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="class",fol
 
 test_that("input_groups_multinomial_errind", {
     expect_equal(unname(pred$errind),
-                 c(0.3877778, 0.3877778, 0.3877778, 0.4066667, 0.3688889),
+                 c(0.4055556, 0.4055556, 0.4055556, 0.3866667, 0.4244444),
                  tolerance = test.tol)
 })
 
@@ -349,8 +509,8 @@ p=140
 scommon=10 # # of common important  features
 sindiv=c(50,40,20,10,10)  #of individual important features
 class.sizes=c(100,80,60,30,30)
-del=rep(2.5,k)
-del2=rep(5, k)
+del=rep(5,k)
+del2=rep(4, k)
 means = sample(1:k)
 sigma=20
 
@@ -387,26 +547,26 @@ cvfit = cv.ptLasso(x,y,groups=groups,family="cox",type.measure="C",foldid=NULL, 
 
 test_that("input_groups_cox_alphahat", {
     expect_equal(cvfit$alphahat,
-                 0.2,
+                 0.7,
                  tolerance = test.tol)
 })
 
 test_that("input_groups_cox_errind", {
     expect_equal(unname(pred$errind),
-                 c(0.5726963, 0.5656087, 0.5781750, 0.6404417, 0.5208463, 0.5912654, 0.5443548, 0.5311355),
+                 c(0.5581741, 0.5685027, 0.5742311, 0.6417018, 0.5108565, 0.5510662, 0.6388889, 0.5000000),
                  tolerance = test.tol)
 })
 
 
 test_that("input_groups_cox_errall_classes", {
     expect_equal(unname(pred$errall),
-                 c(0.5033228, 0.4824847, 0.4957748, 0.5314010, 0.4237710, 0.5991041, 0.3709677, 0.4871795),
+                 c(0.5432290, 0.5234780, 0.5332552, 0.5428973, 0.4825090, 0.6442200, 0.4087302, 0.5390335),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_cox_errpre", {
     expect_equal(unname(pred$errpre),
-                 c(0.5421023, 0.5165051, 0.5414635, 0.5921325, 0.5202240, 0.5834267, 0.4032258, 0.4835165),
+                 c(0.5420089, 0.5415226, 0.5582235, 0.5798172, 0.5211098, 0.6531987, 0.4404762, 0.5130112),
                  tolerance = test.tol)
 })
 
@@ -427,7 +587,6 @@ xtest=out2$x
 ytest=out2$y
 groupstest=ytest
 
-
 fit=ptLasso(x,y,groups=groups,alpha=0.222,family="multinomial",use.case="targetGroups", type.measure="class",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
 pred=predict(fit,xtest,groupstest=groupstest, ytest=ytest)
 
@@ -439,7 +598,7 @@ cvfit2 = cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="devianc
 
 test_that("target_groups_misclassification_alphahat", {
     expect_equal(cvfit$alphahat,
-                 .6,
+                 0.4,
                  tolerance = test.tol)
 })
 
@@ -464,7 +623,7 @@ test_that("target_groups_deviance_errind", {
 
 test_that("target_groups_misclassification_errpre", {
     expect_equal(as.numeric(pred$errpre),
-                 c(0.05666667, 0.05111111, 0.05333333, 0.04666667, 0.05333333), 
+                 c(0.03333333, 0.05000000, 0.05000000, 0.05000000, 0.05000000), 
                  tolerance = test.tol)
 })
 
@@ -494,3 +653,4 @@ test_that("target_groups_deviance_errall", {
 test_that("multiplication works", {
   expect_equal(2 * 2, 4)
 })
+
