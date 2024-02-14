@@ -50,6 +50,11 @@
 #' # plot(fit) to see all of the cv.glmnet models trained
 #' predict(fit, xtest, groupstest, ytest=ytest)
 #'
+#' # Now with sparsenet
+#' fit = ptLasso(x, y, groups = groups, alpha = 0.5, fit.method = "sparsenet", family = "gaussian", type.measure = "mse")
+#' # plot(fit) to see all of the cv.sparsenet models trained
+#' predict(fit, xtest, groupstest, ytest=ytest)
+#'
 #' # Binomial example
 #' 
 #' out = binomial.example.data()
@@ -470,6 +475,10 @@ my.cv.sparsenet <- function(x, y, ...){
         for(ix in 1:length(model$sparsenet.fit$gamma)){
             model$sparsenet.fit$coefficients[[ix]]$beta = rbind(icept.rows, model$sparsenet.fit$coefficients[[ix]]$beta)
         }
+    }
+
+    if("offset" %in% names(params)){
+        model$fit.preval = model$fit.preval + params[["offset"]]
     }
 
     

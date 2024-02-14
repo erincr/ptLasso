@@ -13,6 +13,7 @@
   alphatype = c("fixed", "varying"),
   type = c("link", "response", "class"),
   s = "lambda.min",
+  which = "parms.min",
   return.link = FALSE
 )
 }

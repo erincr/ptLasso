@@ -60,6 +60,13 @@ subset.y <- function(y, ix, family) {
 #' # plot(cvfit) # to see CV performance as a function of alpha 
 #' predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")
 #'
+#' # Repeat, but this time use sparsenet instead of glmnet:
+#' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
+#'                    fit.method = "sparsenet", which = "parms.min")
+#' cvfit
+#' # plot(cvfit) # to see CV performance as a function of alpha 
+#' predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")
+#'
 #' #### Binomial example
 #' # Train data
 #' out = binomial.example.data()
@@ -133,7 +140,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
 
 
     if(fit.method == "sparsenet") { parms = if(which == "parms.min"){ function(m) m$which.min } else { function(m) m$which.1se } }
-
+    
     n <- nrow(x)
     p <- ncol(x)
 
@@ -189,22 +196,18 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                 if(fit.method == "glmnet"){
                     lamhat = get.lamhat(m, s)
                     err = c(err, m$cvm[m$lambda == lamhat])
-                } else if(fit.method == "sparsenet") {
-                    lamgam = parms(m)
-                    err = c(err, m$cvm[lamgam[1], lamgam[2]])
-                }
-
-                if(family == "multinomial"){
-                    pre.preds[groups == i, ] = m$fit.preval[, , m$lambda == lamhat]
-                } else {
-                    if(fit.method == "sparsenet"){
-                        pre.preds[groups == i]   = m$fit.preval[,  lamgam[1], lamgam[2]]
+                    if(family == "multinomial"){
+                        pre.preds[groups == i, ] = m$fit.preval[, , m$lambda == lamhat]
                     } else {
                         pre.preds[groups == i]   = m$fit.preval[,   m$lambda == lamhat]
                     }
+                } else if(fit.method == "sparsenet") {
+                    lamgam = parms(m)
+
+                    err = c(err, m$cvm[lamgam[1], lamgam[2]])
+                    pre.preds[groups == i] = m$fit.preval[,  lamgam[1], lamgam[2]]
                 }
             }
-        
             if(family == "multinomial") dim(pre.preds) = c(dim(pre.preds), 1)
             err = c(as.numeric(assess.glmnet(pre.preds, newy = y, family=family)[type.measure]), mean(err), weighted.mean(err, w = table(groups)/length(groups)), err)
         }

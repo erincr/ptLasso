@@ -20,6 +20,7 @@ cv.ptLasso(
   s = "lambda.min",
   which = "parms.min",
   alphahat.choice = "overall",
+  fit.method = "glmnet",
   ...
 )
 }
@@ -85,6 +86,13 @@ xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 
 # Model fitting
 cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+cvfit
+# plot(cvfit) # to see CV performance as a function of alpha 
+predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")
+
+# Repeat, but this time use sparsenet instead of glmnet:
+cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
+                   fit.method = "sparsenet", which = "parms.min")
 cvfit
 # plot(cvfit) # to see CV performance as a function of alpha 
 predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")

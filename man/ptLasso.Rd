@@ -95,6 +95,11 @@ fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.meas
 # plot(fit) to see all of the cv.glmnet models trained
 predict(fit, xtest, groupstest, ytest=ytest)
 
+# Now with sparsenet
+fit = ptLasso(x, y, groups = groups, alpha = 0.5, fit.method = "sparsenet", family = "gaussian", type.measure = "mse")
+# plot(fit) to see all of the cv.sparsenet models trained
+predict(fit, xtest, groupstest, ytest=ytest)
+
 # Binomial example
 
 out = binomial.example.data()

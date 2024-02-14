@@ -67,7 +67,7 @@
 #' @method predict cv.ptLasso
 #' @export
 predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NULL, alphatype = c("fixed", "varying"),
-                            type = c("link", "response", "class"), s = "lambda.min", return.link = FALSE){
+                            type = c("link", "response", "class"), s = "lambda.min", which = "parms.min", return.link = FALSE){
 
     if(missing("xtest")) stop("Please supply xtest.")
 
@@ -88,7 +88,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
         
         fit = cvfit$fit[[model.ix]]
 
-        out = predict.ptLasso(fit, xtest, groupstest=groupstest, ytest=ytest, type = type, s = s)
+        out = predict.ptLasso(fit, xtest, groupstest=groupstest, ytest=ytest, type = type, s = s, which = which)
         out$call = this.call
         
         return(out)
@@ -106,7 +106,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
                                                       xtest[groupstest == ix, ],
                                                       groupstest=groupstest[groupstest == ix],
                                                       ytest=ytest[groupstest == ix],
-                                                      type = type, s = s, return.link=TRUE)}
+                                                      type = type, s = s, which = which, return.link=TRUE)}
                          )
         
         all.preds = pre.preds = ind.preds = rep(NA, nrow(xtest))
