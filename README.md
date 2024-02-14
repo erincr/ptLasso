@@ -14,7 +14,7 @@ credentials::set_github_pat() (enter your PAT into the popup)
 remotes::install_github("erincr/ptLasso")
 ```
 
-Alternatively, you can download or clone this repo, cd into the director containing it, and use: 
+Alternatively, you can download or clone this repo, cd into the directory containing it, and use: 
 
 ```R CMD build ptLasso``
 
