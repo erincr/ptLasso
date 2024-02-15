@@ -17,17 +17,17 @@
 Get the coefficients from a fitted cv.ptLasso model.
 }
 \examples{
-# Train data
+set.seed(1234)
 out = gaussian.example.data()
 x = out$x; y=out$y; groups = out$group;
 
 cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
 # Get all model coefficients.
-coef(cvfit)
+names(coef(cvfit))
 
 coef(cvfit, model = "overall") # Overall model only
-coef(cvfit, model = "individual") # List of coefficients for each group model
-coef(cvfit, model = "pretrain", alpha = .5) # List of coefficients for each group model
+length(coef(cvfit, model = "individual")) # List of coefficients for each group model
+length(coef(cvfit, model = "pretrain", alpha = .5)) # List of coefficients for each group model
 
 }
 \seealso{

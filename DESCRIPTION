@@ -14,12 +14,13 @@ Repository: CRAN
 Date/Publication:
 NeedsCompilation: yes
 RoxygenNote: 7.3.0
-Imports: 
+Depends: 
     ggplot2,
     glmnet,
     gridExtra,
     Matrix,
-    stats,
+    stats
+Imports: 
     sparsenet
 Suggests: 
     knitr,

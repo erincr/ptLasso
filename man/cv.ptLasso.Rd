@@ -55,6 +55,8 @@ cv.ptLasso(
 
 \item{alphahat.choice}{When choosing alphahat, we may prefer the best performance using all data (\code{alphahat.choice = "overall"}) or the best average performance across groups (\code{alphahat.choice = "mean"}). This is particularly useful when \code{type.measure} is "auc" or "C". These measures look at pairwise comparisons, and therefore are likely to be quite different when using the entire dataset (all pairwise comparisons) and individual groups (comparisons within groups only).}
 
+\item{fit.method}{"glmnet" or "sparsenet". Defaults to "glmnet". If 'fit.method = "glmnet"', then \code{"cv.glmnet"} will be used to train models. If 'fit.method = "sparsenet"', \code{"cv.sparsenet"} will be used. The use of sparsenet is available only when 'family = "gaussian"'.}
+
 \item{\dots}{Additional arguments to be passed to the cv.glmnet function. Some notable choices are \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.}
 }
 \value{
@@ -76,11 +78,10 @@ This function runs \code{ptLasso} once for each requested choice of alpha, and r
 }
 \examples{
 #### Gaussian example
-# Train data
+set.seed(1234)
 out = gaussian.example.data()
 x = out$x; y=out$y; groups = out$group;
 
-# Test data
 outtest = gaussian.example.data()
 xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 
@@ -98,11 +99,10 @@ cvfit
 predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")
 
 #### Binomial example
-# Train data
+set.seed(1234)
 out = binomial.example.data()
 x = out$x; y=out$y; groups = out$group
 
-# Test data
 outtest = binomial.example.data()
 xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 

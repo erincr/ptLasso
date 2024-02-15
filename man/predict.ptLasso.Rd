@@ -34,32 +34,31 @@
 }
 \value{
 A list containing the requested predictions. If \code{ytest} is included, will also return error measures.
-\item{call} The call that produced this object.
-\item{alpha} The value(s) of alpha used to generate predictions. Will be the same alpha used to in model training.
-\item{yhatall} Predictions from the overall model.
-\item{yhatind} Predictions from the individual models.
-\item{yhatpre} Predictions from the pretrained models.
-\item{supall} Indices of the features selected by the overall model.
-\item{supind} Union of the indices of the features selected by the individual models.
-\item{suppre} Union of the indices of the features selected by the pretrained models. Includes features selected in the first stage of pretraining.
-\item{type.measure} If \code{ytest} is supplied, the performance measure computed.
-\item{errall} If \code{ytest} is supplied, performance for the overall model. This is a named vector containing performance for (1) the entire dataset, (2) the average performance across groups, (3) the average performance across groups weighted by group size and (4) group-specific performance.
-\item{errind} If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.
-\item{errpre} If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.
-\item{linkall} If\code{return.link} is TRUE, return the linear link from the overall model.
-\item{linkind} If\code{return.link} is TRUE, return the linear link from the individual models.
-\item{linkpre} If\code{return.link} is TRUE, return the linear link from the pretrained models.
+\item{call}{The call that produced this object.}
+\item{alpha}{The value(s) of alpha used to generate predictions. Will be the same alpha used to in model training.}
+\item{yhatall}{Predictions from the overall model.}
+\item{yhatind}{Predictions from the individual models.}
+\item{yhatpre}{Predictions from the pretrained models.}
+\item{supall}{Indices of the features selected by the overall model.}
+\item{supind}{Union of the indices of the features selected by the individual models.}
+\item{suppre}{Union of the indices of the features selected by the pretrained models. Includes features selected in the first stage of pretraining.}
+\item{type.measure} {If \code{ytest} is supplied, the string name of the computed performance measure.}
+\item{errall}{If \code{ytest} is supplied, performance for the overall model. This is a named vector containing performance for (1) the entire dataset, (2) the average performance across groups, (3) the average performance across groups weighted by group size and (4) group-specific performance.}
+\item{errind}{If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.}
+\item{errpre}{If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.}
+\item{linkall}{If\code{return.link} is TRUE, return the linear link from the overall model.}
+\item{linkind}{If\code{return.link} is TRUE, return the linear link from the individual models.}
+\item{linkpre}{If\code{return.link} is TRUE, return the linear link from the pretrained models.}
 }
 \description{
 Return predictions and performance measures for a test set.
 }
 \examples{
 # Gaussian example
-
+set.seed(1234)
 out = gaussian.example.data()
 x = out$x; y=out$y; groups = out$group
 
-# Test data
 outtest = gaussian.example.data()
 xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 

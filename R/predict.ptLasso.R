@@ -11,24 +11,25 @@
 #' @param alpha The chosen alpha to use for prediction. May be a vector containing one value of alpha for each group. If NULL, this will rely on the choice of "alphatype".
 #' @param alphatype Choice of '"fixed"' or '"varying"'. If '"fixed"', use the alpha that achieved best cross-validated performance. If '"varying"', each group uses the alpha that optimized the group-specific cross-validated performance.
 #' @param type Type of prediction required. Type '"link"' gives the linear predictors for '"binomial", '"multinomial"' or '"cox"' models; for '"gaussian"' models it gives the fitted values. Type '"response"' gives the fitted probabilities for '"binomial"' or '"multinomial"', and the fitted relative-risk for '"cox"'; for '"gaussian"' type '"response"' is equivalent to type '"link"'. Note that for '"binomial"' models, results are returned only for the class corresponding to the second level of the factor response. Type '"class"' applies only to '"binomial"' or '"multinomial"' models, and produces the class label corresponding to the maximum probability.
-#' @param s Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.
+#' @param s For 'fit.measure = "glmnet"' only. Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.
+#' @param which For 'fit.method = "sparsenet"' only. The choice of 'lambda' and 'gamma' at which predictions are required. Will use the same parameters for all models; can be "parms.1se" or "parms.min". Default is "parms.min".
 #' @param return.link If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkall}, \code{linkpre} and \code{linkind}.
 #' @return A list containing the requested predictions. If \code{ytest} is included, will also return error measures.
-#' \item{call} The call that produced this object.
-#' \item{alpha} The value(s) of alpha used to generate predictions.
-#' \item{yhatall} Predictions from the overall model.
-#' \item{yhatind} Predictions from the individual models.
-#' \item{yhatpre} Predictions from the pretrained models.
-#' \item{supall} Indices of the features selected by the overall model.
-#' \item{supind} Union of the indices of the features selected by the individual models.
-#' \item{suppre} Union of the indices of the features selected by the pretrained models. Includes features selected in the first stage of pretraining.
-#' \item{type.measure} If \code{ytest} is supplied, the performance measure computed.
-#' \item{errall} If \code{ytest} is supplied, performance for the overall model. This is a named vector containing performance for (1) the entire dataset, (2) the average performance across groups, (3) the average performance across groups weighted by group size and (4) group-specific performance.
-#' \item{errind} If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.
-#' \item{errpre} If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.
-#' \item{linkall} If\code{return.link} is TRUE, return the linear link from the overall model.
-#' \item{linkind} If\code{return.link} is TRUE, return the linear link from the individual models.
-#' \item{linkpre} If\code{return.link} is TRUE, return the linear link from the pretrained models.
+#' \item{call}{The call that produced this object.}
+#' \item{alpha}{The value(s) of alpha used to generate predictions.}
+#' \item{yhatall}{Predictions from the overall model.}
+#' \item{yhatind}{Predictions from the individual models.}
+#' \item{yhatpre}{Predictions from the pretrained models.}
+#' \item{supall}{Indices of the features selected by the overall model.}
+#' \item{supind}{Union of the indices of the features selected by the individual models.}
+#' \item{suppre}{Union of the indices of the features selected by the pretrained models. Includes features selected in the first stage of pretraining.}
+#' \item{type.measure}{If \code{ytest} is supplied, the performance measure computed.}
+#' \item{errall}{If \code{ytest} is supplied, performance for the overall model. This is a named vector containing performance for (1) the entire dataset, (2) the average performance across groups, (3) the average performance across groups weighted by group size and (4) group-specific performance.}
+#' \item{errind}{If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.}
+#' \item{errpre}{If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.}
+#' \item{linkall}{If \code{return.link} is TRUE, return the linear link from the overall model.}
+#' \item{linkind}{If \code{return.link} is TRUE, return the linear link from the individual models.}
+#' \item{linkpre}{If \code{return.link} is TRUE, return the linear link from the pretrained models.}
 #'
 #'
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer:
@@ -37,13 +38,12 @@
 #' @keywords models regression classification
 #' @examples
 #' #### Gaussian example
-#' # Train data
+#' set.seed(1234)
 #' out = gaussian.example.data()
 #' x = out$x; y=out$y; groups = out$group;
 #'
-#' # Test data
 #' outtest = gaussian.example.data()
-#' xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
+#' xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups;
 #'
 #' # Model fitting
 #' # By default, use the single value of alpha that had the best CV performance on the entire dataset:
@@ -56,11 +56,13 @@
 #' pred
 #'
 #' # Specify a single value of alpha and use lambda.1se.
-#' pred = predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.1se", alphatype = "varying", alpha = .3)
+#' pred = predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.1se",
+#'                alphatype = "varying", alpha = .3)
 #' pred
 #'
 #' # Specify a vector of choices for alpha: 
-#' pred = predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min", alphatype = "varying", alpha = c(.1, .2, .3, .4, .5))
+#' pred = predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min",
+#'                alphatype = "varying", alpha = c(.1, .2, .3, .4, .5))
 #' pred
 #'
 #' @import glmnet
@@ -198,29 +200,28 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 #' @param return.link If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkall}, \code{linkpre} and \code{linkind}.
 #' 
 #' @return A list containing the requested predictions. If \code{ytest} is included, will also return error measures.
-#' \item{call} The call that produced this object.
-#' \item{alpha} The value(s) of alpha used to generate predictions. Will be the same alpha used to in model training.
-#' \item{yhatall} Predictions from the overall model.
-#' \item{yhatind} Predictions from the individual models.
-#' \item{yhatpre} Predictions from the pretrained models.
-#' \item{supall} Indices of the features selected by the overall model.
-#' \item{supind} Union of the indices of the features selected by the individual models.
-#' \item{suppre} Union of the indices of the features selected by the pretrained models. Includes features selected in the first stage of pretraining.
-#' \item{type.measure} If \code{ytest} is supplied, the performance measure computed.
-#' \item{errall} If \code{ytest} is supplied, performance for the overall model. This is a named vector containing performance for (1) the entire dataset, (2) the average performance across groups, (3) the average performance across groups weighted by group size and (4) group-specific performance.
-#' \item{errind} If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.
-#' \item{errpre} If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.
-#' \item{linkall} If\code{return.link} is TRUE, return the linear link from the overall model.
-#' \item{linkind} If\code{return.link} is TRUE, return the linear link from the individual models.
-#' \item{linkpre} If\code{return.link} is TRUE, return the linear link from the pretrained models.
+#' \item{call}{The call that produced this object.}
+#' \item{alpha}{The value(s) of alpha used to generate predictions. Will be the same alpha used to in model training.}
+#' \item{yhatall}{Predictions from the overall model.}
+#' \item{yhatind}{Predictions from the individual models.}
+#' \item{yhatpre}{Predictions from the pretrained models.}
+#' \item{supall}{Indices of the features selected by the overall model.}
+#' \item{supind}{Union of the indices of the features selected by the individual models.}
+#' \item{suppre}{Union of the indices of the features selected by the pretrained models. Includes features selected in the first stage of pretraining.}
+#' \item{type.measure} {If \code{ytest} is supplied, the string name of the computed performance measure.}
+#' \item{errall}{If \code{ytest} is supplied, performance for the overall model. This is a named vector containing performance for (1) the entire dataset, (2) the average performance across groups, (3) the average performance across groups weighted by group size and (4) group-specific performance.}
+#' \item{errind}{If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.}
+#' \item{errpre}{If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.}
+#' \item{linkall}{If\code{return.link} is TRUE, return the linear link from the overall model.}
+#' \item{linkind}{If\code{return.link} is TRUE, return the linear link from the individual models.}
+#' \item{linkpre}{If\code{return.link} is TRUE, return the linear link from the pretrained models.}
 #'
 #' @examples
 #' # Gaussian example
-#' 
+#' set.seed(1234)
 #' out = gaussian.example.data()
 #' x = out$x; y=out$y; groups = out$group
 #'
-#' # Test data
 #' outtest = gaussian.example.data()
 #' xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 #' 

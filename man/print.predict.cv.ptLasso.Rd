@@ -28,7 +28,7 @@ pred = predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")
 print(pred)
 
 # If ytest is not supplied, just prints the pretrained predictions.
-pred = predict(fit, xtest, groupstest, s="lambda.min")
+pred = predict(cvfit, xtest, groupstest, s="lambda.min")
 print(pred)
 
 }

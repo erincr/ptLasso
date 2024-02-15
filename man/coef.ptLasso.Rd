@@ -26,11 +26,11 @@ x = out$x; y=out$y; groups = out$group;
 
 fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
 # Get all model coefficients.
-coef(fit)
+names(coef(fit))
 
 coef(fit, model = "overall") # Overall model only
-coef(fit, model = "individual") # List of coefficients for each group model
-coef(fit, model = "pretrain") # List of coefficients for each group model
+length(coef(fit, model = "individual")) # List of coefficients for each group model
+length(coef(fit, model = "pretrain")) # List of coefficients for each group model
 
 }
 \seealso{

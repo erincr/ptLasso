@@ -139,7 +139,7 @@ print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
 #' print(pred)
 #'
 #' # If ytest is not supplied, just prints the pretrained predictions.
-#' pred = predict(fit, xtest, groupstest, s="lambda.min")
+#' pred = predict(cvfit, xtest, groupstest, s="lambda.min")
 #' print(pred)
 #'
 #' @method print predict.cv.ptLasso

@@ -17,10 +17,11 @@
 A plot is produced, and nothing is returned.
 }
 \examples{
+set.seed(1234)
 out = gaussian.example.data()
 x = out$x; y=out$y; groups = out$group
 
-cvfit = cv.ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
+cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
 plot(cvfit) 
 
 }

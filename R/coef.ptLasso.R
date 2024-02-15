@@ -121,11 +121,11 @@ get.overall.support <- function(fit, s=NULL, which=NULL){
 #'
 #' fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
 #' # Get all model coefficients.
-#' coef(fit)
+#' names(coef(fit))
 #'
 #' coef(fit, model = "overall") # Overall model only
-#' coef(fit, model = "individual") # List of coefficients for each group model
-#' coef(fit, model = "pretrain") # List of coefficients for each group model
+#' length(coef(fit, model = "individual")) # List of coefficients for each group model
+#' length(coef(fit, model = "pretrain")) # List of coefficients for each group model
 #'
 #' @return Model coefficients. If \code{model = "overall"}, this function returns the output of \code{coef}. If \code{model} is "individual" or "pretrain", this function returns a list containing the results of \code{coef} for each group-specific model. If \code{model = "all"}, this returns a list containing all (overall, individual and pretrain) coefficients. 
 #'
@@ -158,17 +158,17 @@ coef.ptLasso=function(fit, model = c("all", "individual", "overall", "pretrain")
 #' @seealso \code{cv.ptLasso}, \code{ptLasso}.
 #' @keywords models regression classification
 #' @examples
-#' # Train data
+#' set.seed(1234)
 #' out = gaussian.example.data()
 #' x = out$x; y=out$y; groups = out$group;
 #'
 #' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
 #' # Get all model coefficients.
-#' coef(cvfit)
+#' names(coef(cvfit))
 #'
 #' coef(cvfit, model = "overall") # Overall model only
-#' coef(cvfit, model = "individual") # List of coefficients for each group model
-#' coef(cvfit, model = "pretrain", alpha = .5) # List of coefficients for each group model
+#' length(coef(cvfit, model = "individual")) # List of coefficients for each group model
+#' length(coef(cvfit, model = "pretrain", alpha = .5)) # List of coefficients for each group model
 #'
 #' @method coef cv.ptLasso
 #' @export
@@ -184,7 +184,7 @@ coef.cv.ptLasso=function(fit, model = c("all", "individual", "overall", "pretrai
         } else {
             which.alpha = which(alpha == fit$alphalist)
             if(length(which.alpha) == 0) stop("Please choose alpha from fit$alphalist")
-            pretrain    = coef(fit[[which.alpha]], "pretrain")
+            pretrain    = coef(fit$fit[[which.alpha]], "pretrain")
         }
     }
 

@@ -21,10 +21,11 @@ yaxis.name = function(x){
 #' @seealso \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
+#' set.seed(1234)
 #' out = gaussian.example.data()
 #' x = out$x; y=out$y; groups = out$group
 #' 
-#' cvfit = cv.ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
+#' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
 #' plot(cvfit) 
 #'
 #' @import ggplot2 gridExtra
@@ -195,6 +196,7 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 #' @seealso \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
+#' set.seed(1234)
 #' out = gaussian.example.data()
 #' x = out$x; y=out$y; groups = out$group
 #' 

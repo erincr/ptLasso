@@ -13,6 +13,7 @@
 A plot is produced, and nothing is returned.
 }
 \examples{
+set.seed(1234)
 out = gaussian.example.data()
 x = out$x; y=out$y; groups = out$group
 

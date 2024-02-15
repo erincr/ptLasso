@@ -23,6 +23,7 @@ ptLasso(
   penalty.factor = rep(1, nvars),
   fitall = NULL,
   fitind = NULL,
+  en.alpha = 1,
   ...
 )
 }
@@ -63,6 +64,8 @@ ptLasso(
 
 \item{fitind}{An optional list of cv.glmnet (or cv.sparsenet) objects specifying the individual models.}
 
+\item{en.alpha}{For 'fit.method = "glmnet"' only. The elasticnet mixing parameter, with 0 <= en.alpha <= 1. The penalty is defined as (1-alpha)/2||beta||_2^2+alpha||beta||_1. 'alpha=1' is the lasso penalty, and 'alpha=0' the ridge penalty. Default is `en.alpha = 1` (lasso).}
+
 \item{\dots}{Additional arguments to be passed to the cv.glmnet (or cv.sparsenet) functions. Notable choices include \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{"cv.glmnet"}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. ptLasso does not support the arguments \code{intercept}, \code{offset}, \code{fit} and \code{check.args}.}
 }
 \value{
@@ -82,12 +85,23 @@ An object of class \code{"ptLasso"}, which is a list with the ingredients of the
 Fits a pretrained lasso model using the glmnet package, for a fixed choice of the pretraining hyperparameter alpha. Additionally fits an "overall" model (using all data) and "individual" models (use each individual group). Can fit input-grouped data with Gaussian, multinomial, binomial or Cox outcomes, and target-grouped data, which necessarily has a multinomial outcome. Many ptLasso arguments are passed directly to glmnet (or sparsenet), and therefore the glmnet (sparsenet) documentation is another good reference for ptLasso.
 }
 \examples{
+# Getting started. First, we simulate data: we need covariates x, response y and group IDs.
+set.seed(1234)
+x = matrix(rnorm(1000*20), 1000, 20)
+y = rnorm(1000)
+groups = sort(rep(1:5, 200))
+
+# Now, we can fit a ptLasso model:
+fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
+# plot(fit) to see all of the cv.glmnet models trained
+
+# Now, we are ready to simulate slightly more realistic data.
 # Gaussian example
 
+set.seed(1234)
 out = gaussian.example.data()
 x = out$x; y=out$y; groups = out$group
 
-# Test data
 outtest = gaussian.example.data()
 xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 
@@ -96,16 +110,17 @@ fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.meas
 predict(fit, xtest, groupstest, ytest=ytest)
 
 # Now with sparsenet
-fit = ptLasso(x, y, groups = groups, alpha = 0.5, fit.method = "sparsenet", family = "gaussian", type.measure = "mse")
+fit = ptLasso(x, y, groups = groups, alpha = 0.5, fit.method = "sparsenet",
+              family = "gaussian", type.measure = "mse")
 # plot(fit) to see all of the cv.sparsenet models trained
 predict(fit, xtest, groupstest, ytest=ytest)
 
 # Binomial example
 
+set.seed(1234)
 out = binomial.example.data()
 x = out$x; y=out$y; groups = out$group
 
-# Test data
 outtest = binomial.example.data()
 xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 
