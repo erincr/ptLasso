@@ -16,7 +16,7 @@ remotes::install_github("erincr/ptLasso")
 
 Alternatively, you can download or clone this repo, cd into the directory containing it, and use: 
 
-```R CMD build ptLasso``
+```R CMD build ptLasso```
 
 followed by
 
