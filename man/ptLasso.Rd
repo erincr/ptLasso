@@ -42,9 +42,9 @@ ptLasso(
 
 \item{use.case}{The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".}
 
-\item{overall.lambda}{For 'fit.method = "glmnet"' only. The choice of lambda to be used by the overall model when defining the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value.}
+\item{overall.lambda}{For 'fit.method = "glmnet"' only. The choice of lambda to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value. This choice of lambda will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another lambda must be specified for the individual models, the second stage of pretraining and the overall model (to make standalone predictions).}
 
-\item{overall.parms}{For 'fit.method = "sparsenet"' only. The choice of lambda and gamma to be used by the overall model when defining the offset and penalty factor for pretrained lasso. Can be "parms.1se" or "parms.min". Defaults to "parms.1se".}
+\item{overall.parms}{For 'fit.method = "sparsenet"' only. The choice of lambda and gamma to be used by the overall model to define the offset and penalty factor for pretrained lasso. Can be "parms.1se" or "parms.min". Defaults to "parms.1se". For more information, see the description of \code{overall.lambda}.}
 
 \item{fit.method}{"glmnet" or "sparsenet". Defaults to "glmnet". If 'fit.method = "glmnet"', then \code{"cv.glmnet"} will be used to train models. If 'fit.method = "sparsenet"', \code{"cv.sparsenet"} will be used. The use of sparsenet is available only when 'family = "gaussian"'.}
 
