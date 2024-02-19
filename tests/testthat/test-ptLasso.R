@@ -59,6 +59,7 @@ set.seed(1234)
 cvfit=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5, overall.lambda = "lambda.min")
 pred.cv=predict(cvfit,xtest,groupstest=groupstest, ytest=ytest, alphatype="varying")
 
+
 pred.cv.gp2=predict(cvfit,xtest[groupstest == 2, ],groupstest=groupstest[groupstest == 2], ytest=ytest[groupstest == 2], alphatype="varying")
 
 fit2=ptLasso(x,y,groups=groups,alpha=0.9,family="gaussian",type.measure="mae",foldid=NULL, nfolds=5, overall.lambda = "lambda.min")
@@ -134,6 +135,13 @@ test_that("input_groups_gaussian_cvfit_mae", {
     expect_equal(unname(cvfit2$errpre[, "mean"]),
                  c(27.16340, 26.95087, 26.12019, 26.37963, 25.15874, 26.13136, 25.23187, 24.98620, 25.28564, 24.60671, 24.00805),
                  tolerance = test.tol)
+})
+
+check.type.default=cv.ptLasso(x,y,groups=groups,family="gaussian",foldid=NULL, nfolds=5, overall.lambda = "lambda.min")
+
+test_that("input_groups_gaussian_varying_alpha", {
+    expect_equal(check.type.default$type.measure,
+                 "mse")
 })
 
 ##########################################################################################
