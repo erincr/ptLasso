@@ -232,7 +232,8 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
         fit[[ii]]<- ptLasso(x,y,groups,alpha=alpha,family=family,type.measure=type.measure, use.case=use.case, foldid=foldid, nfolds=nfolds,
                             fitall = fitall, fitind = fitind, verbose = verbose, fit.method = fit.method, ...)
 
-        if(is.null(fitall)) fitall = fit[[ii]]$fitall
+        if(type.measure == "default") type.measure = fit[[ii]]$call$type.measure
+        if(is.null(fitall)) fitall = fit[[ii]]$fitall 
         if(is.null(fitind)) fitind = fit[[ii]]$fitind
         fitpre[[ii]] = fit[[ii]]$fitpre
 
@@ -249,7 +250,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
             if(family == "multinomial") pre.preds = matrix(NA, nrow = nrow(x), ncol = length(table(y)))
             for(i in 1:length(fitpre[[ii]])){
                 m = fitpre[[ii]][[i]]
-
+                
                 if(fit.method == "glmnet"){
                     lamhat = get.lamhat(m, s)
                     err = c(err, m$cvm[m$lambda == lamhat])
@@ -265,6 +266,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                     pre.preds[groups == i] = m$fit.preval[,  lamgam[1], lamgam[2]]
                 }
             }
+            
             if(family == "multinomial") dim(pre.preds) = c(dim(pre.preds), 1)
             err = c(as.numeric(assess.glmnet(pre.preds, newy = y, family=family)[type.measure]), mean(err), weighted.mean(err, w = table(groups)/length(groups)), err)
         }
