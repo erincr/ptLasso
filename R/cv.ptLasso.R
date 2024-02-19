@@ -46,15 +46,55 @@ subset.y <- function(y, ix, family) {
 #'
 #' @seealso \code{\link{ptLasso}} and \code{\link{plot.cv.ptLasso}}.
 #' @examples
-#' #### Gaussian example
+#' # Getting started. First, we simulate data: we need covariates x, response y and group IDs.
 #' set.seed(1234)
-#' out = gaussian.example.data()
-#' x = out$x; y=out$y; groups = out$group;
+#' x = matrix(rnorm(1000*20), 1000, 20)
+#' y = rnorm(1000)
+#' groups = sort(rep(1:5, 200))
+#' 
+#' xtest = matrix(rnorm(1000*20), 1000, 20)
+#' ytest = rnorm(1000)
+#' groupstest = sort(rep(1:5, 200))
+#' 
+#' # Model fitting
+#' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+#' cvfit
+#' # plot(cvfit) # to see CV performance as a function of alpha 
+#' predict(cvfit, xtest, groupstest, s="lambda.min") # to predict with held out data
+#' predict(cvfit, xtest, groupstest, s="lambda.min", ytest=ytest) # to also measure performance
 #'
-#' outtest = gaussian.example.data()
+#' # Now, we are ready to simulate slightly more realistic data.
+#' # This continuous outcome example has k = 5 groups, where each group has 200 observations.
+#' # There are scommon = 10 features shared across all groups, and
+#' # sindiv = 10 features unique to each group.
+#' # n = 1000 and p = 120 (60 informative features and 60 noise features).
+#' # The coefficients of the common features differ across groups (beta.common).
+#' # In group 1, these coefficients are rep(1, 10); in group 2 they are rep(2, 10), etc.
+#' # Each group has 10 unique features, the coefficients of which are all 3 (beta.indiv).
+#' # The intercept in all groups is 0.
+#' # The variable sigma = 20 indicates that we add noise to y according to 20 * rnorm(n). 
+#' set.seed(1234)
+#' k=5
+#' class.sizes=rep(200, k)
+#' scommon=10; sindiv=rep(10, k)
+#' n=sum(class.sizes); p=2*(sum(sindiv) + scommon)
+#' beta.common=3*(1:k); beta.indiv=rep(3, k)
+#' intercepts=rep(0, k)
+#' sigma=20
+#' out = gaussian.example.data(k=k, class.sizes=class.sizes,
+#'                             scommon=scommon, sindiv=sindiv,
+#'                             n=n, p=p,
+#'                             beta.common=beta.common, beta.indiv=beta.indiv,
+#'                             intercepts=intercepts, sigma=20)
+#' x = out$x; y=out$y; groups = out$group
+#'
+#' outtest = gaussian.example.data(k=k, class.sizes=class.sizes,
+#'                                 scommon=scommon, sindiv=sindiv,
+#'                                 n=n, p=p,
+#'                                 beta.common=beta.common, beta.indiv=beta.indiv,
+#'                                 intercepts=intercepts, sigma=20)
 #' xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 #'
-#' # Model fitting
 #' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
 #' cvfit
 #' # plot(cvfit) # to see CV performance as a function of alpha 
@@ -67,15 +107,33 @@ subset.y <- function(y, ix, family) {
 #' # plot(cvfit) # to see CV performance as a function of alpha 
 #' predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")
 #'
-#' #### Binomial example
+#' # Now, we repeat with a binomial outcome.
+#' # This example has k = 3 groups, where each group has 100 observations.
+#' # There are scommon = 5 features shared across all groups, and
+#' # sindiv = 5 features unique to each group.
+#' # n = 300 and p = 40 (20 informative features and 20 noise features).
+#' # The coefficients of the common features differ across groups (beta.common),
+#' # as do the coefficients specific to each group (beta.indiv).
 #' set.seed(1234)
-#' out = binomial.example.data()
+#' k=3
+#' class.sizes=rep(100, k)
+#' scommon=5; sindiv=rep(5, k)
+#' n=sum(class.sizes); p=2*(sum(sindiv) + scommon)
+#' beta.common=list(c(-.5, .5, .3, -.9, .1), c(-.3, .9, .1, -.1, .2), c(0.1, .2, -.1, .2, .3))
+#' beta.indiv = lapply(1:k, function(i)  0.9 * beta.common[[i]])
+#' 
+#' out = binomial.example.data(k=k, class.sizes=class.sizes,
+#'                             scommon=scommon, sindiv=sindiv,
+#'                             n=n, p=p,
+#'                             beta.common=beta.common, beta.indiv=beta.indiv)
 #' x = out$x; y=out$y; groups = out$group
 #'
-#' outtest = binomial.example.data()
+#' outtest = binomial.example.data(k=k, class.sizes=class.sizes,
+#'                                 scommon=scommon, sindiv=sindiv,
+#'                                 n=n, p=p,
+#'                                 beta.common=beta.common, beta.indiv=beta.indiv)
 #' xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 #'
-#' # Model fitting
 #' cvfit = cv.ptLasso(x, y, groups = groups, family = "binomial",
 #'                    type.measure = "auc", nfolds=3, verbose=TRUE, alphahat.choice="mean")
 #' cvfit
