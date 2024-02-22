@@ -109,17 +109,14 @@ print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
         print(disp, digits = digits, na.print="")   
         cat("\n")
      }
-        
-     #else {
-    #    # Anything better we can do here?
-    #    cat("\npred$yhatpre\n")
-    #    print(x$yhatpre)
-    #}
+
     cat("Support size:\n")
-    disp.support = matrix(c(length(x$supall), length(x$suppre), length(x$supind)), ncol=1)
+    disp.support = matrix(c(length(x$supall),
+                            paste0(length(x$suppre.common), " + ", length(x$suppre.individual), " (common + individual)"),
+                            length(x$supind)), ncol=1)
     rownames(disp.support) = c("Overall", "Pretrain", "Individual")
     colnames(disp.support) = ""
-    print(disp.support)
+    print(noquote(disp.support))
     
 }
 
@@ -156,33 +153,33 @@ print.predict.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
 {
     cat("\nCall: ", deparse(x$call), "\n\n")
 
+    if(length(x$alpha) > 1){
+          alpha.disp = x$alpha
+          names(alpha.disp) = paste0("group", 1:length(x$alpha))
+          cat("alpha:\n")
+          print(alpha.disp)
+        } else {
+          cat(c("alpha =",x$alpha), fill=TRUE)
+        }
+    cat("\n",fill=TRUE)
+    
     if("errpre" %in% names(x)){
         disp = rbind(x$errall, rbind(x$errpre,x$errind))
         rownames(disp) = c("Overall", "Pretrain", "Individual")
 
-        if(length(x$alpha) > 1){
-          cat(c("alpha =", paste(x$alpha, collapse=", ")))
-        } else {
-          cat(c("alpha =",x$alpha),fill=TRUE)
-        }
-        cat("\n",fill=TRUE)
-        
         cat("Performance (", x$type.measure, "):", "\n", sep="")
         print(disp, digits = digits)  
         cat("\n",fill=TRUE)
-        
-        cat("Support size:\n")
-        disp.support = matrix(c(length(x$supall), length(x$suppre), length(x$supind)), ncol=1)
-        rownames(disp.support) = c("Overall", "Pretrain", "Individual")
-        colnames(disp.support) = ""
-        print(disp.support)
+
      }
         
-     else {
-        # Anything better we can do here?
-        cat("\npred$yhatpre\n")
-        print(x$yhatpre)
-   }
+    cat("Support size:\n")
+    disp.support = matrix(c(length(x$supall),
+                          paste0(length(x$suppre.common), " + ", length(x$suppre.individual), " (common + individual)"),
+                          length(x$supind)), ncol=1)
+    rownames(disp.support) = c("Overall", "Pretrain", "Individual")
+    colnames(disp.support) = ""
+    print(noquote(disp.support))
 }
 
 

@@ -113,8 +113,13 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
                                                       ytest=ytest[groupstest == ix],
                                                       type = type, s = s, which = which, return.link=TRUE)}
                          )
+
         
         suppre = lapply(predgroups, function(ix) get.pretrain.support(cvfit$fit[[model.ix[ix]]], groups = ix, includeOverall = FALSE))
+        suppre = sort(unique(unlist(suppre)))
+        suppre.common =  get.overall.support(cvfit, s=cvfit$fitoverall.lambda)
+        suppre.individual = setdiff(suppre, suppre.common)
+        
         all.preds = pre.preds = ind.preds = rep(NA, nrow(xtest))
         all.link = pre.link = ind.link = rep(NA, nrow(xtest))
         for(kk in 1:length(predgroups)){
@@ -155,7 +160,8 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
             yhatind = ind.preds, 
             yhatpre = pre.preds,
 
-            suppre = sort(unique(unlist(suppre))), 
+            suppre.common,
+            suppre.individual,
             supall = results[[1]]$supall,
             supind = results[[1]]$supind,
 
@@ -408,25 +414,27 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
                    mean(errpre, na.rm=TRUE),
                    weighted.mean(errpre[!is.na(errpre)], group.weights),
                    errpre[!is.na(errpre)])
-        names(errall) = names(errpre) = names(errind) = c("allData", "mean", "wtdMean", paste0("group", sort(unique(groupstest))))
+        names(errall) = names(errpre) = names(errind) = c("allGroups", "mean", "wtdMean", paste0("group", sort(unique(groupstest))))
         
         if(fit$call$family == "gaussian") {
             errall = errall[which(names(errall) != "wtdMean")]
             errpre = errpre[which(names(errpre) != "wtdMean")]
             errind = errind[which(names(errind) != "wtdMean")]
             
-            errall = c("r^2" = r2(yhatall, ytest), errall)
-            errpre = c("r^2" = r2(yhatpre, ytest), errpre)
-            errind = c("r^2" = r2(yhatind, ytest), errind)
+            errall = c(errall, "r^2" = r2(yhatall, ytest))
+            errpre = c(errpre, "r^2" = r2(yhatpre, ytest))
+            errind = c(errind, "r^2" = r2(yhatind, ytest))
         }
     }
 
-    
+    suppre.common     =  get.overall.support(fit, s=fit$fitoverall.lambda)
+    suppre.individual = setdiff(get.pretrain.support(fit, s=s), suppre.common)
     
     out = enlist(yhatall = as.numeric(yhatall),
                  yhatind = as.numeric(yhatind),
                  yhatpre = as.numeric(yhatpre), 
-                 suppre  = get.pretrain.support(fit, s=s, which=which, includeOverall = FALSE),
+                 suppre.common,
+                 suppre.individual,
                  supind  = get.individual.support(fit, s=s, which=which),
                  supall  = get.overall.support(fit, s=s, which=which),
                  alpha = fit$alpha,
@@ -511,8 +519,12 @@ predict.ptLasso.targetGroups=function(fit, xtest,  errFun, family, type.measure,
         yhatpre = apply(yhatpre, 1, which.max)
     }
 
+    suppre.common     =  get.overall.support(fit, s=fit$fitoverall.lambda)
+    suppre.individual = setdiff(get.pretrain.support(fit, s=s), suppre.common)
+    
     out = enlist(yhatall, yhatind, yhatpre,
-                 suppre = get.pretrain.support(fit, s=s),
+                 suppre.individual,
+                 suppre.common,
                  supind = get.individual.support(fit, s=s),
                  supall = get.overall.support(fit, s=s),
                  alpha = fit$alpha,

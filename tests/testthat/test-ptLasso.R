@@ -90,38 +90,38 @@ test_that("input_groups_gaussian_default_typemeasure", {
 
 test_that("input_groups_gaussian_errind", {
     expect_equal(unname(pred$errind),
-                 c(0.1399469, 1244.7535, 1112.2134, 1474.2703, 1375.4495, 1154.0878, 684.8444, 872.4152),
+                 c(1244.7535, 1112.2134, 1474.2703, 1375.4495, 1154.0878, 684.8444, 872.4152, 0.1399469),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_errind_mae", {
     expect_equal(unname(pred2$errind),
-                 c(0.1307893, 26.81726, 25.54627, 28.35398, 29.66716, 24.83674, 20.92532, 23.94817),
+                 c(26.81726, 25.54627, 28.35398, 29.66716, 24.83674, 20.92532, 23.94817, 0.1307893),
                  tolerance = test.tol)
 })
 
 
 test_that("input_groups_gaussian_errall_classes", {
     expect_equal(unname(pred$errall),
-                 c(-0.07606314, 1557.3850, 1385.5203, 1808.8799, 1821.3583, 1389.9090,  780.7341, 1126.7373),
+                 c(1557.3850, 1385.5203, 1808.8799, 1821.3583, 1389.9090,  780.7341, 1126.7373, -0.07606314),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_errall_classes_mae", {
     expect_equal(unname(pred2$errall),
-                 c(-0.04667227, 30.07361, 28.13251, 33.17894, 33.70687, 26.47559, 21.75913, 25.54100),
+                 c(30.07361, 28.13251, 33.17894, 33.70687, 26.47559, 21.75913, 25.54100, -0.04667227),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_errpre", {
     expect_equal(unname(pred$errpre),
-                 c( 0.1252024, 1266.0932, 1127.9857, 1517.4517, 1391.3365, 1161.3888,  683.1710, 886.5804),
+                 c(1266.0932, 1127.9857, 1517.4517, 1391.3365, 1161.3888,  683.1710, 886.5804, 0.1252024),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_errpre_mae", {
     expect_equal(unname(pred2$errpre),
-                 c(0.1406901, 26.91595, 25.52184, 29.18884, 29.32310, 24.57115, 20.49902, 24.02710),
+                 c(26.91595, 25.52184, 29.18884, 29.32310, 24.57115, 20.49902, 24.02710, 0.1406901),
                  tolerance = test.tol)
 })
 
@@ -251,38 +251,38 @@ test_that("input_groups_gaussian_default_typemeasure_sparsenet", {
 
 test_that("input_groups_gaussian_errind_sparsenet", {
     expect_equal(unname(pred$errind),
-                 c(8.369452e-03, 1435.1853, 1220.2440, 2115.2101, 1329.5889, 1099.1612,  684.8444,  872.4152),
+                 c(1435.1853, 1220.2440, 2115.2101, 1329.5889, 1099.1612,  684.8444,  872.4152, 8.369452e-03),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_errind_mae_sparsenet", {
     expect_equal(unname(pred2$errind),
-                 c(0.1661463, 26.54637, 25.40687, 28.14299, 28.82122, 24.72705, 20.94634, 24.39674),
+                 c(26.54637, 25.40687, 28.14299, 28.82122, 24.72705, 20.94634, 24.39674, 0.1661463),
                  tolerance = test.tol)
 })
 
 
 test_that("input_groups_gaussian_errall_classes_sparsenet", {
     expect_equal(unname(pred$errall),
-                 c( -0.06362225, 1539.3788, 1369.1626, 1796.0633, 1792.2451, 1370.0848,  767.1935, 1120.2264),
+                 c( 1539.3788, 1369.1626, 1796.0633, 1792.2451, 1370.0848,  767.1935, 1120.2264, -0.06362225),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_errall_classes_mae_sparsenet", {
     expect_equal(unname(pred2$errall),
-                 c(-0.09114248, 30.72768, 28.94636, 33.33252, 34.41040, 27.41851, 22.34286, 27.22750),
+                 c(30.72768, 28.94636, 33.33252, 34.41040, 27.41851, 22.34286, 27.22750, -0.09114248),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_errpre", {
     expect_equal(unname(pred$errpre),
-                 c(2.871804e-04, 1446.8827, 1230.5545, 2115.1859, 1351.8901, 1127.4709,  681.2481, 876.9777),
+                 c(1446.8827, 1230.5545, 2115.1859, 1351.8901, 1127.4709,  681.2481, 876.9777, 2.871804e-04),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_errpre_mae_sparsenet", {
     expect_equal(unname(pred2$errpre),
-                 c( 0.1664984, 26.54058, 25.40164, 28.15902, 28.78011, 24.72639, 20.90221, 24.44045),
+                 c(26.54058, 25.40164, 28.15902, 28.78011, 24.72639, 20.90221, 24.44045, 0.1664984),
                  tolerance = test.tol)
 })
 
