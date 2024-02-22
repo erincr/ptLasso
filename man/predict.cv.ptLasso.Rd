@@ -66,7 +66,7 @@ out = gaussian.example.data()
 x = out$x; y=out$y; groups = out$group;
 
 outtest = gaussian.example.data()
-xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
+xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups;
 
 # Model fitting
 # By default, use the single value of alpha that had the best CV performance on the entire dataset:

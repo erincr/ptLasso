@@ -12,7 +12,7 @@
 #' @param fit.method "glmnet" or "sparsenet". Defaults to "glmnet". If 'fit.method = "glmnet"', then \code{"cv.glmnet"} will be used to train models. If 'fit.method = "sparsenet"', \code{"cv.sparsenet"} will be used. The use of sparsenet is available only when 'family = "gaussian"'.
 #' @param overall.lambda For 'fit.method = "glmnet"' only. The choice of lambda to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value. This choice of lambda will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another lambda must be specified for the individual models, the second stage of pretraining and the overall model (to make standalone predictions).
 #' @param overall.parms For 'fit.method = "sparsenet"' only. The choice of lambda and gamma to be used by the overall model to define the offset and penalty factor for pretrained lasso. Can be "parms.1se" or "parms.min". Defaults to "parms.1se". For more information, see the description of \code{overall.lambda}.
-#' @param fitall An optional cv.glmnet (or cv.sparsenet) object specifying the overall model.
+#' @param fitoverall An optional cv.glmnet (or cv.sparsenet) object specifying the overall model.
 #' @param fitind An optional list of cv.glmnet (or cv.sparsenet) objects specifying the individual models.
 #' @param nfolds Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.
 #' @param foldid An optional vector of values between 1 and \code{nfold} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.
@@ -30,11 +30,11 @@
 #' \item{k}{The number of groups.}
 #' \item{alpha}{The value of alpha used for pretraining.}
 #' \item{group.levels}{IDs for all of the groups used in training.}
-#' \item{fitall}{A fitted \code{cv.glmnet} or \code{cv.sparsenet} object trained using the full data.}
+#' \item{fitoverall}{A fitted \code{cv.glmnet} or \code{cv.sparsenet} object trained using the full data.}
 #' \item{fitpre}{A list of fitted (pretrained) \code{cv.glmnet} or \code{cv.sparsenet} objects, one trained with each data group.}
 #' \item{fitind}{A list of fitted \code{cv.glmnet} or \code{cv.sparsenet} objects, one trained with each group.}
-#' \item{fitall.lambda}{For 'fit.method = "glmnet"'. Lambda used with fitall, to compute the offset for pretraining.}
-#' \item{fitall.which}{For 'fit.method = "sparsenet"' only. Gamma and lambda choices used with fitall, to compute the offset for pretraining.}
+#' \item{fitoverall.lambda}{For 'fit.method = "glmnet"'. Lambda used with fitoverall, to compute the offset for pretraining.}
+#' \item{fitoverall.which}{For 'fit.method = "sparsenet"' only. Gamma and lambda choices used with fitoverall, to compute the offset for pretraining.}
 #' \item{y.mean}{Gaussian outcome only; mean of y for the training data, used for prediction.}
 #' 
 #' @examples
@@ -147,7 +147,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  verbose=FALSE,
                  weights=NULL,
                  penalty.factor = rep(1, nvars),
-                 fitall=NULL, fitind=NULL,
+                 fitoverall=NULL, fitind=NULL,
                  en.alpha = 1,
                  ...
                  ) {
@@ -161,7 +161,6 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     overall.parms = match.arg(overall.parms, c("parms.1se", "parms.min") , several.ok=FALSE)
 
     if(!(family %in% names(this.call))) this.call$family = family
-    if(!(type.measure %in% names(this.call))) this.call$type.measure = type.measure
     if(!(use.case %in% names(this.call))) this.call$use.case = use.case
     
     np=dim(x)
@@ -194,31 +193,16 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     
     # In the future, we want to be able to pass in just the predictions from the overall model.
     # This will be useful for settings where e.g. genentech has released a model (but maybe not as a glmnet object).
-    if(!is.null(fitall)){
-        if(!("cv.glmnet" %in% class(fitall)) & fit.method == "glmnet" ) stop("fitall must be a cv.glmnet object.")
-        if(!("cv.sparsenet" %in% class(fitall)) & fit.method == "sparsenet" ) stop("fitall must be a cv.sparsenet object.")
+    if(!is.null(fitoverall)){
+        if(!("cv.glmnet" %in% class(fitoverall)) & fit.method == "glmnet" ) stop("fitoverall must be a cv.glmnet object.")
+        if(!("cv.sparsenet" %in% class(fitoverall)) & fit.method == "sparsenet" ) stop("fitoverall must be a cv.sparsenet object.")
     }
     if(fit.method == "glmnet" & !is.null(fitind) & !(all(sapply(fitind, function(mm) "cv.glmnet" %in% class(mm))))) stop("fitind must be a list of cv.glmnet objects.")
     if(fit.method == "sparsenet" & !is.null(fitind) & !(all(sapply(fitind, function(mm) "cv.sparsenet" %in% class(mm))))) stop("fitind must be a list of cv.sparsenet objects.")
 
-    if(use.case == "targetGroups" & !(family %in% c("binomial", "multinomial"))){
-        stop("Only the multinomial and binomial families are available for target grouped data.")
-    }
+    type.measure = cvtype(type.measure=type.measure,family=family)
+    this.call$type.measure = type.measure
     
-    if(!(type.measure %in% c("class", "deviance")) & family == "multinomial"){
-        type.measure = "class"
-        message("Only class and deviance are available as type.measure for multinomial models; class used instead.")
-    }
-
-    if(type.measure == "auc" & family != "binomial"){
-        type.measure = "deviance"
-        message("Only the binomial family can use type.measure = auc. Deviance used instead")
-    }
-    
-    if(type.measure == "class" & !(family %in% c("binomial", "multinomial"))){
-        type.measure = "deviance"
-        message("Only multinomial and binomial families can use type.measure = class. Deviance used instead.")
-    }
     ############################################################################################################
     # End error checking
     ############################################################################################################
@@ -261,13 +245,13 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         overall.pf = c(rep(0, ncol(onehot.groups)), overall.pf)
     }
     
-    fitall.is.null = is.null(fitall)
-    if(fitall.is.null){
+    fitoverall.is.null = is.null(fitoverall)
+    if(fitoverall.is.null){
         if(verbose) cat("Fitting overall model",fill=TRUE)
 
         #strangely, gets upset if you do intercept=FALSE for cox
         if( family!="cox" & use.case == "inputGroups"){
-            fitall = method(cbind(onehot.groups, x), y,
+            fitoverall = method(cbind(onehot.groups, x), y,
                             family=family,
                             foldid=foldid, 
                             intercept=TRUE,
@@ -279,7 +263,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                             alpha=en.alpha,
                             ...)
         } else if(family == "cox") {
-            fitall = method(cbind(onehot.groups, x), y,
+            fitoverall = method(cbind(onehot.groups, x), y,
                             family=family,
                             foldid=foldid,  
                             type.measure=type.measure,
@@ -292,7 +276,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         } else if(use.case == "targetGroups") {
             type.multinomial = "grouped"
             if("type.multinomial" %in% names(list(...))) type.multinomial = list(...)$type.multinomial
-            fitall = method(x,y,
+            fitoverall = method(x,y,
                             family=family,
                             foldid=foldid,  
                             type.measure=type.measure,
@@ -307,41 +291,41 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     }
 
     if(fit.method == "glmnet"){
-        if(overall.lambda == "lambda.min") lamhat = fitall$lambda.min
-        if(overall.lambda == "lambda.1se") lamhat = fitall$lambda.1se
+        if(overall.lambda == "lambda.min") lamhat = fitoverall$lambda.min
+        if(overall.lambda == "lambda.1se") lamhat = fitoverall$lambda.1se
         if(is.numeric(overall.lambda)) lamhat = overall.lambda
     }
     if(fit.method == "sparsenet"){
-        if(overall.parms == "parms.1se") {which.parms = fitall$which.1se; parms = fitall$parms.1se}
-        if(overall.parms == "parms.min") {which.parms = fitall$which.min; parms = fitall$parms.min}
+        if(overall.parms == "parms.1se") {which.parms = fitoverall$which.1se; parms = fitoverall$parms.1se}
+        if(overall.parms == "parms.min") {which.parms = fitoverall$which.min; parms = fitoverall$parms.min}
     }
 
     if(use.case=="inputGroups"){
         if(fit.method == "glmnet"){
             if(family == "multinomial"){
-                preval.offset = fitall$fit.preval[, , fitall$lambda == lamhat]
-                bhatall=coef(fitall, s=lamhat, exact=FALSE)
+                preval.offset = fitoverall$fit.preval[, , fitoverall$lambda == lamhat]
+                bhatall=coef(fitoverall, s=lamhat, exact=FALSE)
                 bhatall=do.call(cbind, bhatall)
                 bhatall=bhatall[-(1:(k+1)), ]
                 supall=which(apply(bhatall, 1, function(x) sum(x != 0) > 0))
                 supall=unname(supall)
             } else {
-                preval.offset = fitall$fit.preval[, fitall$lambda == lamhat]
-                bhatall=as.numeric(coef(fitall, s=lamhat, exact=FALSE))
+                preval.offset = fitoverall$fit.preval[, fitoverall$lambda == lamhat]
+                bhatall=as.numeric(coef(fitoverall, s=lamhat, exact=FALSE))
                 if(family!="cox") supall=which(bhatall[-(1:(k+1))]!=0)
                 if(family=="cox") supall=which(bhatall[-(1:k)]!=0) 
             }
         } else if(fit.method == "sparsenet") {
-            preval.offset = fitall$fit.preval[, which.parms[1], which.parms[2]]
-            supall        = which(as.numeric(coef(fitall, which=overall.parms))[-(1:(k+1))] != 0)
+            preval.offset = fitoverall$fit.preval[, which.parms[1], which.parms[2]]
+            supall        = which(as.numeric(coef(fitoverall, which=overall.parms))[-(1:(k+1))] != 0)
         }
     } else if(use.case=="targetGroups"){ # glmnet only!
         preval.offset=vector("list",k)
-        bhatall.orig=coef(fitall, s=lamhat, exact=FALSE)
+        bhatall.orig=coef(fitoverall, s=lamhat, exact=FALSE)
         bhatall=vector("list", k)
         for(kk in 1:k){
             bhatall[[kk]] = as.numeric(bhatall.orig[[kk]])
-            preval.offset[[kk]] = fitall$fit.preval[, kk, fitall$lambda == lamhat]
+            preval.offset[[kk]] = fitoverall$fit.preval[, kk, fitoverall$lambda == lamhat]
         }
         supall = vector("list",k)
         for(kk in 1:k){ supall[[kk]]=which(bhatall[[kk]][-1]!=0)}
@@ -504,10 +488,10 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                k, alpha, group.levels,
                
                # Fitted models
-               fitall, fitind, fitpre
+               fitoverall = fitoverall, fitind, fitpre
     )
-    if(fit.method == "glmnet") out$fitall.lambda = lamhat
-    if(fit.method == "sparsenet") out$fitall.which = overall.parms
+    if(fit.method == "glmnet") out$fitoverall.lambda = lamhat
+    if(fit.method == "sparsenet") out$fitoverall.which = overall.parms
     class(out)="ptLasso"
     return(out)
 
@@ -553,3 +537,37 @@ my.cv.sparsenet <- function(x, y, ...){
     
     return(model)
 }
+
+#' Error checking for type.measure and family - modified from glmnet cvtype.R
+#' @noRd
+cvtype <- function(type.measure="mse",family="gaussian"){
+    type.measures = c("mse","deviance", "class", "auc", "mae","C")
+    devname=switch(family,
+                   "gaussian"="Mean-squared Error",
+                   "binomial"="Binomial Deviance",
+                   "cox"="Partial Likelihood Deviance",
+                   "multinomial"="Multinomial Deviance"
+                   )
+    typenames = c(deviance = devname, mse = "Mean-Squared Error",
+    mae = "Mean Absolute Error",auc = "AUC", class = "Misclassification Error",C="C-index")
+    subclass.ch=switch(family,
+                   "gaussian"=c(1,2,5),
+                   "binomial"=c(2,3,4),
+                   "cox"=c(2,6),
+                   "multinomial"=c(2,3)
+                   )
+   subclass.type=type.measures[subclass.ch]
+   if(type.measure=="default")type.measure=subclass.type[1]
+    model.name=switch(family,
+                   "gaussian"="Gaussian",
+                   "binomial"="Binomial",
+                   "cox"="Cox",
+                   "multinomial"="Multinomial"
+                   )
+    if(!match(type.measure,subclass.type,FALSE)){
+        type.measure=subclass.type[1]
+        warning(paste("Only ",paste(subclass.type,collapse=", ")," available as type.measure for ",model.name," models; ", type.measure," used instead",sep=""),call.=FALSE)
+    }
+    #names(type.measure)=typenames[type.measure]
+type.measure
+    }

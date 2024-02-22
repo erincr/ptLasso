@@ -96,7 +96,10 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
         return(out)
     } else {
         if(!all(sapply(alpha, function(x) any(abs(x - cvfit$errpre[, "alpha"]) < close.enough)))) stop("Includes at least one invalid choice of alpha. Please choose alpha from cvfit$alphalist.")
-        if(length(alpha) != cvfit$fit[[1]]$k) stop("Must have one alpha for each group.")
+        
+        # TODO: what if they have only e.g. one group at prediction time?
+        # They shouldn't have to supply alphas for every group.
+        if(length(alpha) != cvfit$fit[[1]]$k) stop("Must have one alpha for each group.") 
 
         model.ix = sapply(alpha, function(a) which(abs(a - cvfit$errpre[, "alpha"]) < close.enough))
         model.ix = unname(model.ix)
@@ -111,6 +114,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
                                                       type = type, s = s, which = which, return.link=TRUE)}
                          )
         
+        suppre = lapply(predgroups, function(ix) get.pretrain.support(cvfit$fit[[model.ix[ix]]], groups = ix, includeOverall = FALSE))
         all.preds = pre.preds = ind.preds = rep(NA, nrow(xtest))
         all.link = pre.link = ind.link = rep(NA, nrow(xtest))
         for(kk in 1:length(predgroups)){
@@ -145,13 +149,13 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 
             names(errall) = names(errpre) = names(errind) = c("overall", "mean", "wtdMean", paste0("group", 1:length(results)))
          }
-      
+        
         out = enlist(            
             yhatall = all.preds,
             yhatind = ind.preds, 
             yhatpre = pre.preds,
 
-            suppre = sort(unique(unlist(lapply(results, function(x) x$suppre)))), #lapply(results, function(x) x$suppre),
+            suppre = sort(unique(unlist(suppre))), 
             supall = results[[1]]$supall,
             supind = results[[1]]$supind,
 
@@ -274,13 +278,13 @@ predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL,
 #' @noRd
 predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, type.measure, type, call, return.link=FALSE, ytest=NULL, s="lambda.min", which="parms.min"){
 
-    if(inherits(fit$fitall, "cv.sparsenet")) this.predict = function(...) {
+    if(inherits(fit$fitoverall, "cv.sparsenet")) this.predict = function(...) {
         params = list(...)
         params$which = which
         params$type = "response"
         do.call(predict, params)
      }
-    if(inherits(fit$fitall, "cv.glmnet")) this.predict = function(...) predict(..., s=s) 
+    if(inherits(fit$fitoverall, "cv.glmnet")) this.predict = function(...) predict(..., s=s) 
     
     if(is.null(groupstest)) stop("Need group IDs for test data.")
         
@@ -292,9 +296,9 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
     onehot.test = model.matrix(~groupstest - 1)
     if(family != "cox") onehot.test = onehot.test[, 2:k, drop=FALSE]
     
-    phatall = this.predict(fit$fitall, cbind(onehot.test, xtest), type="link") 
+    phatall = this.predict(fit$fitoverall, cbind(onehot.test, xtest), type="link") 
 
-    yhatall = this.predict(fit$fitall, cbind(onehot.test, xtest), type=type) 
+    yhatall = this.predict(fit$fitoverall, cbind(onehot.test, xtest), type=type) 
     
     if(!is.null(ytest)){
         if(family == "multinomial") {
@@ -314,7 +318,7 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
     
     errpre=errind=rep(NA,k)
     
-    if(family == "multinomial") ncolumns = length(fit$fitall$glmnet.fit$beta)
+    if(family == "multinomial") ncolumns = length(fit$fitoverall$glmnet.fit$beta)
     if((family == "binomial") | (family == "gaussian") | (family == "cox")) ncolumns = 1
     phatpre=yhatpre=matrix(NA,nrow(xtest), ncolumns)
     phatind=yhatind=matrix(NA,nrow(xtest), ncolumns)
@@ -357,10 +361,10 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
         test.ix = groupstest == kk
         
         # Pretraining predictions
-        if(inherits(fit$fitall, "cv.sparsenet")){
-            offsetTest = (1-fit$alpha) * predict(fit$fitall, cbind(onehot.test[test.ix, ], xtest[test.ix,]), which=fit$fitall.which, type="response")
+        if(inherits(fit$fitoverall, "cv.sparsenet")){
+            offsetTest = (1-fit$alpha) * predict(fit$fitoverall, cbind(onehot.test[test.ix, ], xtest[test.ix,]), which=fit$fitoverall.which, type="response")
         } else {
-            offsetTest = (1-fit$alpha) * predict(fit$fitall, cbind(onehot.test[test.ix, ], xtest[test.ix,]), s=fit$fitall.lambda, type="link")
+            offsetTest = (1-fit$alpha) * predict(fit$fitoverall, cbind(onehot.test[test.ix, ], xtest[test.ix,]), s=fit$fitoverall.lambda, type="link")
         }
         if(family == "multinomial") offsetTest = offsetTest[, , 1]                             
         phatpre[test.ix, ] = this.predict(fit$fitpre[[kk]], xtest[test.ix,], newoffset=offsetTest,type="link") 
@@ -404,13 +408,25 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
                    mean(errpre, na.rm=TRUE),
                    weighted.mean(errpre[!is.na(errpre)], group.weights),
                    errpre[!is.na(errpre)])
-        names(errall) = names(errpre) = names(errind) = c("overall", "mean", "wtdMean", paste0("group", sort(unique(groupstest))))
+        names(errall) = names(errpre) = names(errind) = c("allData", "mean", "wtdMean", paste0("group", sort(unique(groupstest))))
+        
+        if(fit$call$family == "gaussian") {
+            errall = errall[which(names(errall) != "wtdMean")]
+            errpre = errpre[which(names(errpre) != "wtdMean")]
+            errind = errind[which(names(errind) != "wtdMean")]
+            
+            errall = c("r^2" = r2(yhatall, ytest), errall)
+            errpre = c("r^2" = r2(yhatpre, ytest), errpre)
+            errind = c("r^2" = r2(yhatind, ytest), errind)
+        }
     }
 
+    
+    
     out = enlist(yhatall = as.numeric(yhatall),
                  yhatind = as.numeric(yhatind),
                  yhatpre = as.numeric(yhatpre), 
-                 suppre  = get.pretrain.support(fit, s=s, which=which),
+                 suppre  = get.pretrain.support(fit, s=s, which=which, includeOverall = FALSE),
                  supind  = get.individual.support(fit, s=s, which=which),
                  supall  = get.overall.support(fit, s=s, which=which),
                  alpha = fit$alpha,
@@ -434,6 +450,12 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
 }
 
 
+#' Compute r^2
+#' @noRd
+r2 <- function(yhat, y) 1 - sum((yhat - y)^2)/sum((y - mean(y))^2)
+
+#' Call assess.glmnet for multinomial
+#' @noRd
 binomial.measure = function(newy, one.phat.column, measure = "deviance"){
      as.numeric(assess.glmnet(one.phat.column, newy=newy, family="binomial")[measure])
 }
@@ -449,15 +471,15 @@ predict.ptLasso.targetGroups=function(fit, xtest,  errFun, family, type.measure,
     yhatind=yhatpre=matrix(NA, nrow=nrow(xtest), ncol=k)
     errall=errind=errpre=rep(NA, k) 
 
-    phatall = predict(fit$fitall, xtest, s=s,type="link")[, , 1] 
-    yhatall = predict(fit$fitall, xtest, s=s,type=type)
+    phatall = predict(fit$fitoverall, xtest, s=s,type="link")[, , 1] 
+    yhatall = predict(fit$fitoverall, xtest, s=s,type=type)
     yhatall = if(type == "class"){ as.numeric(yhatall[, 1]) } else { yhatall[, , 1] }
     
     if(!is.null(ytest)){
         errall.overall = errFun(ytest, phatall)
     }
    
-    offsetMatrix = (1-fit$alpha) * predict(fit$fitall, xtest, s=fit$fitall.lambda, type="link")[, , 1]
+    offsetMatrix = (1-fit$alpha) * predict(fit$fitoverall, xtest, s=fit$fitoverall.lambda, type="link")[, , 1]
     for(kk in 1:k){
         # Pretraining predictions
         offsetTest = offsetMatrix[, kk]

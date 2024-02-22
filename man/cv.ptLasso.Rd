@@ -15,7 +15,7 @@ cv.ptLasso(
   nfolds = 10,
   foldid = NULL,
   verbose = FALSE,
-  fitall = NULL,
+  fitoverall = NULL,
   fitind = NULL,
   s = "lambda.min",
   which = "parms.min",
@@ -45,7 +45,7 @@ cv.ptLasso(
 
 \item{verbose}{If \code{verbose=1}, print a statement showing which model is currently being fit.}
 
-\item{fitall}{An optional cv.glmnet (or cv.sparsenet) object specifying the overall model.}
+\item{fitoverall}{An optional cv.glmnet (or cv.sparsenet) object specifying the overall model.}
 
 \item{fitind}{An optional list of cv.glmnet (or cv.sparsenet) objects specifying the individual models.}
 

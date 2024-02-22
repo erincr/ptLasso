@@ -158,6 +158,12 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
         scale_color_manual(values = c(overall.color, pretrain.color, individual.color), breaks = c("Overall", "Pretrain", "Individual")) +
         guides(color="none")
 
+    if(y.label == "Mean squared error") {
+        # Average of group-specific problems is the same as the overall model
+        print(plot1)
+        return()
+    }
+
     forplot = data.frame(
         "alpha"   = c(err.pre[,"alpha"], err.pre[,"alpha"], err.pre[,"alpha"]),
         "overall" = c(err.pre[, "mean"], rep(err.ind["mean"], n.alpha), rep(err.pan["mean"], n.alpha)),
@@ -216,13 +222,13 @@ plot.ptLasso = function(fit){
         nrow = 6,
         byrow = TRUE)
     
-    par(mar=c(1.8,4,1,2))
+    par(mar=c(1.8,3,1,2))
     layout(lo, heights=rep(c(1,3), 3))
     plot.new(); text(0.5,0.5,"Overall model", font=2, cex=1.5);
-    plot(fit$fitall); for(kk in 1:(fit$k - 1)) plot.new()
+    plot(fit$fitoverall); for(kk in 1:(fit$k - 1)) plot.new()
 
     line.nudge = -1
-    if(inherits(fit$fitall, "cv.sparsenet")) line.nudge = -1.5
+    if(inherits(fit$fitoverall, "cv.sparsenet")) line.nudge = -1.5
     
     plot.new(); text(0.5,0.5,"Pretrained models", font=2, cex=1.5);
     for(kk in 1:fit$k){
