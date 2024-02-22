@@ -155,14 +155,14 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
         labs(x = expression(alpha), y = y.label, color = "", title=paste0(as.character(k)," group problem")) +
         ylim(ylims[1], ylims[2]) +
         theme_minimal(base_size = 12) +
-        scale_color_manual(values = c(overall.color, pretrain.color, individual.color), breaks = c("Overall", "Pretrain", "Individual")) +
-        guides(color="none")
+        scale_color_manual(values = c(overall.color, pretrain.color, individual.color), breaks = c("Overall", "Pretrain", "Individual"))
 
     if(y.label == "Mean squared error") {
         # Average of group-specific problems is the same as the overall model
         print(plot1)
         return()
     }
+    plot1 = plot1 + guides(color="none")
 
     forplot = data.frame(
         "alpha"   = c(err.pre[,"alpha"], err.pre[,"alpha"], err.pre[,"alpha"]),
