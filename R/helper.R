@@ -20,7 +20,7 @@
 #' @export
 print.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3)) 
 {
-    cat("\nCall: ", deparse(x$call), "\n\n")
+    cat("\nCall: ", deparse(x$call), "\n\n", fill = 50)
     
     if("errpre" %in% names(x)){
         cat("type.measure: ", x$call$type.measure, "\n\n")
@@ -33,7 +33,11 @@ print.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
 
     cat("",fill=TRUE)
     cat(c("alphahat (fixed) =",x$alphahat),fill=TRUE)
-    cat(c("alphahat (varying) =", paste(x$varying.alphahat, collapse=", ")),fill=TRUE)
+    cat("alphahat (varying):\n")
+    alpha.disp = x$varying.alphahat
+    names(alpha.disp) = paste0("group", 1:length(x$varying.alphahat))
+    print(alpha.disp)
+    #cat(paste(x$varying.alphahat, collapse=", "),fill=TRUE)
     
 }
 
@@ -95,7 +99,7 @@ print.ptLasso=function (x)
 #' @export
 print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3)) 
 {
-    cat("\nCall: ", deparse(x$call), "\n\n")
+    cat("\nCall: ", deparse(x$call), "\n\n", fill = 50)
   
     cat(c("alpha = ", x$alpha, "\n"), fill=TRUE)
 
@@ -112,7 +116,9 @@ print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
 
     cat("Support size:\n")
     disp.support = matrix(c(length(x$supall),
-                            paste0(length(x$suppre.common), " + ", length(x$suppre.individual), " (common + individual)"),
+                            paste0(length(x$suppre.common) + length(x$suppre.individual),
+                                   " (", length(x$suppre.common), " common + ",
+                                   length(x$suppre.individual), " individual)"),
                             length(x$supind)), ncol=1)
     rownames(disp.support) = c("Overall", "Pretrain", "Individual")
     colnames(disp.support) = ""
@@ -151,7 +157,7 @@ print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
 #' @export
 print.predict.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3)) 
 {
-    cat("\nCall: ", deparse(x$call), "\n\n")
+    cat("\nCall: ", deparse(x$call), "\n\n", fill = 50)
 
     if(length(x$alpha) > 1){
           alpha.disp = x$alpha
@@ -175,7 +181,10 @@ print.predict.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
         
     cat("Support size:\n")
     disp.support = matrix(c(length(x$supall),
-                          paste0(length(x$suppre.common), " + ", length(x$suppre.individual), " (common + individual)"),
+                          #paste0(length(x$suppre.common), " + ", length(x$suppre.individual), " (common + individual)"),
+                          paste0(length(x$suppre.common) + length(x$suppre.individual),
+                                 " (", length(x$suppre.common), " common + ",
+                                 length(x$suppre.individual), " individual)"),
                           length(x$supind)), ncol=1)
     rownames(disp.support) = c("Overall", "Pretrain", "Individual")
     colnames(disp.support) = ""
