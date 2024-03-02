@@ -54,6 +54,8 @@ groupstest=out2$groups
 ytest=out2$y
 
 fit=ptLasso(x,y,groups=groups,alpha=0.9,family="gaussian",type.measure="mse",foldid=foldid, overall.lambda = "lambda.min")
+#fit2=ptLasso(x,y,groups=groups,alpha=0.9,family="gaussian",type.measure="mse", lower.limits = 0, foldid=foldid, overall.lambda = "lambda.min")
+
 pred=predict(fit,xtest,groupstest=groupstest, ytest=ytest)
 set.seed(1234)
 cvfit=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5, overall.lambda = "lambda.min")
@@ -621,6 +623,9 @@ pred2=predict.ptLasso(fit2,xtest,groupstest=groupstest, ytest=ytest)
 
 cvfit = cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="class", use.case="targetGroups", foldid=NULL, nfolds=3, overall.lambda="lambda.min")
 cvfit2 = cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="deviance", use.case="targetGroups", foldid=NULL, nfolds=3, overall.lambda="lambda.min")
+pred2=predict(cvfit2,xtest,groupstest=groupstest, ytest=ytest)
+pred3=predict(cvfit2,xtest,groupstest=groupstest, ytest=ytest, alphatype = "varying")
+
 
 test_that("target_groups_misclassification_alphahat", {
     expect_equal(cvfit$alphahat,
@@ -655,7 +660,7 @@ test_that("target_groups_misclassification_errpre", {
 
 test_that("target_groups_deviance_errpre", {
     expect_equal(as.numeric(pred2$errpre),
-                 c(0.2632167, 0.2732831, 0.2520971, 0.2998221, 0.2679302), 
+                 c(0.2459651, 0.2565011, 0.2619418, 0.2756477, 0.2319137), 
                  tolerance = test.tol)
 })
 
@@ -672,6 +677,19 @@ test_that("target_groups_deviance_errall", {
                  tolerance = test.tol)
 })
 
+
+test_that("target_groups_misclassification_varying_alpha", {
+    expect_equal(unname(pred3$errpre),
+                 c(0.2380190, 0.2523420, 0.2579512, 0.2734330, 0.2256416), 
+                 tolerance = test.tol)
+})
+
+
+test_that("target_groups_misclassification_varying_alpha_errind_same", {
+    expect_equal(unname(pred2$errind),
+                 unname(pred3$errind), 
+                 tolerance = test.tol)
+})
 
 ###########################################################################
 # Example test 

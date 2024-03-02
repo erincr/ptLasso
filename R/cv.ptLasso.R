@@ -29,7 +29,7 @@ subset.y <- function(y, ix, family) {
 #' @param alphahat.choice When choosing alphahat, we may prefer the best performance using all data (\code{alphahat.choice = "overall"}) or the best average performance across groups (\code{alphahat.choice = "mean"}). This is particularly useful when \code{type.measure} is "auc" or "C". These measures look at pairwise comparisons, and therefore are likely to be quite different when using the entire dataset (all pairwise comparisons) and individual groups (comparisons within groups only).
 #' @param use.case The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".
 #' @param verbose If \code{verbose=1}, print a statement showing which model is currently being fit.
-#' @param fitoverall An optional cv.glmnet (or cv.sparsenet) object specifying the overall model.
+#' @param fitoverall An optional cv.glmnet (or cv.sparsenet) object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.
 #' @param fitind An optional list of cv.glmnet (or cv.sparsenet) objects specifying the individual models.
 #' @param fit.method "glmnet" or "sparsenet". Defaults to "glmnet". If 'fit.method = "glmnet"', then \code{"cv.glmnet"} will be used to train models. If 'fit.method = "sparsenet"', \code{"cv.sparsenet"} will be used. The use of sparsenet is available only when 'family = "gaussian"'.
 #' @param \dots Additional arguments to be passed to the cv.glmnet function. Some notable choices are \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.
@@ -159,6 +159,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                        s = "lambda.min", which = "parms.min",
                        alphahat.choice = "overall",
                        fit.method = "glmnet",
+                       group.intercepts = TRUE,
                        ...) { 
      
     use.case = match.arg(use.case, c("inputGroups","targetGroups"), several.ok=FALSE)
@@ -195,10 +196,10 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
         }
     }
 
-    fit=vector("list",length(alphalist))
+    fit = vector("list",length(alphalist))
     fitpre = list()
     
-    class.sizes=table(groups)
+    class.sizes = table(groups)
     
     errcvm=NULL
     ii=0
@@ -210,7 +211,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
         }
         
         fit[[ii]]<- ptLasso(x,y,groups,alpha=alpha,family=family,type.measure=type.measure, use.case=use.case, foldid=foldid, nfolds=nfolds,
-                            fitoverall = fitoverall, fitind = fitind, verbose = verbose, fit.method = fit.method, ...)
+                            fitoverall = fitoverall, fitind = fitind, verbose = verbose, fit.method = fit.method, group.intercepts = group.intercepts, ...)
 
         type.measure = fit[[ii]]$call$type.measure
         

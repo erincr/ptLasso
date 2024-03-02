@@ -73,21 +73,22 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 
     if(missing("xtest")) stop("Please supply xtest.")
 
-    this.call <- match.call()
+    type = match.arg(type, several.ok = FALSE)
+    
+    this.call = match.call()
     
     alphatype = match.arg(alphatype)
     if(is.null(alpha)) {
         if(alphatype == "fixed")   alpha = cvfit$alphahat
         if(alphatype == "varying") alpha = cvfit$varying.alphahat
-    }
-    
+    }    
     close.enough = 1e-6
     if(length(alpha) == 1){      
         if(all(abs(alpha - cvfit$errpre[, "alpha"]) > close.enough)) stop("Not a valid choice of alpha. Please choose alpha from cvfit$alphalist.")
         
         model.ix = which(abs(cvfit$errpre[, "alpha"] - alpha) < close.enough)    
         if(length(model.ix) > 1) model.ix = model.ix[1]
-        
+       
         fit = cvfit$fit[[model.ix]]
 
         out = predict.ptLasso(fit, xtest, groupstest=groupstest, ytest=ytest, type = type, s = s, which = which)
@@ -95,31 +96,52 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
         
         return(out)
     } else {
-        if(!all(sapply(alpha, function(x) any(abs(x - cvfit$errpre[, "alpha"]) < close.enough)))) stop("Includes at least one invalid choice of alpha. Please choose alpha from cvfit$alphalist.")
+        if(!all(sapply(alpha, function(x) any(abs(x - cvfit$errpre[, "alpha"]) < close.enough)))) {
+            stop("Includes at least one invalid choice of alpha. Please choose alpha from cvfit$alphalist.")
+        }
         
-        # TODO: what if they have only e.g. one group at prediction time?
+        # TODO future: what if they have only e.g. one group at prediction time?
         # They shouldn't have to supply alphas for every group.
         if(length(alpha) != cvfit$fit[[1]]$k) stop("Must have one alpha for each group.") 
-
+        
         model.ix = sapply(alpha, function(a) which(abs(a - cvfit$errpre[, "alpha"]) < close.enough))
         model.ix = unname(model.ix)
 
-        predgroups = sort(unique(groupstest))
-        
-        results = lapply(predgroups,
-                         function(ix) {predict.ptLasso(cvfit$fit[[model.ix[ix]]],
-                                                      xtest[groupstest == ix, ],
-                                                      groupstest=groupstest[groupstest == ix],
-                                                      ytest=ytest[groupstest == ix],
-                                                      type = type, s = s, which = which, return.link=TRUE)}
-                         )
+        if(cvfit$call$use.case == "targetGroups") {
+            results = lapply(1:cvfit$fit[[1]]$k,
+                             function(ix) {predict.ptLasso.targetGroups(cvfit$fit[[model.ix[ix]]],
+                                                           xtest, ytest = ytest,
+                                                           pred.groups = ix,
+                                                           process.results = FALSE,
+                                                           type = type, s = s, return.link=TRUE)}
+                             )
+            phatall = results[[1]]$phatall
+            phatpre = do.call(cbind, lapply(results, function(x) x$phatpre))
+            phatind = do.call(cbind, lapply(results, function(x) x$phatind))
+            suppre.common = results[[1]]$suppre.common
+            suppre.individual = unique(sort(unlist(lapply(results, function(x) x$suppre.individual))))
+            
+            return(process.targetGroup.results(phatall = phatall, phatpre = phatpre, phatind = phatind,
+                                        ytest = ytest, k = cvfit$fit[[1]]$k, type.measure = cvfit$type.measure,
+                                        return.link = return.link, type = type,
+                                        alpha = alpha, s = s, call = this.call, fit = cvfit,
+                                        suppre.common = suppre.common, suppre.individual = suppre.individual
+                                        )
+
+                   )
+        }
 
         
-        suppre = lapply(predgroups, function(ix) get.pretrain.support(cvfit$fit[[model.ix[ix]]], groups = ix, includeOverall = FALSE))
-        suppre = sort(unique(unlist(suppre)))
-        suppre.common =  get.overall.support(cvfit, s=cvfit$fitoverall.lambda)
-        suppre.individual = setdiff(suppre, suppre.common)
-        
+        predgroups = sort(unique(groupstest))
+
+        results = lapply(predgroups,
+                             function(ix) {predict.ptLasso(cvfit$fit[[model.ix[ix]]],
+                                                           xtest[groupstest == ix, ],
+                                                           groupstest=groupstest[groupstest == ix],
+                                                           ytest=ytest[groupstest == ix],
+                                                           type = type, s = s, which = which, return.link=TRUE)}
+                             )
+
         all.preds = pre.preds = ind.preds = rep(NA, nrow(xtest))
         all.link = pre.link = ind.link = rep(NA, nrow(xtest))
         for(kk in 1:length(predgroups)){
@@ -132,6 +154,11 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
             ind.link[groupstest == predgroups[kk]] = results[[kk]]$linkind
         }
         
+        suppre = lapply(predgroups, function(ix) get.pretrain.support(cvfit$fit[[model.ix[ix]]], groups = ix, includeOverall = FALSE))
+        suppre = sort(unique(unlist(suppre)))
+        suppre.common =  get.overall.support(cvfit, s=cvfit$fitoverall.lambda)
+        suppre.individual = setdiff(suppre, suppre.common)
+
         if(!is.null(ytest)){
             group.weights = table(groupstest)/length(groupstest)
             errall = sapply(results, function(r) r$errall[grepl("group", names(r$errall))])
@@ -243,13 +270,15 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 #' @method predict ptLasso
 #' @export
 predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL, 
-                         type = c("link", "response", "class"), s="lambda.min", which="parms.min", return.link=FALSE){
+                         type = c("link", "response", "class"),
+                         s="lambda.min", which="parms.min", return.link=FALSE){
 
     this.call <- match.call()
     
     type = match.arg(type)
     family = fit$call$family
     type.measure = fit$call$type.measure
+    group.intercepts = fit$call$group.intercepts
     
     if(type == "class" & !(family %in% c("binomial", "multinomial")) ){
         stop("Class prediction is only valid for binomial and multinomial models.")
@@ -273,16 +302,18 @@ predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL,
             }
         }
     }
+
     
-    if(fit$call$use.case=="inputGroups") out=predict.ptLasso.inputGroups(fit, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s, which=which, return.link=return.link)
-    if(fit$call$use.case=="targetGroups") out=predict.ptLasso.targetGroups(fit, xtest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s, return.link=return.link)
+    if(fit$call$use.case=="inputGroups") out=predict.ptLasso.inputGroups(fit, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s, which=which, return.link=return.link, group.intercepts=group.intercepts)
+    if(fit$call$use.case=="targetGroups") out=predict.ptLasso.targetGroups(fit, xtest, ytest=ytest, type=type, call=this.call, family=family, type.measure=type.measure, s=s, return.link=return.link)
     class(out)="predict.ptLasso"
     return(out)
 }
 
 #' Predict function for input grouped data
 #' @noRd
-predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, type.measure, type, call, return.link=FALSE, ytest=NULL, s="lambda.min", which="parms.min"){
+predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, type.measure, type, call, group.intercepts,
+                                     s="lambda.min", return.link=FALSE, ytest=NULL, which="parms.min"){
 
     if(inherits(fit$fitoverall, "cv.sparsenet")) this.predict = function(...) {
         params = list(...)
@@ -297,10 +328,13 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
     k=fit$k
     
     predgroups = sort(unique(groupstest))
-    
-    groupstest = factor(groupstest, levels=fit$group.levels)
-    onehot.test = model.matrix(~groupstest - 1)
-    if(family != "cox") onehot.test = onehot.test[, 2:k, drop=FALSE]
+
+    onehot.test = NULL
+    if(group.intercepts == TRUE){
+        groupstest = factor(groupstest, levels=fit$group.levels)
+        onehot.test = model.matrix(~groupstest - 1)
+        if(family != "cox") onehot.test = onehot.test[, 2:k, drop=FALSE]
+    }
     
     phatall = this.predict(fit$fitoverall, cbind(onehot.test, xtest), type="link") 
 
@@ -470,64 +504,92 @@ binomial.measure = function(newy, one.phat.column, measure = "deviance"){
 
 #' Predict function for target grouped data
 #' @noRd
-predict.ptLasso.targetGroups=function(fit, xtest,  errFun, family, type.measure, type, call, return.link=FALSE, ytest=NULL, s="lambda.min"){
+predict.ptLasso.targetGroups=function(fit, xtest, family, type.measure, type, call,
+                                      return.link=FALSE, ytest=NULL, s="lambda.min",
+                                      pred.groups = 1:fit$k, process.results=TRUE){
    
     k=fit$k
     groups=fit$y
 
-    phatind=phatpre=matrix(NA, nrow=nrow(xtest), ncol=k)
-    yhatind=yhatpre=matrix(NA, nrow=nrow(xtest), ncol=k)
-    errall=errind=errpre=rep(NA, k) 
+    phatind = phatpre = matrix(NA, nrow=nrow(xtest), ncol=length(pred.groups))
 
     phatall = predict(fit$fitoverall, xtest, s=s,type="link")[, , 1] 
-    yhatall = predict(fit$fitoverall, xtest, s=s,type=type)
-    yhatall = if(type == "class"){ as.numeric(yhatall[, 1]) } else { yhatall[, , 1] }
     
-    if(!is.null(ytest)){
-        errall.overall = errFun(ytest, phatall)
-    }
-   
     offsetMatrix = (1-fit$alpha) * predict(fit$fitoverall, xtest, s=fit$fitoverall.lambda, type="link")[, , 1]
-    for(kk in 1:k){
+    
+    ix = 1
+    
+    for(kk in pred.groups){
+        
         # Pretraining predictions
-        offsetTest = offsetMatrix[, kk]
-        phatpre[,kk] = as.numeric(predict(fit$fitpre[[kk]], xtest, s=s, newoffset=offsetTest, type="link")) 
+        phatpre[,ix] = as.numeric(predict(fit$fitpre[[kk]], xtest, s=s, newoffset=offsetMatrix[, kk], type="link")) 
 
         # Individual predictions
-        phatind[,kk] = as.numeric(predict(fit$fitind[[kk]],xtest,s=s, type="link"))
+        phatind[,ix] = as.numeric(predict(fit$fitind[[kk]], xtest, s=s, type="link"))
+
+        ix = ix + 1
+    }
+    
+    suppre.common = get.overall.support(fit, s=fit$fitoverall.lambda)
+    if(process.results){
+        suppre.individual = setdiff(get.pretrain.support(fit, s=s), suppre.common)
         
-        if(!is.null(ytest)){
+        return(process.targetGroup.results(phatall = phatall, phatpre = phatpre, phatind = phatind,
+                                           ytest = ytest, k = k, type.measure = type.measure,
+                                           return.link = return.link, type = type,
+                                           alpha = fit$alpha, s = s, call = call, fit = fit,
+                                           suppre.common = suppre.common,
+                                           suppre.individual = suppre.individual))
+    } else {
+        suppre.individual = setdiff(get.pretrain.support(fit, s=s, groups=pred.groups, includeOverall=FALSE), suppre.common)
+        return(enlist(phatall, phatpre, phatind, suppre.common, suppre.individual))
+    }
+}
+
+
+process.targetGroup.results <- function(phatall, phatpre, phatind,
+                                        ytest, k, type.measure,
+                                        return.link, type,
+                                        alpha, s, call, fit,
+                                        suppre.common,
+                                        suppre.individual
+                                        ){
+    multinomialErrFun = function(y, predmat){
+            predmat.expanded = predmat
+            dim(predmat.expanded) = c(dim(predmat), 1)
+            as.numeric(assess.glmnet(predmat.expanded, newy=y, family="multinomial")[type.measure])
+    }
+    
+    yhatind=yhatpre=matrix(NA, nrow=nrow(phatall), ncol=ncol(phatall))
+    errall=errind=errpre=rep(NA, k)
+    
+    if(!is.null(ytest)){
+        for(kk in 1:k){
             yytest = rep(0, length(ytest))
             yytest[ytest==kk]=1
-         
+
             errind[kk] = binomial.measure(newy = yytest, one.phat.column = phatind[, kk], measure=type.measure)
             errpre[kk] = binomial.measure(newy = yytest, one.phat.column = phatpre[, kk], measure=type.measure)
         }
-    }
-    
-    if(!is.null(ytest)){
-        errind = c(errFun(ytest, phatind), mean(errind), errind)
-        errpre = c(errFun(ytest, phatpre), mean(errpre), errpre)
-        errall = c(errall.overall, NA, rep(NA, k))
+        errind = c(multinomialErrFun(ytest, phatind), mean(errind), errind)
+        errpre = c(multinomialErrFun(ytest, phatpre), mean(errpre), errpre)
+        errall = c(multinomialErrFun(ytest, phatall), NA, rep(NA, k))
         names(errall) = names(errpre) = names(errind) = c("overall", "mean", paste0("group", as.character(1:k)))
      }
-
     
-    yhatind = phatind; yhatpre = phatpre
+    yhatind = phatind; yhatpre = phatpre; yhatall = phatall
     if(type == "class") {
         yhatind = apply(yhatind, 1, which.max)
         yhatpre = apply(yhatpre, 1, which.max)
+        yhatall = apply(yhatall, 1, which.max)
     }
-
-    suppre.common     =  get.overall.support(fit, s=fit$fitoverall.lambda)
-    suppre.individual = setdiff(get.pretrain.support(fit, s=s), suppre.common)
     
     out = enlist(yhatall, yhatind, yhatpre,
                  suppre.individual,
                  suppre.common,
                  supind = get.individual.support(fit, s=s),
                  supall = get.overall.support(fit, s=s),
-                 alpha = fit$alpha,
+                 alpha = alpha,
                  type.measure = type.measure,
                  call)
     
@@ -544,5 +606,7 @@ predict.ptLasso.targetGroups=function(fit, xtest,  errFun, family, type.measure,
     }
     
     class(out) = "predict.ptLasso"
+
     return(out)
+
 }

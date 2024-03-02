@@ -24,5 +24,6 @@ Imports:
     sparsenet
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    rpart
 VignetteBuilder: knitr

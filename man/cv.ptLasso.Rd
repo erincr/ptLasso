@@ -45,7 +45,7 @@ cv.ptLasso(
 
 \item{verbose}{If \code{verbose=1}, print a statement showing which model is currently being fit.}
 
-\item{fitoverall}{An optional cv.glmnet (or cv.sparsenet) object specifying the overall model.}
+\item{fitoverall}{An optional cv.glmnet (or cv.sparsenet) object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.}
 
 \item{fitind}{An optional list of cv.glmnet (or cv.sparsenet) objects specifying the individual models.}
 

@@ -60,7 +60,7 @@ ptLasso(
 
 \item{penalty.factor}{Separate penalty factors can be applied to each coefficient. This is a number that multiplies 'lambda' to allow differential shrinkage. Can be 0 for some variables,  which implies no shrinkage, and that variable is always included in the model. Default is 1 for all variables (and implicitly infinity for variables listed in 'exclude'). For more information, see \code{?glmnet}. For pretraining, the user-supplied penalty.factor will be multiplied by the penalty.factor computed by the overall model.}
 
-\item{fitoverall}{An optional cv.glmnet (or cv.sparsenet) object specifying the overall model.}
+\item{fitoverall}{An optional cv.glmnet (or cv.sparsenet) object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.}
 
 \item{fitind}{An optional list of cv.glmnet (or cv.sparsenet) objects specifying the individual models.}
 

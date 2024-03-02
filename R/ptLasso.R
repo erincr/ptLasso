@@ -12,8 +12,8 @@
 #' @param fit.method "glmnet" or "sparsenet". Defaults to "glmnet". If 'fit.method = "glmnet"', then \code{"cv.glmnet"} will be used to train models. If 'fit.method = "sparsenet"', \code{"cv.sparsenet"} will be used. The use of sparsenet is available only when 'family = "gaussian"'.
 #' @param overall.lambda For 'fit.method = "glmnet"' only. The choice of lambda to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value. This choice of lambda will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another lambda must be specified for the individual models, the second stage of pretraining and the overall model (to make standalone predictions).
 #' @param overall.parms For 'fit.method = "sparsenet"' only. The choice of lambda and gamma to be used by the overall model to define the offset and penalty factor for pretrained lasso. Can be "parms.1se" or "parms.min". Defaults to "parms.1se". For more information, see the description of \code{overall.lambda}.
-#' @param fitoverall An optional cv.glmnet (or cv.sparsenet) object specifying the overall model.
-#' @param fitind An optional list of cv.glmnet (or cv.sparsenet) objects specifying the individual models.
+#' @param fitoverall An optional cv.glmnet (or cv.sparsenet) object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.
+#' @param fitind An optional list of cv.glmnet (or cv.sparsenet) objects specifying the individual models. 
 #' @param nfolds Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.
 #' @param foldid An optional vector of values between 1 and \code{nfold} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.
 #' @param standardize Should the predictors be standardized before fitting (default is TRUE). If \code{fit.method = "sparsenet"}, standardize must be TRUE.
@@ -149,6 +149,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  penalty.factor = rep(1, nvars),
                  fitoverall=NULL, fitind=NULL,
                  en.alpha = 1,
+                 group.intercepts = TRUE,
                  ...
                  ) {
     this.call = match.call()
@@ -202,6 +203,8 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
 
     type.measure = cvtype(type.measure=type.measure,family=family)
     this.call$type.measure = type.measure
+
+    this.call$group.intercepts = group.intercepts
     
     ############################################################################################################
     # End error checking
@@ -230,14 +233,16 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         foldid2=NULL
     }
 
-
+    fitind.is.null = is.null(fitind)
+    fitoverall.is.null = is.null(fitoverall)
     ############################################################################################################
     # Fit overall model 
     ############################################################################################################
 
     group.levels = NULL
     overall.pf = penalty.factor
-    if(use.case == "inputGroups") {
+    onehot.groups = NULL
+    if(use.case == "inputGroups" && group.intercepts == TRUE) {
         group.levels = sort(unique(groups))
         groups = factor(groups, levels=group.levels)
         onehot.groups = model.matrix(~groups - 1)
@@ -245,7 +250,6 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         overall.pf = c(rep(0, ncol(onehot.groups)), overall.pf)
     }
     
-    fitoverall.is.null = is.null(fitoverall)
     if(fitoverall.is.null){
         if(verbose) cat("Fitting overall model",fill=TRUE)
 
@@ -335,7 +339,6 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     ############################################################################################################
     # Fit individual models
     ############################################################################################################
-    fitind.is.null = is.null(fitind)
 
     if(verbose & fitind.is.null) cat("Fitting individual models",fill=TRUE)
     
