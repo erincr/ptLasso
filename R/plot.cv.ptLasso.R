@@ -64,7 +64,7 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
         suppan = length(x$supall)
     }
 
-    k = ncol(err.pre) - 2
+    k = ncol(err.pre) - 3
 
     ylim = range(c(err.pre[, "overall"], err.pan["overall"], err.ind["overall"])) 
     nudge = .1 * (ylim[2] - ylim[1])

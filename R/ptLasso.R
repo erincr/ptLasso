@@ -176,6 +176,8 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     # Begin error checking:
     ############################################################################################################
 
+    if( (use.case == "targetGroups") && (family != "multinomial") ) stop("use.case = 'targetGroups' is only possible for family = 'multinomial'.")
+    
     if((fit.method == "sparsenet") & (family != "gaussian")) stop("sparsenet is only available for the Gaussian family.")
     if((fit.method == "sparsenet") & ("exclude" %in% names(list(...)))) stop("sparsenet does not support 'exclude'.")
     if((fit.method == "sparsenet") & (standardize == FALSE)) stop("sparsenet does not support 'standardize = FALSE'.")
