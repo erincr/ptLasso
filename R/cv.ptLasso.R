@@ -32,7 +32,8 @@ subset.y <- function(y, ix, family) {
 #' @param fitoverall An optional cv.glmnet (or cv.sparsenet) object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.
 #' @param fitind An optional list of cv.glmnet (or cv.sparsenet) objects specifying the individual models.
 #' @param fit.method "glmnet" or "sparsenet". Defaults to "glmnet". If 'fit.method = "glmnet"', then \code{"cv.glmnet"} will be used to train models. If 'fit.method = "sparsenet"', \code{"cv.sparsenet"} will be used. The use of sparsenet is available only when 'family = "gaussian"'.
-#' @param \dots Additional arguments to be passed to the cv.glmnet function. Some notable choices are \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.
+#' @param group.intercepts For 'use.case = "inputGroups"' only. If `TRUE`, fit the overall model with a separate intercept for each group. If `FALSE`, ignore the grouping and fit one overall intercept. Default is `TRUE`.
+#' @param \dots Additional arguments to be passed to the `cv.glmnet` function. Some notable choices are \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.
 #' 
 #' @return An object of class \code{"cv.ptLasso"}, which is a list with the ingredients of the cross-validation fit.
 #' \item{call}{The call that produced this object.}
@@ -43,6 +44,12 @@ subset.y <- function(y, ix, family) {
 #' \item{errpre}{CV performance for the pretrained models (one for each \code{alpha} tried).}
 #' \item{errind}{CV performance for the individual model.}
 #' \item{fit}{List of \code{ptLasso} objects, one for each \code{alpha} tried.}
+#' \item{fitoverall}{The fitted overall model used for the first stage of pretraining.}
+#' \item{fitoverall.lambda}{The value of \code{lambda} used for the first stage of pretraining.}
+#' \item{fitind}{A list containing one individual model for each group.}
+#' \item{use.case}{The use case: "inputGroups" or "targetGroups".}
+#' \item{family}{The family used.}
+#' \item{type.measure}{The type.measure used.}
 #'
 #' @seealso \code{\link{ptLasso}} and \code{\link{plot.cv.ptLasso}}.
 #' @examples
@@ -144,9 +151,8 @@ subset.y <- function(y, ix, family) {
 #' ### Model fitting with parallel = TRUE
 #' require(doMC)
 #' registerDoMC(cores = 4)
-#' outtest = binomial.example.data()
-#' xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
-#' cvfit = cv.ptLasso(x, y, groups = groups, family = "binomial", type.measure = "mse", parallel=TRUE)
+#' cvfit = cv.ptLasso(x, y, groups = groups, family = "binomial",
+#'                    type.measure = "auc", parallel=TRUE)
 #' }
 #' 
 #' @export

@@ -21,6 +21,7 @@
 #' @param weights observation weights. Default is 1 for each observation.
 #' @param penalty.factor Separate penalty factors can be applied to each coefficient. This is a number that multiplies 'lambda' to allow differential shrinkage. Can be 0 for some variables,  which implies no shrinkage, and that variable is always included in the model. Default is 1 for all variables (and implicitly infinity for variables listed in 'exclude'). For more information, see \code{?glmnet}. For pretraining, the user-supplied penalty.factor will be multiplied by the penalty.factor computed by the overall model.
 #' @param en.alpha For 'fit.method = "glmnet"' only. The elasticnet mixing parameter, with 0 <= en.alpha <= 1. The penalty is defined as (1-alpha)/2||beta||_2^2+alpha||beta||_1. 'alpha=1' is the lasso penalty, and 'alpha=0' the ridge penalty. Default is `en.alpha = 1` (lasso).
+#' @param group.intercepts For 'use.case = "inputGroups"' only. If `TRUE`, fit the overall model with a separate intercept for each group. If `FALSE`, ignore the grouping and fit one overall intercept. Default is `TRUE`.
 #' @param \dots Additional arguments to be passed to the cv.glmnet (or cv.sparsenet) functions. Notable choices include \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{"cv.glmnet"}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. ptLasso does not support the arguments \code{intercept}, \code{offset}, \code{fit} and \code{check.args}.
 #'
 #' 
@@ -35,7 +36,6 @@
 #' \item{fitind}{A list of fitted \code{cv.glmnet} or \code{cv.sparsenet} objects, one trained with each group.}
 #' \item{fitoverall.lambda}{For 'fit.method = "glmnet"'. Lambda used with fitoverall, to compute the offset for pretraining.}
 #' \item{fitoverall.which}{For 'fit.method = "sparsenet"' only. Gamma and lambda choices used with fitoverall, to compute the offset for pretraining.}
-#' \item{y.mean}{Gaussian outcome only; mean of y for the training data, used for prediction.}
 #' 
 #' @examples
 #' # Getting started. First, we simulate data: we need covariates x, response y and group IDs.
@@ -126,6 +126,14 @@
 #' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
 #' # plot(fit) to see all of the cv.glmnet models trained
 #' predict(fit, xtest, groupstest, ytest=ytest)
+#'
+#' \dontrun{
+#' ### Model fitting with parallel = TRUE
+#' require(doMC)
+#' registerDoMC(cores = 4)
+#' fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse", parallel=TRUE)
+#' }
+#' 
 #' 
 #' @import glmnet sparsenet Matrix
 #' @export

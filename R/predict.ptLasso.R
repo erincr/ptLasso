@@ -22,7 +22,8 @@
 #' \item{yhatpre}{Predictions from the pretrained models.}
 #' \item{supall}{Indices of the features selected by the overall model.}
 #' \item{supind}{Union of the indices of the features selected by the individual models.}
-#' \item{suppre}{Union of the indices of the features selected by the pretrained models. Includes features selected in the first stage of pretraining.}
+#' \item{suppre.common}{Features selected in the first stage of pretraining.}
+#' \item{suppre.individual}{Union of the indices of the features selected by the pretrained models, without the features selected in the first stage.}
 #' \item{type.measure}{If \code{ytest} is supplied, the performance measure computed.}
 #' \item{errall}{If \code{ytest} is supplied, performance for the overall model. This is a named vector containing performance for (1) the entire dataset, (2) the average performance across groups, (3) the average performance across groups weighted by group size and (4) group-specific performance.}
 #' \item{errind}{If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.}
@@ -244,7 +245,8 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 #' \item{yhatpre}{Predictions from the pretrained models.}
 #' \item{supall}{Indices of the features selected by the overall model.}
 #' \item{supind}{Union of the indices of the features selected by the individual models.}
-#' \item{suppre}{Union of the indices of the features selected by the pretrained models. Includes features selected in the first stage of pretraining.}
+#' \item{suppre.common}{Features selected in the first stage of pretraining.}
+#' \item{suppre.individual}{Union of the indices of the features selected by the pretrained models, without the features selected in the first stage.}
 #' \item{type.measure} {If \code{ytest} is supplied, the string name of the computed performance measure.}
 #' \item{errall}{If \code{ytest} is supplied, performance for the overall model. This is a named vector containing performance for (1) the entire dataset, (2) the average performance across groups, (3) the average performance across groups weighted by group size and (4) group-specific performance.}
 #' \item{errind}{If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.}

@@ -24,6 +24,7 @@ ptLasso(
   fitoverall = NULL,
   fitind = NULL,
   en.alpha = 1,
+  group.intercepts = TRUE,
   ...
 )
 }
@@ -66,6 +67,8 @@ ptLasso(
 
 \item{en.alpha}{For 'fit.method = "glmnet"' only. The elasticnet mixing parameter, with 0 <= en.alpha <= 1. The penalty is defined as (1-alpha)/2||beta||_2^2+alpha||beta||_1. 'alpha=1' is the lasso penalty, and 'alpha=0' the ridge penalty. Default is `en.alpha = 1` (lasso).}
 
+\item{group.intercepts}{For 'use.case = "inputGroups"' only. If `TRUE`, fit the overall model with a separate intercept for each group. If `FALSE`, ignore the grouping and fit one overall intercept. Default is `TRUE`.}
+
 \item{\dots}{Additional arguments to be passed to the cv.glmnet (or cv.sparsenet) functions. Notable choices include \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{"cv.glmnet"}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. ptLasso does not support the arguments \code{intercept}, \code{offset}, \code{fit} and \code{check.args}.}
 }
 \value{
@@ -79,7 +82,6 @@ An object of class \code{"ptLasso"}, which is a list with the ingredients of the
 \item{fitind}{A list of fitted \code{cv.glmnet} or \code{cv.sparsenet} objects, one trained with each group.}
 \item{fitoverall.lambda}{For 'fit.method = "glmnet"'. Lambda used with fitoverall, to compute the offset for pretraining.}
 \item{fitoverall.which}{For 'fit.method = "sparsenet"' only. Gamma and lambda choices used with fitoverall, to compute the offset for pretraining.}
-\item{y.mean}{Gaussian outcome only; mean of y for the training data, used for prediction.}
 }
 \description{
 Fits a pretrained lasso model using the glmnet package, for a fixed choice of the pretraining hyperparameter alpha. Additionally fits an "overall" model (using all data) and "individual" models (use each individual group). Can fit input-grouped data with Gaussian, multinomial, binomial or Cox outcomes, and target-grouped data, which necessarily has a multinomial outcome. Many ptLasso arguments are passed directly to glmnet (or sparsenet), and therefore the glmnet (sparsenet) documentation is another good reference for ptLasso.
@@ -173,6 +175,14 @@ xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
 # plot(fit) to see all of the cv.glmnet models trained
 predict(fit, xtest, groupstest, ytest=ytest)
+
+\dontrun{
+### Model fitting with parallel = TRUE
+require(doMC)
+registerDoMC(cores = 4)
+fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse", parallel=TRUE)
+}
+
 
 }
 \references{
