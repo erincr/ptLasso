@@ -5,7 +5,7 @@
 #' @param x input matrix, of dimension nobs x nvars; each row is an observation vector. Can be in sparse matrix format (inherit from class '"sparseMatrix"' as in package 'Matrix'). Requirement: 'nvars >1'; in other words, 'x' should have 2 or more columns.
 #' @param y response variable. Quantitative for 'family="gaussian"'. For 'family="binomial"' should be either a factor with two levels, or a two-column matrix of counts or proportions (the second column is treated as the target class; for a factor, the last level in alphabetical order is the target class). For 'family="multinomial"', can be a 'nc>=2' level factor, or a matrix with 'nc' columns of counts or proportions. For either '"binomial"' or '"multinomial"', if 'y' is presented as a vector, it will be coerced into a factor. For 'family="cox"', preferably a 'Surv' object from the survival package: see Detail section for more information. For 'family="mgaussian"', 'y' is a matrix of quantitative responses.
 #' @param groups A vector of length nobs indicating to which group each observation belongs. For data with k groups, groups should be coded as integers 1 through k. 
-#' @param alpha The pretrained lasso hyperparameter, with \eqn{0\le\alpha\le 1}.
+#' @param alpha The pretrained lasso hyperparameter, with \eqn{0\le\alpha\le 1}. The range of alpha is from 0 (which fits the overall model with fine tuning) to 1 (the individual models). The default value is 0.5, chosen mostly at random. To choose the appropriate value for your data, please either run \code{ptLasso} with a few choices of alpha and evaluate with a validation set, or use cv.ptLasso, which recommends a value of alpha using cross validation.
 #' @param family Either a character string representing one of the built-in families, or else a 'glm()' family object. For more information, see Details section below or the documentation for response type (above).
 #' @param type.measure loss to use for cross-validation within each individual, overall, or pretrained lasso model. Currently five options, not all available for all models. The default is 'type.measure="deviance"', which uses squared-error for gaussian models (a.k.a 'type.measure="mse"' there), deviance for logistic and poisson regression, and partial-likelihood for the Cox model. 'type.measure="class"' applies to binomial and multinomial logistic regression only, and gives misclassification error. 'type.measure="auc"' is for two-class logistic regression only, and gives area under the ROC curve. 'type.measure="mse"' or 'type.measure="mae"' (mean absolute error) can be used by all models except the '"cox"'; they measure the deviation from the fitted mean to the response. 'type.measure="C"' is Harrel's concordance measure, only available for 'cox' models.
 #' @param use.case The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".
@@ -54,6 +54,9 @@
 #' predict(fit, xtest, groupstest) # to predict on new data
 #' predict(fit, xtest, groupstest, ytest=ytest) # if ytest is included, we also measure performance
 #'
+#' # In practice, we may want to try many values of alpha. The choices of alpha range from 0 (which fits the overall model with fine tuning) to 1 (the individual models). To choose alpha, you may either (1) run ptLasso with different values of alpha and measure performance with a validation set, or (2) use cv.ptLasso.
+#'
+#' 
 #' # Now, we are ready to simulate slightly more realistic data.
 #' # This continuous outcome example has k = 5 groups, where each group has 200 observations.
 #' # There are scommon = 10 features shared across all groups, and
@@ -501,7 +504,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                k, alpha, group.levels,
                
                # Fitted models
-               fitoverall = fitoverall, fitind, fitpre
+               fitoverall, fitind, fitpre
     )
     if(fit.method == "glmnet") out$fitoverall.lambda = lamhat
     if(fit.method == "sparsenet") out$fitoverall.which = overall.parms

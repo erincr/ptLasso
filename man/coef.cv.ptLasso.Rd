@@ -4,7 +4,12 @@
 \alias{coef.cv.ptLasso}
 \title{Get the coefficients from a fitted cv.ptLasso model.}
 \usage{
-\method{coef}{cv.ptLasso}(fit, model = c("all", "individual", "overall", "pretrain"), alpha = NULL)
+\method{coef}{cv.ptLasso}(
+  fit,
+  model = c("all", "individual", "overall", "pretrain"),
+  alpha = NULL,
+  ...
+)
 }
 \arguments{
 \item{fit}{fitted \code{"cv.ptLasso"} object.}

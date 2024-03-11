@@ -35,7 +35,7 @@ ptLasso(
 
 \item{groups}{A vector of length nobs indicating to which group each observation belongs. For data with k groups, groups should be coded as integers 1 through k.}
 
-\item{alpha}{The pretrained lasso hyperparameter, with \eqn{0\le\alpha\le 1}.}
+\item{alpha}{The pretrained lasso hyperparameter, with \eqn{0\le\alpha\le 1}. The range of alpha is from 0 (which fits the overall model with fine tuning) to 1 (the individual models). The default value is 0.5, chosen mostly at random. To choose the appropriate value for your data, please either run \code{ptLasso} with a few choices of alpha and evaluate with a validation set, or use cv.ptLasso, which recommends a value of alpha using cross validation.}
 
 \item{family}{Either a character string representing one of the built-in families, or else a 'glm()' family object. For more information, see Details section below or the documentation for response type (above).}
 
@@ -102,6 +102,9 @@ fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.meas
 # plot(fit) # to see all of the cv.glmnet models trained
 predict(fit, xtest, groupstest) # to predict on new data
 predict(fit, xtest, groupstest, ytest=ytest) # if ytest is included, we also measure performance
+
+# In practice, we may want to try many values of alpha. The choices of alpha range from 0 (which fits the overall model with fine tuning) to 1 (the individual models). To choose alpha, you may either (1) run ptLasso with different values of alpha and measure performance with a validation set, or (2) use cv.ptLasso.
+
 
 # Now, we are ready to simulate slightly more realistic data.
 # This continuous outcome example has k = 5 groups, where each group has 200 observations.

@@ -50,7 +50,7 @@ pretrain.color   <- "#2A9D8F"
 ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
 
     err.pre = x$errpre
-    err.pan = x$errall
+    err.pan = x$erroverall
     err.ind = x$errind
     n.alpha = nrow(err.pre)
 
@@ -129,7 +129,7 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
 ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
     k = length(x$fit[[1]]$fitind)
     err.pre = x$errpre
-    err.pan = x$errall
+    err.pan = x$erroverall
     err.ind = x$errind
 
     suppre = sapply(x$fit, function(ff) length(get.pretrain.support(ff, commonOnly = FALSE)))
@@ -253,7 +253,7 @@ plot.ptLasso = function(fit){
 #plot.ptLasso.targetGroups=function(x, plot.alphahat = FALSE, y.label = "Cross validated error",...){
 #
 #    err.pre = x$errpre
-#    err.pan = x$errall
+#    err.pan = x$erroverall
 #    err.ind = x$errind
 #    n.alpha = nrow(err.pre)
 #
@@ -336,7 +336,7 @@ plot.ptLasso = function(fit){
 #    
 #    k = length(x$fitind)
 #    err.pre = x$errpre
-#    err.pan = x$errall
+#    err.pan = x$erroverall
 #    err.ind = x$errind
 #
 #    y.label = gsub("error", x$type.measure, y.label)

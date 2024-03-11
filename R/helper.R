@@ -24,7 +24,7 @@ print.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
     
     if("errpre" %in% names(x)){
         cat("type.measure: ", x$call$type.measure, "\n\n")
-        disp = rbind(c(NA, x$errall), rbind(x$errpre, c(NA, x$errind)))
+        disp = rbind(c(NA, x$erroverall), rbind(x$errpre, c(NA, x$errind)))
         rownames(disp) = c("Overall", rep("Pretrain", nrow(x$errpre)), "Individual")
         colnames(disp)[1] = "alpha"
         cat("",fill=TRUE)
@@ -105,7 +105,7 @@ print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
 
     if("errpre" %in% names(x)){
         #cat("type.measure: ", x$type.measure, "\n\n")
-        disp = rbind(x$errall, rbind(x$errpre,x$errind))
+        disp = rbind(x$erroverall, rbind(x$errpre,x$errind))
         rownames(disp) = c("Overall", "Pretrain", "Individual")
 
         cat("Performance (", x$type.measure, "):", "\n", sep="")
@@ -115,7 +115,7 @@ print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
      }
 
     cat("Support size:\n")
-    disp.support = matrix(c(length(x$supall),
+    disp.support = matrix(c(length(x$supoverall),
                             paste0(length(x$suppre.common) + length(x$suppre.individual),
                                    " (", length(x$suppre.common), " common + ",
                                    length(x$suppre.individual), " individual)"),
@@ -170,7 +170,7 @@ print.predict.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
     cat("\n",fill=TRUE)
     
     if("errpre" %in% names(x)){
-        disp = rbind(x$errall, rbind(x$errpre,x$errind))
+        disp = rbind(x$erroverall, rbind(x$errpre,x$errind))
         rownames(disp) = c("Overall", "Pretrain", "Individual")
 
         cat("Performance (", x$type.measure, "):", "\n", sep="")
@@ -178,9 +178,9 @@ print.predict.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
         cat("\n",fill=TRUE)
 
      }
-        
+    
     cat("Support size:\n")
-    disp.support = matrix(c(length(x$supall),
+    disp.support = matrix(c(length(x$supoverall),
                           #paste0(length(x$suppre.common), " + ", length(x$suppre.individual), " (common + individual)"),
                           paste0(length(x$suppre.common) + length(x$suppre.individual),
                                  " (", length(x$suppre.common), " common + ",

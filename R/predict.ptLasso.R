@@ -13,22 +13,22 @@
 #' @param type Type of prediction required. Type '"link"' gives the linear predictors for '"binomial", '"multinomial"' or '"cox"' models; for '"gaussian"' models it gives the fitted values. Type '"response"' gives the fitted probabilities for '"binomial"' or '"multinomial"', and the fitted relative-risk for '"cox"'; for '"gaussian"' type '"response"' is equivalent to type '"link"'. Note that for '"binomial"' models, results are returned only for the class corresponding to the second level of the factor response. Type '"class"' applies only to '"binomial"' or '"multinomial"' models, and produces the class label corresponding to the maximum probability.
 #' @param s For 'fit.measure = "glmnet"' only. Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.
 #' @param which For 'fit.method = "sparsenet"' only. The choice of 'lambda' and 'gamma' at which predictions are required. Will use the same parameters for all models; can be "parms.1se" or "parms.min". Default is "parms.min".
-#' @param return.link If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkall}, \code{linkpre} and \code{linkind}.
+#' @param return.link If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkoverall}, \code{linkpre} and \code{linkind}.
 #' @return A list containing the requested predictions. If \code{ytest} is included, will also return error measures.
 #' \item{call}{The call that produced this object.}
 #' \item{alpha}{The value(s) of alpha used to generate predictions.}
-#' \item{yhatall}{Predictions from the overall model.}
+#' \item{yhatoverall}{Predictions from the overall model.}
 #' \item{yhatind}{Predictions from the individual models.}
 #' \item{yhatpre}{Predictions from the pretrained models.}
-#' \item{supall}{Indices of the features selected by the overall model.}
+#' \item{supoverall}{Indices of the features selected by the overall model.}
 #' \item{supind}{Union of the indices of the features selected by the individual models.}
 #' \item{suppre.common}{Features selected in the first stage of pretraining.}
 #' \item{suppre.individual}{Union of the indices of the features selected by the pretrained models, without the features selected in the first stage.}
 #' \item{type.measure}{If \code{ytest} is supplied, the performance measure computed.}
-#' \item{errall}{If \code{ytest} is supplied, performance for the overall model. This is a named vector containing performance for (1) the entire dataset, (2) the average performance across groups, (3) the average performance across groups weighted by group size and (4) group-specific performance.}
-#' \item{errind}{If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.}
-#' \item{errpre}{If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.}
-#' \item{linkall}{If \code{return.link} is TRUE, return the linear link from the overall model.}
+#' \item{erroverall}{If \code{ytest} is supplied, performance for the overall model. This is a named vector containing performance for (1) the entire dataset, (2) the average performance across groups, (3) the average performance across groups weighted by group size and (4) group-specific performance.}
+#' \item{errind}{If \code{ytest} is supplied, performance for the overall model. As described in \code{erroverall}.}
+#' \item{errpre}{If \code{ytest} is supplied, performance for the overall model. As described in \code{erroverall}.}
+#' \item{linkoverall}{If \code{return.link} is TRUE, return the linear link from the overall model.}
 #' \item{linkind}{If \code{return.link} is TRUE, return the linear link from the individual models.}
 #' \item{linkpre}{If \code{return.link} is TRUE, return the linear link from the pretrained models.}
 #'
@@ -146,27 +146,27 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
         all.preds = pre.preds = ind.preds = rep(NA, nrow(xtest))
         all.link = pre.link = ind.link = rep(NA, nrow(xtest))
         for(kk in 1:length(predgroups)){
-            all.preds[groupstest == predgroups[kk]] = results[[kk]]$yhatall
+            all.preds[groupstest == predgroups[kk]] = results[[kk]]$yhatoverall
             pre.preds[groupstest == predgroups[kk]] = results[[kk]]$yhatpre
             ind.preds[groupstest == predgroups[kk]] = results[[kk]]$yhatind
 
-            all.link[groupstest == predgroups[kk]] = results[[kk]]$linkall
+            all.link[groupstest == predgroups[kk]] = results[[kk]]$linkoverall
             pre.link[groupstest == predgroups[kk]] = results[[kk]]$linkpre
             ind.link[groupstest == predgroups[kk]] = results[[kk]]$linkind
         }
         
-        suppre = lapply(predgroups, function(ix) get.pretrain.support(cvfit$fit[[model.ix[ix]]], groups = ix, includeOverall = FALSE))
+        suppre = lapply(predgroups, function(ix) get.pretrain.support(cvfit$fit[[model.ix[ix]]], groups = ix, includeOverall = FALSE, which = which, s = s))
         suppre = sort(unique(unlist(suppre)))
-        suppre.common =  get.overall.support(cvfit, s=cvfit$fitoverall.lambda)
+        suppre.common =  get.overall.support(cvfit, s=cvfit$fitoverall.lambda, which=cvfit$fitoverall.which)
         suppre.individual = setdiff(suppre, suppre.common)
 
         if(!is.null(ytest)){
             group.weights = table(groupstest)/length(groupstest)
-            errall = sapply(results, function(r) r$errall[grepl("group", names(r$errall))])
-            errall = c(as.numeric(assess.glmnet(all.link, newy=ytest, family=cvfit$family)[cvfit$type.measure]),
-                       mean(errall),
-                       weighted.mean(errall, w = group.weights),
-                       errall)
+            erroverall = sapply(results, function(r) r$erroverall[grepl("group", names(r$erroverall))])
+            erroverall = c(as.numeric(assess.glmnet(all.link, newy=ytest, family=cvfit$family)[cvfit$type.measure]),
+                       mean(erroverall),
+                       weighted.mean(erroverall, w = group.weights),
+                       erroverall)
 
             errpre = sapply(results, function(r) r$errpre[grepl("group", names(r$errpre))])
             errpre = c(as.numeric(assess.glmnet(pre.link, newy=ytest, family=cvfit$family)[cvfit$type.measure]),
@@ -180,17 +180,17 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
                        weighted.mean(errind, w = group.weights),
                        errind)
 
-            names(errall) = names(errpre) = names(errind) = c("overall", "mean", "wtdMean", paste0("group", 1:length(results)))
+            names(erroverall) = names(errpre) = names(errind) = c("overall", "mean", "wtdMean", paste0("group", 1:length(results)))
          }
         
         out = enlist(            
-            yhatall = all.preds,
+            yhatoverall = all.preds,
             yhatind = ind.preds, 
             yhatpre = pre.preds,
 
             suppre.common,
             suppre.individual,
-            supall = results[[1]]$supall,
+            supoverall = results[[1]]$supoverall,
             supind = results[[1]]$supind,
 
             use.case = cvfit$fit[[1]]$call$use.case,
@@ -202,7 +202,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
         )
 
         if(return.link){
-            out$linkall = all.link
+            out$linkoverall = all.link
             out$linkind = ind.link
             out$linkpre = pre.link
         }
@@ -210,7 +210,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
         if(!is.null(ytest)){
             out$errpre = errpre
             out$errind = errind
-            out$errall = errall
+            out$erroverall = erroverall
         }
         
         class(out) = "predict.cv.ptLasso"
@@ -235,23 +235,23 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 #' @param type Type of prediction required. Type '"link"' gives the linear predictors for '"binomial", '"multinomial"' or '"cox"' models; for '"gaussian"' models it gives the fitted values. Type '"response"' gives the fitted probabilities for '"binomial"' or '"multinomial"', and the fitted relative-risk for '"cox"'; for '"gaussian"' type '"response"' is equivalent to type '"link"'. Note that for '"binomial"' models, results are returned only for the class corresponding to the second level of the factor response. Type '"class"' applies only to '"binomial"' or '"multinomial"' models, and produces the class label corresponding to the maximum probability.
 #' @param s For use with 'fit.method = "glmnet"' only. Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.
 #' @param which For use with 'fit.method = "sparsenet"' only. Either the paramaters of the minimum of the CV curves (default "parms.min" or the parameters corresponding to the one standard-error rule "parms.1se"). Default is "parms.min".
-#' @param return.link If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkall}, \code{linkpre} and \code{linkind}.
+#' @param return.link If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkoverall}, \code{linkpre} and \code{linkind}.
 #' 
 #' @return A list containing the requested predictions. If \code{ytest} is included, will also return error measures.
 #' \item{call}{The call that produced this object.}
 #' \item{alpha}{The value(s) of alpha used to generate predictions. Will be the same alpha used to in model training.}
-#' \item{yhatall}{Predictions from the overall model.}
+#' \item{yhatoverall}{Predictions from the overall model.}
 #' \item{yhatind}{Predictions from the individual models.}
 #' \item{yhatpre}{Predictions from the pretrained models.}
-#' \item{supall}{Indices of the features selected by the overall model.}
+#' \item{supoverall}{Indices of the features selected by the overall model.}
 #' \item{supind}{Union of the indices of the features selected by the individual models.}
 #' \item{suppre.common}{Features selected in the first stage of pretraining.}
 #' \item{suppre.individual}{Union of the indices of the features selected by the pretrained models, without the features selected in the first stage.}
 #' \item{type.measure} {If \code{ytest} is supplied, the string name of the computed performance measure.}
-#' \item{errall}{If \code{ytest} is supplied, performance for the overall model. This is a named vector containing performance for (1) the entire dataset, (2) the average performance across groups, (3) the average performance across groups weighted by group size and (4) group-specific performance.}
-#' \item{errind}{If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.}
-#' \item{errpre}{If \code{ytest} is supplied, performance for the overall model. As described in \code{errall}.}
-#' \item{linkall}{If\code{return.link} is TRUE, return the linear link from the overall model.}
+#' \item{erroverall}{If \code{ytest} is supplied, performance for the overall model. This is a named vector containing performance for (1) the entire dataset, (2) the average performance across groups, (3) the average performance across groups weighted by group size and (4) group-specific performance.}
+#' \item{errind}{If \code{ytest} is supplied, performance for the overall model. As described in \code{erroverall}.}
+#' \item{errpre}{If \code{ytest} is supplied, performance for the overall model. As described in \code{erroverall}.}
+#' \item{linkoverall}{If\code{return.link} is TRUE, return the linear link from the overall model.}
 #' \item{linkind}{If\code{return.link} is TRUE, return the linear link from the individual models.}
 #' \item{linkpre}{If\code{return.link} is TRUE, return the linear link from the pretrained models.}
 #'
@@ -340,20 +340,20 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
     
     phatall = this.predict(fit$fitoverall, cbind(onehot.test, xtest), type="link") 
 
-    yhatall = this.predict(fit$fitoverall, cbind(onehot.test, xtest), type=type) 
+    yhatoverall = this.predict(fit$fitoverall, cbind(onehot.test, xtest), type=type) 
     
     if(!is.null(ytest)){
         if(family == "multinomial") {
             if(type.measure == "class"){
-                errall=errFun(ytest, phatall[, , 1])
-                errall.classes=sapply(predgroups, function(kk) errFun(ytest[groupstest == kk], phatall[groupstest == kk, , 1]))  
+                erroverall=errFun(ytest, phatall[, , 1])
+                erroverall.classes=sapply(predgroups, function(kk) errFun(ytest[groupstest == kk], phatall[groupstest == kk, , 1]))  
             } 
         } else if(family=="cox") {
-            errall=errFun(ytest, as.numeric(phatall))
-            errall.classes=sapply(predgroups, function(kk) errFun(ytest[groupstest == kk,], phatall[groupstest == kk]))
+            erroverall=errFun(ytest, as.numeric(phatall))
+            erroverall.classes=sapply(predgroups, function(kk) errFun(ytest[groupstest == kk,], phatall[groupstest == kk]))
         } else {
-            errall=errFun(ytest, as.numeric(phatall))
-            errall.classes=sapply(predgroups, function(kk) errFun(ytest[groupstest == kk], phatall[groupstest == kk]))
+            erroverall=errFun(ytest, as.numeric(phatall))
+            erroverall.classes=sapply(predgroups, function(kk) errFun(ytest[groupstest == kk], phatall[groupstest == kk]))
         }
       }
 
@@ -369,7 +369,7 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
         yhatpre = yhatind = rep(NA, nrow(xtest))
     }
     
-    errallInd=NULL
+    erroverallInd=NULL
     
     # individual group//class predictions
     for(kk in predgroups){
@@ -438,10 +438,10 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
     
     if(!is.null(ytest)){
         group.weights = table(as.numeric(groupstest))/length(groupstest)
-        errall = c(errall,
-                   mean( errall.classes),
-                   weighted.mean( errall.classes, group.weights),
-                   errall.classes)
+        erroverall = c(erroverall,
+                   mean( erroverall.classes),
+                   weighted.mean( erroverall.classes, group.weights),
+                   erroverall.classes)
         errind = c(errind.overall,
                    mean(errind, na.rm=TRUE),
                    weighted.mean(errind[!is.na(errind)], group.weights),
@@ -450,41 +450,41 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
                    mean(errpre, na.rm=TRUE),
                    weighted.mean(errpre[!is.na(errpre)], group.weights),
                    errpre[!is.na(errpre)])
-        names(errall) = names(errpre) = names(errind) = c("allGroups", "mean", "wtdMean", paste0("group", sort(unique(groupstest))))
+        names(erroverall) = names(errpre) = names(errind) = c("allGroups", "mean", "wtdMean", paste0("group", sort(unique(groupstest))))
         
         if(fit$call$family == "gaussian") {
-            errall = errall[which(names(errall) != "wtdMean")]
+            erroverall = erroverall[which(names(erroverall) != "wtdMean")]
             errpre = errpre[which(names(errpre) != "wtdMean")]
             errind = errind[which(names(errind) != "wtdMean")]
             
-            errall = c(errall, "r^2" = r2(yhatall, ytest))
+            erroverall = c(erroverall, "r^2" = r2(yhatoverall, ytest))
             errpre = c(errpre, "r^2" = r2(yhatpre, ytest))
             errind = c(errind, "r^2" = r2(yhatind, ytest))
         }
     }
 
-    suppre.common     =  get.overall.support(fit, s=fit$fitoverall.lambda)
-    suppre.individual = setdiff(get.pretrain.support(fit, s=s), suppre.common)
+    suppre.common     = get.overall.support(fit, s=fit$fitoverall.lambda, which=fit$fitoverall.which)
+    suppre.individual = setdiff(get.pretrain.support(fit, s=s, which=which), suppre.common)
     
-    out = enlist(yhatall = as.numeric(yhatall),
+    out = enlist(yhatoverall = as.numeric(yhatoverall),
                  yhatind = as.numeric(yhatind),
                  yhatpre = as.numeric(yhatpre), 
                  suppre.common,
                  suppre.individual,
                  supind  = get.individual.support(fit, s=s, which=which),
-                 supall  = get.overall.support(fit, s=s, which=which),
+                 supoverall  = get.overall.support(fit, s=s, which=which),
                  alpha = fit$alpha,
                  type.measure = type.measure,
                  call)
 
     if(return.link){
-        out$linkall = phatall
+        out$linkoverall = phatall
         out$linkind = phatind
         out$linkpre = phatpre 
     }
     
     if(!is.null(ytest)) {
-        out$errall = errall
+        out$erroverall = erroverall
         out$errind = errind
         out$errpre = errpre
     } 
@@ -563,7 +563,7 @@ process.targetGroup.results <- function(phatall, phatpre, phatind,
     }
     
     yhatind=yhatpre=matrix(NA, nrow=nrow(phatall), ncol=ncol(phatall))
-    errall=errind=errpre=rep(NA, k)
+    erroverall=errind=errpre=rep(NA, k)
     
     if(!is.null(ytest)){
         for(kk in 1:k){
@@ -575,22 +575,22 @@ process.targetGroup.results <- function(phatall, phatpre, phatind,
         }
         errind = c(multinomialErrFun(ytest, phatind), mean(errind), errind)
         errpre = c(multinomialErrFun(ytest, phatpre), mean(errpre), errpre)
-        errall = c(multinomialErrFun(ytest, phatall), NA, rep(NA, k))
-        names(errall) = names(errpre) = names(errind) = c("overall", "mean", paste0("group", as.character(1:k)))
+        erroverall = c(multinomialErrFun(ytest, phatall), NA, rep(NA, k))
+        names(erroverall) = names(errpre) = names(errind) = c("overall", "mean", paste0("group", as.character(1:k)))
      }
     
-    yhatind = phatind; yhatpre = phatpre; yhatall = phatall
+    yhatind = phatind; yhatpre = phatpre; yhatoverall = phatall
     if(type == "class") {
         yhatind = apply(yhatind, 1, which.max)
         yhatpre = apply(yhatpre, 1, which.max)
-        yhatall = apply(yhatall, 1, which.max)
+        yhatoverall = apply(yhatoverall, 1, which.max)
     }
     
-    out = enlist(yhatall, yhatind, yhatpre,
+    out = enlist(yhatoverall, yhatind, yhatpre,
                  suppre.individual,
                  suppre.common,
                  supind = get.individual.support(fit, s=s),
-                 supall = get.overall.support(fit, s=s),
+                 supoverall = get.overall.support(fit, s=s),
                  alpha = alpha,
                  type.measure = type.measure,
                  call)
@@ -598,11 +598,11 @@ process.targetGroup.results <- function(phatall, phatpre, phatind,
     if(!is.null(ytest)) {
         out$errind = errind
         out$errpre = errpre
-        out$errall = errall
+        out$erroverall = erroverall
     }
 
     if(return.link){
-        out$linkall = phatall
+        out$linkoverall = phatall
         out$linkpre = phatpre
         out$linkind = phatind
     }

@@ -32,7 +32,7 @@ cv.ptLasso(
 
 \item{groups}{A vector of length nobs indicating to which group each observation belongs. For data with k groups, groups should be coded as integers 1 through k.}
 
-\item{alphalist}{A vector of values of the pretraining hyperparameter alpha. Defaults to \code{seq(0, 1, length.out=11)}.}
+\item{alphalist}{A vector of values of the pretraining hyperparameter alpha. Defaults to \code{seq(0, 1, length.out=11)}. This function will do pretraining for each choice of alpha in alphalist and return the CV performance for each alpha.}
 
 \item{family}{Response type as in \code{ptLasso}.}
 
@@ -54,13 +54,13 @@ cv.ptLasso(
 
 \item{which}{For \code{fit.method = "sparsenet"} only. The choice of lambda and gamma to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "parms.min". May also be "parms.1se".}
 
-\item{alphahat.choice}{When choosing alphahat, we may prefer the best performance using all data (\code{alphahat.choice = "overall"}) or the best average performance across groups (\code{alphahat.choice = "mean"}). This is particularly useful when \code{type.measure} is "auc" or "C". These measures look at pairwise comparisons, and therefore are likely to be quite different when using the entire dataset (all pairwise comparisons) and individual groups (comparisons within groups only).}
+\item{alphahat.choice}{When choosing alphahat, we may prefer the best performance using all data (\code{alphahat.choice = "overall"}) or the best average performance across groups (\code{alphahat.choice = "mean"}). This is particularly useful when \code{type.measure} is "auc" or "C", because the average performance across groups is different than the performance with the full dataset. The default is "overall".}
 
 \item{fit.method}{"glmnet" or "sparsenet". Defaults to "glmnet". If 'fit.method = "glmnet"', then \code{"cv.glmnet"} will be used to train models. If 'fit.method = "sparsenet"', \code{"cv.sparsenet"} will be used. The use of sparsenet is available only when 'family = "gaussian"'.}
 
 \item{group.intercepts}{For 'use.case = "inputGroups"' only. If `TRUE`, fit the overall model with a separate intercept for each group. If `FALSE`, ignore the grouping and fit one overall intercept. Default is `TRUE`.}
 
-\item{\dots}{Additional arguments to be passed to the `cv.glmnet` function. Some notable choices are \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.}
+\item{\dots}{Additional arguments to be passed to the `cv.glmnet` function. Notable choices include \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"cv.ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.}
 }
 \value{
 An object of class \code{"cv.ptLasso"}, which is a list with the ingredients of the cross-validation fit.

@@ -40,7 +40,7 @@
 #' @export
 #'
 get.pretrain.support <- function(fit, s="lambda.min", which="parms.min", commonOnly = FALSE, includeOverall = TRUE, groups = 1:length(fit$fitind)) {
-    if(inherits(fit, "cv.ptLasso")) return(lapply(fit$fit, function(model) get.pretrain.or.individual.support(model, s=s, commonOnly=commonOnly, includeOverall=includeOverall, groups = groups, model="pretrain"))) 
+    if(inherits(fit, "cv.ptLasso")) return(lapply(fit$fit, function(m) get.pretrain.or.individual.support(m, s=s, commonOnly=commonOnly, includeOverall=includeOverall, groups = groups, model="pretrain"))) 
     get.pretrain.or.individual.support(fit, s=s, commonOnly=commonOnly, includeOverall=includeOverall, groups = groups, model="pretrain")
 }
 
@@ -279,19 +279,19 @@ coef.ptLasso=function(fit, model = c("all", "individual", "overall", "pretrain")
 #'
 #' @method coef cv.ptLasso
 #' @export
-coef.cv.ptLasso=function(fit, model = c("all", "individual", "overall", "pretrain"), alpha = NULL){
+coef.cv.ptLasso=function(fit, model = c("all", "individual", "overall", "pretrain"), alpha = NULL, ...){
     model = match.arg(model)
 
-    if((model == "all") | (model == "individual")) individual = lapply(fit$fitind, coef)
-    if((model == "all") | (model == "overall"))    overall    = coef(fit$fitoverall)
+    if((model == "all") | (model == "individual")) individual = lapply(fit$fitind, function(x) coef(x, ...))
+    if((model == "all") | (model == "overall"))    overall    = coef(fit$fitoverall, ...)
 
     if((model == "all") | (model == "pretrain")){
         if(is.null(alpha)){
-            pretrain = lapply(fit$fit, function(model) coef(model, "pretrain"))
+            pretrain = lapply(fit$fit, function(model) coef(model, "pretrain", ...))
         } else {
             which.alpha = which(alpha == fit$alphalist)
             if(length(which.alpha) == 0) stop("Please choose alpha from fit$alphalist")
-            pretrain    = coef(fit$fit[[which.alpha]], "pretrain")
+            pretrain    = coef(fit$fit[[which.alpha]], "pretrain", ...)
         }
     }
 
