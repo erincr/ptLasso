@@ -181,6 +181,41 @@ test_that("input_groups_gaussian_wrong_type_measure", {
                  "mse")
 })
 
+
+spl = sample(1:nrow(x), 100)
+wrong.fit = cv.glmnet(x[spl, ], y[spl])
+err=tryCatch( ptLasso(x,y,groups=groups,alpha=0.9,family="gaussian",type.measure="mse",foldid=foldid,
+                      overall.lambda = "lambda.min", fitoverall = wrong.fit , verbose=TRUE),
+             error = function(x) "error")
+test_that("wrong_training_data_overall", {
+    expect_equal(err, "error")
+})
+
+err=tryCatch( ptLasso(x,y,groups=groups,alpha=0.9,family="gaussian",type.measure="mse",foldid=foldid,
+                      overall.lambda = "lambda.min", fitoverall = wrong.fit , verbose=TRUE),
+             error = function(x) "error")
+test_that("wrong_model_type_overall", {
+    expect_equal(err, "error")
+})
+
+err=tryCatch( ptLasso(x,y,groups=groups,alpha=0.9,family="gaussian",type.measure="mse",foldid=foldid,
+                      overall.lambda = "lambda.min", fitoverall = fit3$fitoverall, fitind = fit3$fitind[1:2], verbose=TRUE),
+             error = function(x) "error")
+test_that("missing_individual_models_type_overall", {
+    expect_equal(err, "error")
+})
+
+
+bad.fitind=lapply(1:k, function(kk) cv.glmnet(x[which(groups == kk)[1:20], ], y[which(groups == kk)[1:20]], keep=TRUE))
+err=tryCatch(cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=foldid,
+                      overall.lambda = "lambda.min", fitind=bad.fitind),
+             error = function(x) "error")
+test_that("wrong_training_data_individual", {
+    expect_equal(err, "error")
+})
+
+
+
 ##########################################################################################
 # (my) sparsenet vs glmnet
 ##########################################################################################
@@ -206,7 +241,6 @@ test_that("glmnet_sparsenet_base", {
 ##########################################################################################
 # Input groups, Gaussian response, sparsenet
 ##########################################################################################
-
 set.seed(1234)
 n=300
 k=5  # of classes

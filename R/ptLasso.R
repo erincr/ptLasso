@@ -208,11 +208,22 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     # In the future, we want to be able to pass in just the predictions from the overall model.
     # This will be useful for settings where e.g. genentech has released a model (but maybe not as a glmnet object).
     if(!is.null(fitoverall)){
-        if(!("cv.glmnet" %in% class(fitoverall)) & fit.method == "glmnet" ) stop("fitoverall must be a cv.glmnet object.")
-        if(!("cv.sparsenet" %in% class(fitoverall)) & fit.method == "sparsenet" ) stop("fitoverall must be a cv.sparsenet object.")
+        if(!("cv.glmnet" %in% class(fitoverall)) && fit.method == "glmnet" ) stop("fit.method is 'glmnet', so fitoverall must be a cv.glmnet object.")
+        if(!("cv.sparsenet" %in% class(fitoverall)) && fit.method == "sparsenet" ) stop("fit.method is 'sparsenet', so fitoverall must be a cv.sparsenet object.")
+        if(!("fit.preval" %in% names(fitoverall))) stop("fitoverall must have fit.preval defined (fitted with the argument keep = TRUE).")
+        if(nrow(fitoverall$fit.preval) != nrow(x)) stop("fitoverall must have been trained using the same training data passed to ptLasso.")
     }
-    if(fit.method == "glmnet" & !is.null(fitind) & !(all(sapply(fitind, function(mm) "cv.glmnet" %in% class(mm))))) stop("fitind must be a list of cv.glmnet objects.")
-    if(fit.method == "sparsenet" & !is.null(fitind) & !(all(sapply(fitind, function(mm) "cv.sparsenet" %in% class(mm))))) stop("fitind must be a list of cv.sparsenet objects.")
+    if(!is.null(fitind)){
+        if(length(fitind) != k) stop("Some of the individual models are missing: need one model trained for each group.")
+        if(fit.method == "glmnet" && !(all(sapply(fitind, function(mm) "cv.glmnet" %in% class(mm))))) stop("fit.method is 'glmnet', so fitind must be a list of cv.glmnet objects.")
+        if(fit.method == "sparsenet" && !(all(sapply(fitind, function(mm) "cv.sparsenet" %in% class(mm))))) stop("fit.method is 'sparsenet', so fitind must be a list of cv.sparsenet objects.")
+        if(!all(sapply(fitind, function(mm) "fit.preval" %in% names(mm)))) stop("Individual models must have fit.preval defined (fitted with the argument keep = TRUE).")
+        if(use.case == "inputGroups"){
+            if(!all(sapply(fitind, function(mm) nrow(mm$fit.preval)) == table(groups))) stop("Individual models must have been trained using the same training data passed to ptLasso.")
+        } else {
+            if(!all(sapply(fitind, function(mm) nrow(mm$fit.preval)) == nrow(x))) stop("Individual models must have been trained using the same training data passed to ptLasso.")                                                                                                                                                                              }
+    }
+    
 
     type.measure = cvtype(type.measure=type.measure,family=family)
     this.call$type.measure = type.measure
@@ -355,15 +366,15 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
 
     if(verbose & fitind.is.null) cat("Fitting individual models",fill=TRUE)
     
-    if(use.case=="inputGroups"){
+    if(fitind.is.null && (use.case=="inputGroups")){
         if(fitind.is.null) fitind=vector("list",k) #bhatInd
         
         for(kk in 1:k){
             train.ix = groups == kk
             
             # individual model 
-            if(fitind.is.null){
-                if(family!="cox") { 
+            if(verbose) cat("\tFitting individual model", kk, "/", k, fill=TRUE)
+            if(family!="cox") { 
                     fitind[[kk]]=method(x[train.ix,], y[train.ix],
                                         family=family,
                                         type.measure=type.measure,
@@ -375,7 +386,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                         standardize=standardize,
                                         alpha=en.alpha,
                                         ...)
-                } else if(family=="cox") {
+             } else if(family=="cox") {
                     fitind[[kk]]=method(x[train.ix,], y[train.ix, ],
                                         family=family,
                                         type.measure=type.measure,
@@ -385,7 +396,6 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                                         standardize=standardize,
                                         alpha=en.alpha,
                                         ...)
-                }
             }
         }
     }
@@ -421,7 +431,8 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         fitpre = fitind
     } else {
          if(use.case=="inputGroups"){
-             for(kk in 1:k){ 
+             for(kk in 1:k){
+                 if(verbose) cat("\tFitting pretrained model", kk, "/", k, fill=TRUE)
                  train.ix = groups == kk
 
                  if(family == "multinomial"){
