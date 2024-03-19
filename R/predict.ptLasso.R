@@ -295,8 +295,8 @@ predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL,
 
     if(!is.null(ytest)){
         if(family == "cox") {
-            if(!is.matrix(ytest) | (is.matrix(ytest) & ncol(ytest) != 2)) stop("For survival models, ytest must be a matrix with columns 'time' (>0) and 'status', or a Surv object.")
-            if(!("Surv" %in% class(ytest))) {
+            if(!check.Surv(ytest)) stop("For survival models, ytest must be a matrix with columns 'time' (>0) and 'status', or a Surv object.")
+            if(!inherits(ytest, "Surv")) {
                 if(is.null(colnames(ytest))) {
                     message("ytest missing column names; assuming column 1 is time and column 2 is status.")
                     colnames(ytest) = c("time", "status")
@@ -493,6 +493,13 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
 
 }
 
+#' Check survival object
+#' @noRD
+check.Surv <- function(y){
+    if(inherits(y, "Surv")) return(TRUE)
+    if(is.matrix(ytest) & ncol(ytest) == 2) return(TRUE)
+    return(FALSE)
+}
 
 #' Compute r^2
 #' @noRd

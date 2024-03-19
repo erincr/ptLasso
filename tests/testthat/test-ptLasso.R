@@ -674,6 +674,22 @@ test_that("input_groups_cox_wrong_type_measure", {
                  "deviance")
 })
 
+#fitoverall = cv.glmnet(x, y, family = "cox", keep = TRUE, type.measure="C")
+#fit=ptLasso(x[groups %in% (1:2), ],y[groups %in% (1:2), ],groups=groups[groups %in% (1:2)],alpha=0.1,family="cox",type.measure="C",foldid=NULL, nfolds=5, overall.lambda="lambda.min", fitoverall=fitoverall, group.intercepts=FALSE)
+#pred=predict(fit,xtest[groupstest ==1 ,],groupstest=groupstest[groupstest == 1], ytest=ytest[groupstest==1,])
+
+#cvfit = cv.ptLasso(x,y,groups=groups,family="cox",type.measure="C",foldid=NULL, nfolds=5, overall.lambda="lambda.min", fitoverall=fitoverall, group.intercepts=FALSE)
+
+#y = Surv(runif(nrow(x), 0, .1), y[, 1], y[, 2])
+#fit=ptLasso(x, y, groups=groups, alpha=0.1,family="cox",type.measure="C",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
+
+#ytest = Surv(runif(nrow(xtest), 0, .1), ytest[, 1], ytest[, 2])
+#pred = predict(fit, xtest, groupstest, ytest)
+#test_that("three_arg_Surv", {
+#    expect_equal(unname(pred$errpre),
+#                 c(0.5468076, 0.5308165, 0.5540374, 0.5840366, 0.5174910, 0.6610550, 0.4007937, 0.4907063))
+#})
+
 ###########################################################################
 # Target groups
 ###########################################################################
