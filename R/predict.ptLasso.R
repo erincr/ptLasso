@@ -497,7 +497,7 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
 #' @noRD
 check.Surv <- function(y){
     if(inherits(y, "Surv")) return(TRUE)
-    if(is.matrix(ytest) & ncol(ytest) == 2) return(TRUE)
+    if(is.matrix(y) & ncol(y) == 2) return(TRUE)
     return(FALSE)
 }
 
