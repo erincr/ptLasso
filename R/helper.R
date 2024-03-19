@@ -108,7 +108,7 @@ print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
         disp = rbind(x$erroverall, rbind(x$errpre,x$errind))
         rownames(disp) = c("Overall", "Pretrain", "Individual")
 
-        cat("Performance (", x$type.measure, "):", "\n", sep="")
+        cat("Performance (",  yaxis.name(x$type.measure), "):", "\n", sep="")
         cat("", fill=TRUE)
         print(disp, digits = digits, na.print="")   
         cat("\n")
@@ -173,7 +173,7 @@ print.predict.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
         disp = rbind(x$erroverall, rbind(x$errpre,x$errind))
         rownames(disp) = c("Overall", "Pretrain", "Individual")
 
-        cat("Performance (", x$type.measure, "):", "\n", sep="")
+        cat("Performance (", yaxis.name(x$type.measure), "):", "\n", sep="")
         print(disp, digits = digits)  
         cat("\n",fill=TRUE)
 

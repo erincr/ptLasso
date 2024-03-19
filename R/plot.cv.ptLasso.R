@@ -213,190 +213,36 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 #' @export
 plot.ptLasso = function(fit){
     lo = matrix(
-        c(rep(1, fit$k),                      # Title: "Overall model"
-          2:(2 + fit$k - 1),                  # Overall model
-          rep(2 + fit$k, fit$k),              # Title: "Pretrained models"
-          (3 + fit$k) : (3 + 2*fit$k - 1),    # Pretrained models
-          rep(3 + 2*fit$k, fit$k),            # Title: "Individual models"
-          (4 + 2*fit$k) : (4 + 3*fit$k - 1)), # Individual models
-        nrow = 6,
+        c(1:fit$k,                  # Overall model
+          (1 + fit$k) : (2*fit$k),    # Pretrained models
+          (1 + 2*fit$k) : (3*fit$k)), # Individual models
+        nrow = 3,
         byrow = TRUE)
     
-    par(mar=c(1.8,3,1,2))
-    layout(lo, heights=rep(c(1,3), 3))
-    plot.new(); text(0.5,0.5,"Overall model", font=2, cex=1.5);
-    plot(fit$fitoverall); for(kk in 1:(fit$k - 1)) plot.new()
+    par()
+    layout(lo, heights=rep(1, 3))
+    plot(fit$fitoverall); title("Overall model", line = 2)
+    for(kk in 1:(fit$k - 1)) plot.new()
 
-    line.nudge = -1
-    if(inherits(fit$fitoverall, "cv.sparsenet")) line.nudge = -1.5
+    line.nudge = 2
+    if(inherits(fit$fitoverall, "cv.sparsenet")) line.nudge = 2.2
     
-    plot.new(); text(0.5,0.5,"Pretrained models", font=2, cex=1.5);
     for(kk in 1:fit$k){
         plot(fit$fitpre[[kk]]);
-        title(paste0("Group ", kk), line=line.nudge)
+        if(kk == 1) {
+            title(paste0("Pretrained\nGroup ", kk), line=line.nudge)
+        } else {
+            title(paste0("Group ", kk), line=line.nudge)
+        }
+        
     }
 
-    plot.new(); text(0.5,0.5,"Individual models", font=2, cex=1.5);
     for(kk in 1:fit$k){
         plot(fit$fitind[[kk]]);
-        title(paste0("Group ", kk), line=line.nudge)
+        if(kk == 1) {
+            title(paste0("Individual\nGroup ", kk), line=line.nudge)
+        } else {
+            title(paste0("Group ", kk), line=line.nudge)
+        }
     }
-    
 }
-
-
-#######################################
-# OLD
-#######################################
-
-
-#plot.ptLasso.targetGroups=function(x, plot.alphahat = FALSE, y.label = "Cross validated error",...){
-#
-#    err.pre = x$errpre
-#    err.pan = x$erroverall
-#    err.ind = x$errind
-#    n.alpha = nrow(err.pre)
-#
-#    if(is.null(x$suppre)){
-#        suppre = sapply(x$fit, function(ff) length(get.pretrain.support(ff, commonOnly = FALSE)))
-#        supind = length(get.individual.support(x, commonOnly = FALSE))
-#        suppan = length(get.overall.support(x))
-#    } else {
-#        suppre = sapply(x$suppre, function(ff) length(ff))
-#        supind = length(x$supind)
-#        suppan = length(x$supall)
-#    }
-#
-#    k = ncol(err.pre) - 2
-#
-#    ylim = range(c(err.pre[, "overallError"], err.pan["overallError"], err.ind["overallError"])) 
-#    nudge = .1 * (ylim[2] - ylim[1])
-#    ylim[2] = ylim[2] + nudge
-#    
-#    par(mfrow=c(1,2))
-#    par(lwd=1.5)
-#    par(mar=c(5,4,5,1))
-#
-#    plot(err.pre[,"alpha"], err.pre[,"overallError"], ylab=y.label,xlab=expression(alpha),
-#         type="l",
-#         ylim=ylim, 
-#         col=3)
-#    lines(err.pre[,"alpha"], rep(err.pan["overallError"], n.alpha), type="l",col=2)
-#    lines(err.pre[,"alpha"], rep(err.ind["overallError"], n.alpha), type="l",col=1) 
-#    
-#    text(.2, err.pan + nudge/2, as.character(suppan))
-#    text(.2, err.ind["overallError"] + nudge/2, as.character(supind))
-#    axis(3,  at=err.pre[, 1], labels=as.character(suppre))#, gap.axis = 0)
-#
-#    if(plot.alphahat) abline(v = x$alphahat, col = 'gray60', lty=2)
-#    
-#    title(paste0(as.character(k),"-class problem"))
-#
-#    xloc = .4#2 * (min(err.pre[, 1]) + max(err.pre[, 1]))/3
-#    
-#    legend(xloc, ylim[2] - 2*nudge, 
-#           col=c(1:3), ncol=1, c("Individual", "Overall (grouped)", "Pretrain"),
-#           lwd = 3,
-#           xpd = NA, cex = 1,
-#           bty = "n",
-#           seg.len=1)
-#
-#    group.cols = colnames(err.pre)[grepl("group", colnames(err.pre))]
-#    sum.of.indiv.pre = rowSums(err.pre[, group.cols])
-#    sum.of.indiv.ind = sum(err.ind[group.cols])
-#    ylim2 = range(c(sum.of.indiv.pre, sum.of.indiv.ind))
-#    nudge2 = .1 * (ylim2[2] - ylim2[1])
-#    ylim2[2] = ylim2[2] + nudge2
-#    
-#    plot(err.pre[, "alpha"], sum.of.indiv.pre, ylab=y.label,xlab=expression(alpha),
-#         type="l",
-#         ylim=ylim2, 
-#         col=3)
-#    lines(err.pre[, "alpha"], rep(sum.of.indiv.ind, nrow(err.pre)), type="l",col=1)
-#
-#    if(plot.alphahat) abline(v = x$alphahat, col = 'gray60', lty=2)
-#    
-#    text(.2, sum.of.indiv.ind + nudge2/2, as.character(supind))
-#    axis(3,  at=err.pre[, "alpha"], labels=as.character(suppre))#, gap.axis = 0)
-#    title("Sum of individual\none vs. rest problems", line=2)
-#
-#    legend(1.5*xloc, ylim2[2] - 2*nudge2, 
-#           col=c(1, 3), ncol=1, c("Individual","Pretrain"), 
-#           lwd = 3,
-#           xpd = NA, cex = 1,
-#           bty = "n",
-#           seg.len=1)
-#    
-#    invisible()
-#}
-
-
-#plot.ptLasso.inputGroups=function(x, plot.alphahat = FALSE, y.label = "Cross validated error",...){
-#                                        # par(mfrow=c(1,3))
-#    
-#    k = length(x$fitind)
-#    err.pre = x$errpre
-#    err.pan = x$erroverall
-#    err.ind = x$errind
-#
-#    y.label = gsub("error", x$type.measure, y.label)
-#
-#    suppre = sapply(x$fit, function(ff) length(get.pretrain.support(ff, commonOnly = FALSE)))
-#    supind = length(get.individual.support(x, commonOnly = FALSE))
-#    suppan = length(get.overall.support(x))
-#
-#    n.alpha = nrow(err.pre)
-#    
-#    par(mfrow=c(1,2))
-#    par(lwd=1.5)
-#    par(mar=c(5,4,5,1))
-#
-#    ylim = range(c(err.pre[, "overallError"], err.pan["overallError"], err.ind["overallError"])) 
-#    nudge = .1 * (ylim[2] - ylim[1])
-#    ylim[2] = ylim[2] + nudge
-#    plot(err.pre[,"alpha"], err.pre[,"overallError"], ylab=y.label,xlab=expression(alpha),
-#         type="l",
-#         ylim=ylim, 
-#         col=3)
-#    lines(err.pre[,"alpha"], rep(err.pan["overallError"], n.alpha), type="l",col=2)
-#    lines(err.pre[,"alpha"], rep(err.ind["overallError"], n.alpha), type="l",col=1) 
-#    
-#    text(.2, err.pan["overallError"] + nudge/2, as.character(suppan))
-#    text(.2, err.ind["overallError"] + nudge/2, as.character(supind))
-#    axis(3,  at=err.pre[, 1], labels=as.character(suppre))#, gap.axis = 0)
-#
-#    if(plot.alphahat) abline(v = x$alphahat, col = 'gray60', lty=2)
-#    
-#    title(paste0(as.character(k),"-group problem"))
-#
-#    xloc = 0.3
-#    legend(xloc, ylim[2] - 2*nudge, 
-#           col=c(1:3), ncol=1, c("Individual", "Overall (grouped)", "Pretrain"),
-#           lwd = 3,
-#           xpd = NA, cex = 1,
-#           bty = "n",
-#           seg.len=1)
-#
-#    ylim = range(c(err.pre[, "meanError"], err.ind["meanError"]))
-#    nudge = .1 * (ylim[2] - ylim[1])
-#    ylim[2] = ylim[2] + nudge
-#    plot(err.pre[,"alpha"], err.pre[,"meanError"], ylab=y.label,xlab=expression(alpha),
-#         type="l",
-#         ylim=ylim, 
-#         col=3)
-#    lines(err.pre[,"alpha"], rep(err.ind["meanError"], n.alpha), type="l",col=1) 
-#    
-#    text(.2, err.ind["meanError"] + nudge/2, as.character(supind))
-#    axis(3,  at=err.pre[, 1], labels=as.character(suppre))#, gap.axis = 0)
-#
-#    if(plot.alphahat) abline(v = x$alphahat, col = 'gray60', lty=2)
-#    
-#    title(paste0("Average of ", as.character(k)," individual problems"))
-#
-#     legend(1.5*xloc, ylim[2] - 2*nudge, 
-#           col=c(1, 3), ncol=1, c("Individual","Pretrain"), 
-#           lwd = 3,
-#           xpd = NA, cex = 1,
-#           bty = "n",
-#           seg.len=1)
-#}
