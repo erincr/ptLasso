@@ -3,8 +3,7 @@
 #' Get the indices of nonzero coefficients from the pretrained models in a fitted ptLasso or cv.ptLasso object, excluding the intercept.
 #'
 #' @param fit fitted \code{"ptLasso"} or \code{"cv.ptLasso"} object.
-#' @param s for glmnet models only: the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".
-#' @param which for sparsenet models only: the choice of parameters to use. May be "parms.min" or "parms.1se". Default is "parms.min".
+#' @param s the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".
 #' @param commonOnly whether to return the features that are chosen by all group-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.
 #' @param includeOverall whether to return the features that are chosen by the overall model and not the group-specific models (TRUE) or the features that are chosen by the overall model or the group-specific models (FALSE). Default is TRUE.
 #' @param groups which groups to include when computing the support. Default is to include all groups.
@@ -39,7 +38,7 @@
 #'
 #' @export
 #'
-get.pretrain.support <- function(fit, s="lambda.min", which="parms.min", commonOnly = FALSE, includeOverall = TRUE, groups = 1:length(fit$fitind)) {
+get.pretrain.support <- function(fit, s="lambda.min", commonOnly = FALSE, includeOverall = TRUE, groups = 1:length(fit$fitind)) {
     if(inherits(fit, "cv.ptLasso")) return(lapply(fit$fit, function(m) get.pretrain.or.individual.support(m, s=s, commonOnly=commonOnly, includeOverall=includeOverall, groups = groups, model="pretrain"))) 
     get.pretrain.or.individual.support(fit, s=s, commonOnly=commonOnly, includeOverall=includeOverall, groups = groups, model="pretrain")
 }
@@ -49,8 +48,7 @@ get.pretrain.support <- function(fit, s="lambda.min", which="parms.min", commonO
 #' Get the indices of nonzero coefficients from the individual models in a fitted ptLasso or cv.ptLasso object, excluding the intercept.
 #'
 #' @param fit fitted \code{"ptLasso"} or \code{"cv.ptLasso"} object.
-#' @param s for glmnet models only: the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".
-#' @param which for sparsenet models only: the choice of parameters to use. May be "parms.min" or "parms.1se". Default is "parms.min".
+#' @param s the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".
 #' @param commonOnly whether to return the features that are chosen by all group-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.
 #' @param groups which groups to include when computing the support. Default is to include all groups.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
@@ -83,25 +81,19 @@ get.pretrain.support <- function(fit, s="lambda.min", which="parms.min", commonO
 #'
 #' @export
 #'
-get.individual.support <- function(fit, s="lambda.min", which="parms.min", commonOnly = FALSE, groups = 1:length(fit$fitind)) {
+get.individual.support <- function(fit, s="lambda.min", commonOnly = FALSE, groups = 1:length(fit$fitind)) {
     if(inherits(fit, "cv.ptLasso")) return(get.pretrain.or.individual.support(fit$fit[[1]], s=s, commonOnly=commonOnly, groups = groups, model="individual")) 
     return(get.pretrain.or.individual.support(fit, s=s, commonOnly=commonOnly, groups = groups, model="individual"))
 }
 
 #' Helper function to get support for pretrained or individual models.
 #' @noRd
-get.pretrain.or.individual.support <- function(fit, s="lambda.min", which="parms.min", model="pretrain", groups = groups, includeOverall=TRUE, commonOnly = FALSE){
-
-    my.coef <- function(model, s, which, ...){
-        if(inherits(model, "cv.sparsenet")) return(coef(model, which=which, ...))
-        return(coef(model, s=s, ...))
-     }
+get.pretrain.or.individual.support <- function(fit, s="lambda.min", model="pretrain", groups = groups, includeOverall=TRUE, commonOnly = FALSE){
     
     include.these = c()
     if((model == "pretrain") && (includeOverall == TRUE)){
         if(fit$alpha < 1) {
-            if(inherits(fit$fitoverall, "cv.sparsenet")) include.these = get.overall.support(fit, which=fit$fitoverall.which)
-            if(inherits(fit$fitoverall, "cv.glmnet"))    include.these = get.overall.support(fit, s=fit$fitoverall.lambda)
+            include.these = get.overall.support(fit, s=fit$fitoverall.lambda)
         }
     }
 
@@ -122,7 +114,7 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", which="parms
                 if(fit$call$family=="cox"){
                     bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, exact=F))
                 } else {
-                    bhatpre[[ix]] = as.numeric(my.coef(model[[kk]], s=s, which=which, exact=F)[-1])
+                    bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, exact=F)[-1])
                 }
                 suppre[[ix]]=sort(unique(c(which(bhatpre[[ix]]!=0), include.these)))
             }
@@ -147,8 +139,7 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", which="parms
 #' Get the indices of nonzero coefficients from the overall model in a fitted ptLasso or cv.ptLasso object, excluding the intercept.
 #'
 #' @param fit fitted \code{"ptLasso"} or \code{"cv.ptLasso"} object.
-#' @param s for glmnet models only: the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".
-#' @param which for sparsenet models only: the choice of parameters to use. May be "parms.min" or "parms.1se". Default is "parms.min".
+#' @param s the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso}.
 #' @keywords models regression classification
@@ -172,26 +163,16 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", which="parms
 #'
 #' @export
 #'
-get.overall.support <- function(fit, s="lambda.min", which="parms.min"){
+get.overall.support <- function(fit, s="lambda.min"){
 
     if(inherits(fit, "cv.ptLasso")) {
-        if("fitoverall.which" %in% names(fit)) {
-            if(is.null(which)) which = fit$fitoverall.which
-            return(get.overall.support(fit$fit[[1]], which = which))
-        }
-        if("fitoverall.lambda" %in% names(fit)) {
-            if(is.null(s)) s = fit$fitoverall.lambda
-            return(get.overall.support(fit$fit[[1]], s = s))
-        }
+        if(is.null(s)) s = fit$fitoverall.lambda
+        return(get.overall.support(fit$fit[[1]], s = s))
     }
 
-    if(is.null(which) && is.null(s)) stop("s and which cannot both be null.")
+    if(is.null(s)) stop("s cannot be null.")
     
-    if(inherits(fit$fitoverall, "cv.glmnet")) {
-        coefs = coef(fit$fitoverall, s=s)
-    } else {
-        coefs = coef(fit$fitoverall, which=which)
-    }
+    coefs = coef(fit$fitoverall, s=s)
     k = fit$k
     
     # multinomial
@@ -217,7 +198,7 @@ get.overall.support <- function(fit, s="lambda.min", which="parms.min"){
 #' @aliases coef.ptLasso 
 #' @param fit fitted \code{"ptLasso"} object.
 #' @param model string indicating which coefficients to retrieve. Must be one of "all", "individual", "overall" or "pretrain".
-#' @param \dots other arguments to be passed to the \code{"coef"} function. For glmnet models, may be e.g. \code{s = "lambda.min"}; for sparsenet models \code{which.parms = "parms.1se"}.
+#' @param \dots other arguments to be passed to the \code{"coef"} function. May be e.g. \code{s = "lambda.min"}.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
 #' @seealso \code{ptLasso}.
 #' @keywords models regression classification
@@ -261,6 +242,7 @@ coef.ptLasso=function(fit, model = c("all", "individual", "overall", "pretrain")
 #' @param fit fitted \code{"cv.ptLasso"} object.
 #' @param model string indicating which coefficients to retrieve. Must be one of "all", "individual", "overall" or "pretrain".
 #' @param alpha value between 0 and 1, indicating which alpha to use. If \code{NULL}, return coefficients from all models.  Only impacts the results for model = "all" or model = "pretrain".
+#' @param \dots other arguments to be passed to the \code{"coef"} function. May be e.g. \code{s = "lambda.min"}.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
 #' @seealso \code{cv.ptLasso}, \code{ptLasso}.
 #' @keywords models regression classification

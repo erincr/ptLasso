@@ -4,12 +4,12 @@
 \alias{print.predict.ptLasso}
 \title{Print the predict.ptLasso object.}
 \usage{
-\method{print}{predict.ptLasso}(x, digits = max(3, getOption("digits") - 3))
+\method{print}{predict.ptLasso}(x, ...)
 }
 \arguments{
 \item{x}{output of predict called with a ptLasso object.}
 
-\item{digits}{number of digits to display.}
+\item{\dots}{other arguments to pass to the print function.}
 }
 \description{
 Print the predict.ptLasso object.

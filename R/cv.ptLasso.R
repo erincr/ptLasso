@@ -24,14 +24,12 @@ subset.y <- function(y, ix, family) {
 #' @param type.measure Measure computed in \code{cv.glmnet}, as in \code{ptLasso}.
 #' @param nfolds Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.
 #' @param foldid An optional vector of values between 1 and \code{nfold} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.
-#' @param s For \code{fit.method = "glmnet"} only. The choice of lambda to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "lambda.min". May be "lambda.1se", or a numeric value. (Use caution when supplying a numeric value: the same lambda will be used for all models.)
-#' @param which For \code{fit.method = "sparsenet"} only. The choice of lambda and gamma to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "parms.min". May also be "parms.1se".
+#' @param s The choice of lambda to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "lambda.min". May be "lambda.1se", or a numeric value. (Use caution when supplying a numeric value: the same lambda will be used for all models.)
 #' @param alphahat.choice When choosing alphahat, we may prefer the best performance using all data (\code{alphahat.choice = "overall"}) or the best average performance across groups (\code{alphahat.choice = "mean"}). This is particularly useful when \code{type.measure} is "auc" or "C", because the average performance across groups is different than the performance with the full dataset. The default is "overall".
 #' @param use.case The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".
 #' @param verbose If \code{verbose=1}, print a statement showing which model is currently being fit.
-#' @param fitoverall An optional cv.glmnet (or cv.sparsenet) object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.
-#' @param fitind An optional list of cv.glmnet (or cv.sparsenet) objects specifying the individual models.
-#' @param fit.method "glmnet" or "sparsenet". Defaults to "glmnet". If 'fit.method = "glmnet"', then \code{"cv.glmnet"} will be used to train models. If 'fit.method = "sparsenet"', \code{"cv.sparsenet"} will be used. The use of sparsenet is available only when 'family = "gaussian"'.
+#' @param fitoverall An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.
+#' @param fitind An optional list of cv.glmnet objects specifying the individual models. This should have been trained on the training data, with the argumnet keep = TRUE.
 #' @param group.intercepts For 'use.case = "inputGroups"' only. If `TRUE`, fit the overall model with a separate intercept for each group. If `FALSE`, ignore the grouping and fit one overall intercept. Default is `TRUE`.
 #' @param \dots Additional arguments to be passed to the `cv.glmnet` function. Notable choices include \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"cv.ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.
 #' 
@@ -107,13 +105,6 @@ subset.y <- function(y, ix, family) {
 #' # plot(cvfit) # to see CV performance as a function of alpha 
 #' predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")
 #'
-#' # Repeat, but this time use sparsenet instead of glmnet:
-#' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
-#'                    fit.method = "sparsenet", which = "parms.min")
-#' cvfit
-#' # plot(cvfit) # to see CV performance as a function of alpha 
-#' predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")
-#'
 #' # Now, we repeat with a binomial outcome.
 #' # This example has k = 3 groups, where each group has 100 observations.
 #' # There are scommon = 5 features shared across all groups, and
@@ -161,10 +152,9 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                        type.measure = c("default", "mse", "mae", "auc","deviance","class", "C"),
                        nfolds = 10, foldid = NULL,
                        verbose=FALSE,
-                       fitoverall=NULL, fitind=NULL, # Do we need to name these? They are in ptLasso.
-                       s = "lambda.min", which = "parms.min",
+                       fitoverall=NULL, fitind=NULL, 
+                       s = "lambda.min", 
                        alphahat.choice = "overall",
-                       fit.method = "glmnet",
                        group.intercepts = TRUE,
                        ...) { 
      
@@ -182,8 +172,6 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
     if((use.case == "inputGroups") & is.null(groups)) stop("For the input grouped setting, groups must be supplied.")
     if(!is.null(groups)) k = length(table(groups))
     if(is.null(groups))  k = length(table(y))
-
-    if(fit.method == "sparsenet") { parms = if(which == "parms.min"){ function(m) m$which.min } else { function(m) m$which.1se } }
     
     n <- nrow(x)
     p <- ncol(x)
@@ -217,7 +205,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
         }
         
         fit[[ii]]<- ptLasso(x,y,groups,alpha=alpha,family=family,type.measure=type.measure, use.case=use.case, foldid=foldid, nfolds=nfolds,
-                            fitoverall = fitoverall, fitind = fitind, verbose = verbose, fit.method = fit.method, group.intercepts = group.intercepts, ...)
+                            fitoverall = fitoverall, fitind = fitind, verbose = verbose, group.intercepts = group.intercepts, ...)
 
         type.measure = fit[[ii]]$call$type.measure
         
@@ -239,19 +227,12 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
             for(i in 1:length(fitpre[[ii]])){
                 m = fitpre[[ii]][[i]]
                 
-                if(fit.method == "glmnet"){
-                    lamhat = get.lamhat(m, s)
-                    err = c(err, m$cvm[m$lambda == lamhat])
-                    if(family == "multinomial"){
-                        pre.preds[groups == i, ] = m$fit.preval[, , m$lambda == lamhat]
-                    } else {
-                        pre.preds[groups == i]   = m$fit.preval[,   m$lambda == lamhat]
-                    }
-                } else if(fit.method == "sparsenet") {
-                    lamgam = parms(m)
-
-                    err = c(err, m$cvm[lamgam[1], lamgam[2]])
-                    pre.preds[groups == i] = m$fit.preval[,  lamgam[1], lamgam[2]]
+                lamhat = get.lamhat(m, s)
+                err = c(err, m$cvm[m$lambda == lamhat])
+                if(family == "multinomial"){
+                    pre.preds[groups == i, ] = m$fit.preval[, , m$lambda == lamhat]
+                } else {
+                    pre.preds[groups == i]   = m$fit.preval[,   m$lambda == lamhat]
                 }
             }
             
@@ -288,22 +269,12 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
         err.ind = NULL
         for(i in 1:k){
             m = fit[[1]]$fitind[[i]]
-            if(fit.method == "glmnet"){
-                lamhat = get.lamhat(m, s)
-                err.ind = c(err.ind, m$cvm[m$lambda == lamhat])
-            } else if(fit.method == "sparsenet") {
-                lamgam = parms(m)
-                err.ind = c(err.ind, m$cvm[lamgam[1], lamgam[2]])
-            }
-
+            lamhat = get.lamhat(m, s)
+            err.ind = c(err.ind, m$cvm[m$lambda == lamhat])
             if(family == "multinomial"){
                 ind.preds[groups == i, ] = m$fit.preval[, , m$lambda == lamhat]
             } else {
-                if(fit.method == "sparsenet"){
-                    ind.preds[groups == i]   = m$fit.preval[,  lamgam[1], lamgam[2]]
-                } else {
-                    ind.preds[groups == i]   = m$fit.preval[,   m$lambda == lamhat]
-                }
+                ind.preds[groups == i]   = m$fit.preval[,   m$lambda == lamhat]
             }   
         }
         if(family == "multinomial") dim(ind.preds) = c(dim(ind.preds), 1)
@@ -315,8 +286,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
         # Overall model
         err.overall = NULL
         m = fit[[1]]$fitoverall
-        if(fit.method == "glmnet") lamhat = get.lamhat(m, s)
-        if(fit.method == "sparsenet") lamgam = parms(m)
+        lamhat = get.lamhat(m, s)
         for(i in 1:k){
             if(family == "multinomial"){
                 overall.preds = m$fit.preval[groups == i, , m$lambda == lamhat]
@@ -325,24 +295,15 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                             as.numeric(assess.glmnet(overall.preds, newy = subset.y(y, groups==i, family), family=family)[type.measure])
                             )
             } else {
-                if(fit.method == "glmnet") {
-                    err.overall = c(err.overall,
+                err.overall = c(err.overall,
                                 as.numeric(assess.glmnet(m$fit.preval[groups == i, m$lambda == lamhat], newy = subset.y(y, groups==i, family), family=family)[type.measure])
                                 )
-                } else if(fit.method == "sparsenet"){
-                    err.overall = c(err.overall,
-                                as.numeric(assess.glmnet(m$fit.preval[groups == i, lamgam[1], lamgam[2]], newy = subset.y(y, groups==i, family), family=family)[type.measure])
-                                )
-                }
             }
         }
         err.overall = c(mean(err.overall), weighted.mean(err.overall, w = table(groups)/length(groups)), err.overall)
-        if(fit.method == "glmnet")    err.overall = c(m$cvm[m$lambda == lamhat], err.overall)
-        if(fit.method == "sparsenet") err.overall = c(m$cvm[lamgam[1], lamgam[2]], err.overall)
+        err.overall = c(m$cvm[m$lambda == lamhat], err.overall)
         names(err.ind) = names(err.overall) = colnames(res)[2:ncol(res)]                
-    }
-
-    
+    }  
 
     this.call$type.measure = type.measure
     
@@ -357,10 +318,8 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                type.measure,
                fitind = fitind,
                fitoverall = fitoverall,
+               fitoverall.lambda = fit[[1]]$fitoverall.lambda,
                fit)
- 
-    if(fit.method == "glmnet")    out$fitoverall.lambda = fit[[1]]$fitoverall.lambda
-    if(fit.method == "sparsenet") out$fitoverall.which = fit[[1]]$fitoverall.which
 
     class(out)="cv.ptLasso"
     return(out)

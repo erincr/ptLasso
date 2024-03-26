@@ -4,7 +4,7 @@
 #'
 #' @aliases print.cv.ptLasso 
 #' @param x fitted \code{"cv.ptLasso"} object.
-#' @param digits number of digits to display.
+#' @param \dots other arguments to pass to the print function.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer:
 #' Erin Craig <erincr@@stanford.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
@@ -18,9 +18,11 @@
 #'
 #' @method print cv.ptLasso
 #' @export
-print.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3)) 
+print.cv.ptLasso=function (x, ...) 
 {
     cat("\nCall: ", deparse(x$call), "\n\n", fill = 50)
+
+    digits = max(3, getOption("digits") - 3)
     
     if("errpre" %in% names(x)){
         cat("type.measure: ", x$call$type.measure, "\n\n")
@@ -46,6 +48,7 @@ print.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
 #'
 #' @aliases print.ptLasso 
 #' @param x fitted \code{"ptLasso"} object.
+#' @param \dots other arguments to pass to the print function.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer:
 #' Erin Craig <erincr@@stanford.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
@@ -60,7 +63,7 @@ print.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
 #' @method print ptLasso
 #' @export
 #'
-print.ptLasso=function (x) 
+print.ptLasso=function (x, ...) 
 {
     cat("\nCall: ", deparse(x$call), "\n\n")
 }
@@ -73,7 +76,7 @@ print.ptLasso=function (x)
 #'
 #' @aliases print.predict.ptLasso 
 #' @param x output of predict called with a ptLasso object.
-#' @param digits number of digits to display.
+#' @param \dots other arguments to pass to the print function.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer:
 #' Erin Craig <erincr@@stanford.edu>
 #' @seealso \code{ptLasso} and \code{predict.ptLasso}.
@@ -97,8 +100,10 @@ print.ptLasso=function (x)
 #' 
 #' @method print predict.ptLasso
 #' @export
-print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3)) 
+print.predict.ptLasso=function (x, ...) 
 {
+    digits = max(3, getOption("digits") - 3)
+    
     cat("\nCall: ", deparse(x$call), "\n\n", fill = 50)
   
     cat(c("alpha = ", x$alpha, "\n"), fill=TRUE)
@@ -131,7 +136,7 @@ print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
 #'
 #' @aliases print.predict.cv.ptLasso 
 #' @param x output of predict called with a ptLasso object.
-#' @param digits number of digits to display.
+#' @param \dots other arguments to pass to the print function.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer:
 #' Erin Craig <erincr@@stanford.edu>
 #' @seealso \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
@@ -155,8 +160,10 @@ print.predict.ptLasso=function (x, digits = max(3, getOption("digits") - 3))
 #'
 #' @method print predict.cv.ptLasso
 #' @export
-print.predict.cv.ptLasso=function (x, digits = max(3, getOption("digits") - 3)) 
+print.predict.cv.ptLasso=function (x, ...) 
 {
+    digits = max(3, getOption("digits") - 3)
+    
     cat("\nCall: ", deparse(x$call), "\n\n", fill = 50)
 
     if(length(x$alpha) > 1){

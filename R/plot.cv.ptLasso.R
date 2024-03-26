@@ -197,7 +197,8 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 #' A plot is produced, and nothing is returned.
 #'
 #' @aliases plot.ptLasso 
-#' @param fit Fitted \code{"ptLasso"} object.
+#' @param x Fitted \code{"ptLasso"} object.
+#' @param \dots Other parameters to pass to the plot function.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 #' @keywords models regression classification
@@ -211,24 +212,23 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 #'
 #' @method plot ptLasso
 #' @export
-plot.ptLasso = function(fit){
+plot.ptLasso = function(x, ...){
     lo = matrix(
-        c(1:fit$k,                  # Overall model
-          (1 + fit$k) : (2*fit$k),    # Pretrained models
-          (1 + 2*fit$k) : (3*fit$k)), # Individual models
+        c(1:x$k,                  # Overall model
+          (1 + x$k) : (2*x$k),    # Pretrained models
+          (1 + 2*x$k) : (3*x$k)), # Individual models
         nrow = 3,
         byrow = TRUE)
     
     par()
     layout(lo, heights=rep(1, 3))
-    plot(fit$fitoverall); title("Overall model", line = 2)
-    for(kk in 1:(fit$k - 1)) plot.new()
+    plot(x$fitoverall); title("Overall model", line = 2)
+    for(kk in 1:(x$k - 1)) plot.new()
 
     line.nudge = 2
-    if(inherits(fit$fitoverall, "cv.sparsenet")) line.nudge = 2.2
     
-    for(kk in 1:fit$k){
-        plot(fit$fitpre[[kk]]);
+    for(kk in 1:x$k){
+        plot(x$fitpre[[kk]]);
         if(kk == 1) {
             title(paste0("Pretrained\nGroup ", kk), line=line.nudge)
         } else {
@@ -237,8 +237,8 @@ plot.ptLasso = function(fit){
         
     }
 
-    for(kk in 1:fit$k){
-        plot(fit$fitind[[kk]]);
+    for(kk in 1:x$k){
+        plot(x$fitind[[kk]]);
         if(kk == 1) {
             title(paste0("Individual\nGroup ", kk), line=line.nudge)
         } else {

@@ -11,7 +11,7 @@
 
 \item{model}{string indicating which coefficients to retrieve. Must be one of "all", "individual", "overall" or "pretrain".}
 
-\item{\dots}{other arguments to be passed to the \code{"coef"} function. For glmnet models, may be e.g. \code{s = "lambda.min"}; for sparsenet models \code{which.parms = "parms.1se"}.}
+\item{\dots}{other arguments to be passed to the \code{"coef"} function. May be e.g. \code{s = "lambda.min"}.}
 }
 \value{
 Model coefficients. If \code{model = "overall"}, this function returns the output of \code{coef}. If \code{model} is "individual" or "pretrain", this function returns a list containing the results of \code{coef} for each group-specific model. If \code{model = "all"}, this returns a list containing all (overall, individual and pretrain) coefficients.

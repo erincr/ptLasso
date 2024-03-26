@@ -7,7 +7,6 @@
 get.individual.support(
   fit,
   s = "lambda.min",
-  which = "parms.min",
   commonOnly = FALSE,
   groups = 1:length(fit$fitind)
 )
@@ -15,9 +14,7 @@ get.individual.support(
 \arguments{
 \item{fit}{fitted \code{"ptLasso"} or \code{"cv.ptLasso"} object.}
 
-\item{s}{for glmnet models only: the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".}
-
-\item{which}{for sparsenet models only: the choice of parameters to use. May be "parms.min" or "parms.1se". Default is "parms.min".}
+\item{s}{the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".}
 
 \item{commonOnly}{whether to return the features that are chosen by all group-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.}
 

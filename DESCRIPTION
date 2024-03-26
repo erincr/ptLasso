@@ -20,8 +20,6 @@ Depends:
     gridExtra,
     Matrix,
     stats
-Imports: 
-    sparsenet
 Suggests: 
     knitr,
     rmarkdown,

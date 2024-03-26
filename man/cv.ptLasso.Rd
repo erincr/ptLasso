@@ -18,9 +18,7 @@ cv.ptLasso(
   fitoverall = NULL,
   fitind = NULL,
   s = "lambda.min",
-  which = "parms.min",
   alphahat.choice = "overall",
-  fit.method = "glmnet",
   group.intercepts = TRUE,
   ...
 )
@@ -46,17 +44,13 @@ cv.ptLasso(
 
 \item{verbose}{If \code{verbose=1}, print a statement showing which model is currently being fit.}
 
-\item{fitoverall}{An optional cv.glmnet (or cv.sparsenet) object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.}
+\item{fitoverall}{An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.}
 
-\item{fitind}{An optional list of cv.glmnet (or cv.sparsenet) objects specifying the individual models.}
+\item{fitind}{An optional list of cv.glmnet objects specifying the individual models. This should have been trained on the training data, with the argumnet keep = TRUE.}
 
-\item{s}{For \code{fit.method = "glmnet"} only. The choice of lambda to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "lambda.min". May be "lambda.1se", or a numeric value. (Use caution when supplying a numeric value: the same lambda will be used for all models.)}
-
-\item{which}{For \code{fit.method = "sparsenet"} only. The choice of lambda and gamma to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "parms.min". May also be "parms.1se".}
+\item{s}{The choice of lambda to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "lambda.min". May be "lambda.1se", or a numeric value. (Use caution when supplying a numeric value: the same lambda will be used for all models.)}
 
 \item{alphahat.choice}{When choosing alphahat, we may prefer the best performance using all data (\code{alphahat.choice = "overall"}) or the best average performance across groups (\code{alphahat.choice = "mean"}). This is particularly useful when \code{type.measure} is "auc" or "C", because the average performance across groups is different than the performance with the full dataset. The default is "overall".}
-
-\item{fit.method}{"glmnet" or "sparsenet". Defaults to "glmnet". If 'fit.method = "glmnet"', then \code{"cv.glmnet"} will be used to train models. If 'fit.method = "sparsenet"', \code{"cv.sparsenet"} will be used. The use of sparsenet is available only when 'family = "gaussian"'.}
 
 \item{group.intercepts}{For 'use.case = "inputGroups"' only. If `TRUE`, fit the overall model with a separate intercept for each group. If `FALSE`, ignore the grouping and fit one overall intercept. Default is `TRUE`.}
 
@@ -136,13 +130,6 @@ outtest = gaussian.example.data(k=k, class.sizes=class.sizes,
 xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 
 cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
-cvfit
-# plot(cvfit) # to see CV performance as a function of alpha 
-predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")
-
-# Repeat, but this time use sparsenet instead of glmnet:
-cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
-                   fit.method = "sparsenet", which = "parms.min")
 cvfit
 # plot(cvfit) # to see CV performance as a function of alpha 
 predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")

@@ -13,7 +13,6 @@
   alphatype = c("fixed", "varying"),
   type = c("link", "response", "class"),
   s = "lambda.min",
-  which = "parms.min",
   return.link = FALSE
 )
 }
@@ -32,9 +31,7 @@
 
 \item{type}{Type of prediction required. Type '"link"' gives the linear predictors for '"binomial", '"multinomial"' or '"cox"' models; for '"gaussian"' models it gives the fitted values. Type '"response"' gives the fitted probabilities for '"binomial"' or '"multinomial"', and the fitted relative-risk for '"cox"'; for '"gaussian"' type '"response"' is equivalent to type '"link"'. Note that for '"binomial"' models, results are returned only for the class corresponding to the second level of the factor response. Type '"class"' applies only to '"binomial"' or '"multinomial"' models, and produces the class label corresponding to the maximum probability.}
 
-\item{s}{For 'fit.measure = "glmnet"' only. Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.}
-
-\item{which}{For 'fit.method = "sparsenet"' only. The choice of 'lambda' and 'gamma' at which predictions are required. Will use the same parameters for all models; can be "parms.1se" or "parms.min". Default is "parms.min".}
+\item{s}{Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.}
 
 \item{return.link}{If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkoverall}, \code{linkpre} and \code{linkind}.}
 }
@@ -65,7 +62,6 @@ Return predictions and performance measures for a test set.
 set.seed(1234)
 out = gaussian.example.data()
 x = out$x; y=out$y; groups = out$group;
-
 outtest = gaussian.example.data()
 xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups;
 

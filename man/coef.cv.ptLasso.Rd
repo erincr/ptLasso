@@ -17,6 +17,8 @@
 \item{model}{string indicating which coefficients to retrieve. Must be one of "all", "individual", "overall" or "pretrain".}
 
 \item{alpha}{value between 0 and 1, indicating which alpha to use. If \code{NULL}, return coefficients from all models.  Only impacts the results for model = "all" or model = "pretrain".}
+
+\item{\dots}{other arguments to be passed to the \code{"coef"} function. May be e.g. \code{s = "lambda.min"}.}
 }
 \description{
 Get the coefficients from a fitted cv.ptLasso model.

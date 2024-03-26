@@ -4,10 +4,12 @@
 \alias{plot.ptLasso}
 \title{Plot the models trained by a ptLasso object}
 \usage{
-\method{plot}{ptLasso}(fit)
+\method{plot}{ptLasso}(x, ...)
 }
 \arguments{
-\item{fit}{Fitted \code{"ptLasso"} object.}
+\item{x}{Fitted \code{"ptLasso"} object.}
+
+\item{\dots}{Other parameters to pass to the plot function.}
 }
 \description{
 A plot is produced, and nothing is returned.

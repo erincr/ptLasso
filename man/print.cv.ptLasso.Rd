@@ -4,12 +4,12 @@
 \alias{print.cv.ptLasso}
 \title{Print the cv.ptLasso object.}
 \usage{
-\method{print}{cv.ptLasso}(x, digits = max(3, getOption("digits") - 3))
+\method{print}{cv.ptLasso}(x, ...)
 }
 \arguments{
 \item{x}{fitted \code{"cv.ptLasso"} object.}
 
-\item{digits}{number of digits to display.}
+\item{\dots}{other arguments to pass to the print function.}
 }
 \description{
 Print the cv.ptLasso object.

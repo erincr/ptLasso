@@ -4,14 +4,12 @@
 \alias{get.overall.support}
 \title{Get the support for the overall model}
 \usage{
-get.overall.support(fit, s = "lambda.min", which = "parms.min")
+get.overall.support(fit, s = "lambda.min")
 }
 \arguments{
 \item{fit}{fitted \code{"ptLasso"} or \code{"cv.ptLasso"} object.}
 
-\item{s}{for glmnet models only: the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".}
-
-\item{which}{for sparsenet models only: the choice of parameters to use. May be "parms.min" or "parms.1se". Default is "parms.min".}
+\item{s}{the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".}
 }
 \value{
 This returns a vector containing the indices of nonzero coefficients (excluding the intercept).

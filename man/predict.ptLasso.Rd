@@ -11,7 +11,6 @@
   ytest = NULL,
   type = c("link", "response", "class"),
   s = "lambda.min",
-  which = "parms.min",
   return.link = FALSE
 )
 }
@@ -26,9 +25,7 @@
 
 \item{type}{Type of prediction required. Type '"link"' gives the linear predictors for '"binomial", '"multinomial"' or '"cox"' models; for '"gaussian"' models it gives the fitted values. Type '"response"' gives the fitted probabilities for '"binomial"' or '"multinomial"', and the fitted relative-risk for '"cox"'; for '"gaussian"' type '"response"' is equivalent to type '"link"'. Note that for '"binomial"' models, results are returned only for the class corresponding to the second level of the factor response. Type '"class"' applies only to '"binomial"' or '"multinomial"' models, and produces the class label corresponding to the maximum probability.}
 
-\item{s}{For use with 'fit.method = "glmnet"' only. Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.}
-
-\item{which}{For use with 'fit.method = "sparsenet"' only. Either the paramaters of the minimum of the CV curves (default "parms.min" or the parameters corresponding to the one standard-error rule "parms.1se"). Default is "parms.min".}
+\item{s}{Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.}
 
 \item{return.link}{If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkoverall}, \code{linkpre} and \code{linkind}.}
 }
@@ -43,7 +40,7 @@ A list containing the requested predictions. If \code{ytest} is included, will a
 \item{supind}{Union of the indices of the features selected by the individual models.}
 \item{suppre.common}{Features selected in the first stage of pretraining.}
 \item{suppre.individual}{Union of the indices of the features selected by the pretrained models, without the features selected in the first stage.}
-\item{type.measure} {If \code{ytest} is supplied, the string name of the computed performance measure.}
+\item{type.measure}{If \code{ytest} is supplied, the string name of the computed performance measure.}
 \item{erroverall}{If \code{ytest} is supplied, performance for the overall model. This is a named vector containing performance for (1) the entire dataset, (2) the average performance across groups, (3) the average performance across groups weighted by group size and (4) group-specific performance.}
 \item{errind}{If \code{ytest} is supplied, performance for the overall model. As described in \code{erroverall}.}
 \item{errpre}{If \code{ytest} is supplied, performance for the overall model. As described in \code{erroverall}.}

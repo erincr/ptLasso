@@ -4,10 +4,12 @@
 \alias{print.ptLasso}
 \title{Print the ptLasso object.}
 \usage{
-\method{print}{ptLasso}(x)
+\method{print}{ptLasso}(x, ...)
 }
 \arguments{
 \item{x}{fitted \code{"ptLasso"} object.}
+
+\item{\dots}{other arguments to pass to the print function.}
 }
 \description{
 Print the ptLasso object.
