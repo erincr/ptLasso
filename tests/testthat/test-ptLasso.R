@@ -214,6 +214,43 @@ test_that("wrong_training_data_individual", {
     expect_equal(err, "error")
 })
 
+
+cvfit1=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5,
+                 overall.lambda = "lambda.min", overall.gamma = "gamma.min",
+                 relax=TRUE)
+
+cvfit2=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5,
+                 overall.lambda = "lambda.min", overall.gamma = "gamma.1se",
+                 relax=TRUE)
+
+test_that("relax_gamma_min", {
+    expect_equal(unname(cvfit1$errpre[1, ]),
+                 c(0.0000, 1304, 1194, 1293, 1637, 1334, 919, 814, 1265),
+                 tolerance = test.tol)
+})
+
+test_that("relax_gamma_1se", {
+    expect_equal(unname(cvfit2$errpre[1, ]),
+                 c(0.0000, 1318, 1152, 1285, 1694, 1299, 971, 813, 982),
+                 tolerance = test.tol)
+})
+
+pred.cv1=predict(cvfit1,xtest,groupstest=groupstest, ytest=ytest, alphatype="varying")
+pred.cv2=predict(cvfit2,xtest,groupstest=groupstest, ytest=ytest, alphatype="varying")
+
+test_that("pred_gamma_min", {
+    expect_equal(unname(pred.cv1$errpre),
+                 c(1346, 1189, 1346, 1517, 1686, 1166, 688, 888),
+                 tolerance = test.tol)
+})
+
+test_that("pred_gamma_1se", {
+    expect_equal(unname(pred.cv2$errpre),
+                 c(1362, 1376, 1362, 1249, 1603, 1157, 833, 2037),
+                 tolerance = test.tol)
+})
+
+
 ###########################################################################
 # Input groups, binomial response
 ###########################################################################

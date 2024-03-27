@@ -4,12 +4,14 @@
 \alias{get.overall.support}
 \title{Get the support for the overall model}
 \usage{
-get.overall.support(fit, s = "lambda.min")
+get.overall.support(fit, s = "lambda.min", gamma = "gamma.min")
 }
 \arguments{
 \item{fit}{fitted \code{"ptLasso"} or \code{"cv.ptLasso"} object.}
 
 \item{s}{the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".}
+
+\item{gamma}{for use only when 'relax = TRUE' was specified during training. The choice of 'gamma' to use. May be "gamma.min" or "gamma.1se". Default is "gamma.min".}
 }
 \value{
 This returns a vector containing the indices of nonzero coefficients (excluding the intercept).

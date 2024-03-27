@@ -9,7 +9,8 @@
 #' @param family Either a character string representing one of the built-in families, or else a 'glm()' family object. For more information, see Details section below or the documentation for response type (above).
 #' @param type.measure loss to use for cross-validation within each individual, overall, or pretrained lasso model. Currently five options, not all available for all models. The default is 'type.measure="deviance"', which uses squared-error for gaussian models (a.k.a 'type.measure="mse"' there), deviance for logistic and poisson regression, and partial-likelihood for the Cox model. 'type.measure="class"' applies to binomial and multinomial logistic regression only, and gives misclassification error. 'type.measure="auc"' is for two-class logistic regression only, and gives area under the ROC curve. 'type.measure="mse"' or 'type.measure="mae"' (mean absolute error) can be used by all models except the '"cox"'; they measure the deviation from the fitted mean to the response. 'type.measure="C"' is Harrel's concordance measure, only available for 'cox' models.
 #' @param use.case The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".
-#' @param overall.lambda The choice of lambda to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value. This choice of lambda will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another lambda must be specified for the individual models, the second stage of pretraining and the overall model (to make standalone predictions).
+#' @param overall.lambda The choice of lambda to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value. This choice of lambda will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another lambda must be specified for the individual models, the second stage of pretraining and the overall model.
+#' @param overall.gamma For use only when the option \code{relax = TRUE} is specified. The choice of gamma to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "gamma.1se", but "gamma.min" is also a good option. This choice of gamma will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another gamma must be specified for the individual models, the second stage of pretraining and the overall model.
 #' @param fitoverall An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.
 #' @param fitind An optional list of cv.glmnet objects specifying the individual models. 
 #' @param nfolds Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.
@@ -50,6 +51,24 @@
 #' # plot(fit) # to see all of the cv.glmnet models trained
 #' predict(fit, xtest, groupstest) # to predict on new data
 #' predict(fit, xtest, groupstest, ytest=ytest) # if ytest is included, we also measure performance
+#'
+#' # When we trained our model, we used "lambda.1se" in the first stage of pretraining by default.
+#' # This is a necessary choice to make during model training; we need to select the model
+#' # we want to use to define the offset and penalty factor for the second stage of pretraining.
+#' # We could instead have used "lambda.min":
+#' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse",
+#'               overall.lambda = "lambda.min")
+#'
+#' # We can use the 'relax' option to fit relaxed lasso models:
+#' fit = ptLasso(x, y, groups = groups, alpha = 0.5,
+#'               family = "gaussian", type.measure = "mse",
+#'               relax = TRUE)
+#'
+#' # As we did for lambda, we may want to specify the choice of gamma for stage one
+#' # of pretraining. (The default is "gamma.1se".)
+#' fit = ptLasso(x, y, groups = groups, alpha = 0.5,
+#'               family = "gaussian", type.measure = "mse",
+#'               relax = TRUE, overall.gamma = "gamma.min")
 #'
 #' # In practice, we may want to try many values of alpha.
 #' # alpha may range from 0 (the overall model with fine tuning) to 1 (the individual models).
@@ -142,6 +161,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  type.measure=c("default", "mse", "mae", "auc","deviance","class", "C"),
                  use.case=c("inputGroups","targetGroups"),
                  overall.lambda = "lambda.1se",
+                 overall.gamma = "gamma.1se",
                  foldid=NULL,
                  nfolds=10,
                  standardize = TRUE,
@@ -193,16 +213,16 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     if(!is.null(fitoverall)){
         if(!("cv.glmnet" %in% class(fitoverall))) stop("fitoverall must be a cv.glmnet object.")
         if(!("fit.preval" %in% names(fitoverall))) stop("fitoverall must have fit.preval defined (fitted with the argument keep = TRUE).")
-        if(nrow(fitoverall$fit.preval) != nrow(x)) stop("fitoverall must have been trained using the same training data passed to ptLasso.")
+        if(nrow(get.preval(fitoverall, gamma = overall.gamma)) != nrow(x)) stop("fitoverall must have been trained using the same training data passed to ptLasso.")
     }
     if(!is.null(fitind)){
         if(length(fitind) != k) stop("Some of the individual models are missing: need one model trained for each group.")
         if(!(all(sapply(fitind, function(mm) "cv.glmnet" %in% class(mm))))) stop("fitind must be a list of cv.glmnet objects.")
         if(!all(sapply(fitind, function(mm) "fit.preval" %in% names(mm)))) stop("Individual models must have fit.preval defined (fitted with the argument keep = TRUE).")
         if(use.case == "inputGroups"){
-            if(!all(sapply(fitind, function(mm) nrow(mm$fit.preval)) == table(groups))) stop("Individual models must have been trained using the same training data passed to ptLasso.")
+            if(!all(sapply(fitind, function(mm) nrow(get.preval(mm, gamma = overall.gamma))) == table(groups))) stop("Individual models must have been trained using the same training data passed to ptLasso.")
         } else {
-            if(!all(sapply(fitind, function(mm) nrow(mm$fit.preval)) == nrow(x))) stop("Individual models must have been trained using the same training data passed to ptLasso.")                                                                                                                                                                              }
+            if(!all(sapply(fitind, function(mm) nrow(get.preval(mm, gamma = overall.gamma))) == nrow(x))) stop("Individual models must have been trained using the same training data passed to ptLasso.")                                                                                                                                                                              }
     }
     
 
@@ -302,14 +322,14 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
 
     if(use.case=="inputGroups"){
         if(family == "multinomial"){
-            preval.offset = fitoverall$fit.preval[, , fitoverall$lambda == lamhat]
+            preval.offset = get.preval(fitoverall, gamma = overall.gamma)[, , fitoverall$lambda == lamhat]
             bhatall=coef(fitoverall, s=lamhat, exact=FALSE)
             bhatall=do.call(cbind, bhatall)
             bhatall=bhatall[-(1:(k+1)), ]
             supall=which(apply(bhatall, 1, function(x) sum(x != 0) > 0))
             supall=unname(supall)
         } else {
-            preval.offset = fitoverall$fit.preval[, fitoverall$lambda == lamhat]
+            preval.offset = get.preval(fitoverall, gamma = overall.gamma)[, fitoverall$lambda == lamhat]
             bhatall=as.numeric(coef(fitoverall, s=lamhat, exact=FALSE))
             if(family!="cox") supall=which(bhatall[-(1:(k+1))]!=0)
             if(family=="cox") supall=which(bhatall[-(1:k)]!=0)
@@ -320,7 +340,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         bhatall=vector("list", k)
         for(kk in 1:k){
             bhatall[[kk]] = as.numeric(bhatall.orig[[kk]])
-            preval.offset[[kk]] = fitoverall$fit.preval[, kk, fitoverall$lambda == lamhat]
+            preval.offset[[kk]] = get.preval(fitoverall, gamma = overall.gamma)[, kk, fitoverall$lambda == lamhat]
         }
         supall = vector("list",k)
         for(kk in 1:k){ supall[[kk]]=which(bhatall[[kk]][-1]!=0)}
@@ -485,6 +505,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         fitoverall, fitind, fitpre,
         fitoverall.lambda = lamhat
     )
+    if(("relax" %in% names(list(...))) && list(...)$relax == TRUE) out$fitoverall.gamma = overall.gamma
     class(out)="ptLasso"
     return(out)
 
@@ -522,3 +543,21 @@ cvtype <- function(type.measure="mse",family="gaussian"){
     }
     type.measure
 }
+
+#' Error checking for type.measure and family - modified from glmnet cvtype.R
+#' @noRd
+get.preval <- function(fit, gamma = "gamma.1se"){
+    if("relaxed" %in% names(fit)){
+        if(!(gamma %in% c("gamma.1se", "gamma.min"))) stop("gamma must be 'gamma.1se' or 'gamma.min'.")
+        if(gamma == "gamma.1se") ix = which(fit$relaxed$gamma == fit$relaxed$gamma.1se)
+        if(gamma == "gamma.min") ix = which(fit$relaxed$gamma == fit$relaxed$gamma.min)
+        if(is.numeric(gamma)) ix = which(abs(fit$relaxed$gamma - gamma) < 1e-5)
+        if(length(ix) < 1) stop("gamma must be in fit$relaxed$gamma.")
+        if(length(ix) > 1) ix = ix[1]
+        return(fit$fit.preval[[ix]])
+    } else {
+        return(fit$fit.preval)
+    }
+            
+}
+    

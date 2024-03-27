@@ -13,6 +13,7 @@ ptLasso(
   type.measure = c("default", "mse", "mae", "auc", "deviance", "class", "C"),
   use.case = c("inputGroups", "targetGroups"),
   overall.lambda = "lambda.1se",
+  overall.gamma = "gamma.1se",
   foldid = NULL,
   nfolds = 10,
   standardize = TRUE,
@@ -41,7 +42,9 @@ ptLasso(
 
 \item{use.case}{The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".}
 
-\item{overall.lambda}{The choice of lambda to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value. This choice of lambda will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another lambda must be specified for the individual models, the second stage of pretraining and the overall model (to make standalone predictions).}
+\item{overall.lambda}{The choice of lambda to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value. This choice of lambda will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another lambda must be specified for the individual models, the second stage of pretraining and the overall model.}
+
+\item{overall.gamma}{For use only when the option \code{relax = TRUE} is specified. The choice of gamma to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "gamma.1se", but "gamma.min" is also a good option. This choice of gamma will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another gamma must be specified for the individual models, the second stage of pretraining and the overall model.}
 
 \item{foldid}{An optional vector of values between 1 and \code{nfold} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.}
 
@@ -95,6 +98,24 @@ fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.meas
 # plot(fit) # to see all of the cv.glmnet models trained
 predict(fit, xtest, groupstest) # to predict on new data
 predict(fit, xtest, groupstest, ytest=ytest) # if ytest is included, we also measure performance
+
+# When we trained our model, we used "lambda.1se" in the first stage of pretraining by default.
+# This is a necessary choice to make during model training; we need to select the model
+# we want to use to define the offset and penalty factor for the second stage of pretraining.
+# We could instead have used "lambda.min":
+fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse",
+              overall.lambda = "lambda.min")
+
+# We can use the 'relax' option to fit relaxed lasso models:
+fit = ptLasso(x, y, groups = groups, alpha = 0.5,
+              family = "gaussian", type.measure = "mse",
+              relax = TRUE)
+
+# As we did for lambda, we may want to specify the choice of gamma for stage one
+# of pretraining. (The default is "gamma.1se".)
+fit = ptLasso(x, y, groups = groups, alpha = 0.5,
+              family = "gaussian", type.measure = "mse",
+              relax = TRUE, overall.gamma = "gamma.min")
 
 # In practice, we may want to try many values of alpha.
 # alpha may range from 0 (the overall model with fine tuning) to 1 (the individual models).

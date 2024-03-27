@@ -18,6 +18,7 @@ cv.ptLasso(
   fitoverall = NULL,
   fitind = NULL,
   s = "lambda.min",
+  gamma = "gamma.min",
   alphahat.choice = "overall",
   group.intercepts = TRUE,
   ...
@@ -44,11 +45,13 @@ cv.ptLasso(
 
 \item{verbose}{If \code{verbose=1}, print a statement showing which model is currently being fit.}
 
-\item{fitoverall}{An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.}
+\item{fitoverall}{An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argument keep = TRUE.}
 
 \item{fitind}{An optional list of cv.glmnet objects specifying the individual models. This should have been trained on the training data, with the argumnet keep = TRUE.}
 
 \item{s}{The choice of lambda to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "lambda.min". May be "lambda.1se", or a numeric value. (Use caution when supplying a numeric value: the same lambda will be used for all models.)}
+
+\item{gamma}{For use only when \code{relax = TRUE}. The choice of gamma to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "gamma.min". May also be "gamma.1se".}
 
 \item{alphahat.choice}{When choosing alphahat, we may prefer the best performance using all data (\code{alphahat.choice = "overall"}) or the best average performance across groups (\code{alphahat.choice = "mean"}). This is particularly useful when \code{type.measure} is "auc" or "C", because the average performance across groups is different than the performance with the full dataset. The default is "overall".}
 
@@ -96,6 +99,22 @@ cvfit
 # plot(cvfit) # to see CV performance as a function of alpha 
 predict(cvfit, xtest, groupstest, s="lambda.min") # to predict with held out data
 predict(cvfit, xtest, groupstest, s="lambda.min", ytest=ytest) # to also measure performance
+
+# By default, we used s = "lambda.min" to compute CV performance.
+# We could instead use s = "lambda.1se":
+cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
+                   s = "lambda.1se")
+
+# We could also use the glmnet option relax = TRUE:
+cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
+                   relax = TRUE)
+# And, as we did with lambda, we may want to specify the choice of gamma to compute CV performance:
+cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
+                   relax = TRUE, gamma = "gamma.1se")
+
+# Note that the first stage of pretraining uses "lambda.1se" and "gamma.1se" by default.
+# This behavior can be modified by specifying overall.lambda and overall.gamma;
+# see the documentation for ptLasso for more information.
 
 # Now, we are ready to simulate slightly more realistic data.
 # This continuous outcome example has k = 5 groups, where each group has 200 observations.

@@ -11,6 +11,7 @@
   ytest = NULL,
   type = c("link", "response", "class"),
   s = "lambda.min",
+  gamma = "gamma.min",
   return.link = FALSE
 )
 }
@@ -26,6 +27,8 @@
 \item{type}{Type of prediction required. Type '"link"' gives the linear predictors for '"binomial", '"multinomial"' or '"cox"' models; for '"gaussian"' models it gives the fitted values. Type '"response"' gives the fitted probabilities for '"binomial"' or '"multinomial"', and the fitted relative-risk for '"cox"'; for '"gaussian"' type '"response"' is equivalent to type '"link"'. Note that for '"binomial"' models, results are returned only for the class corresponding to the second level of the factor response. Type '"class"' applies only to '"binomial"' or '"multinomial"' models, and produces the class label corresponding to the maximum probability.}
 
 \item{s}{Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.}
+
+\item{gamma}{For use only when 'relax = TRUE' was specified during training. Value of the penalty parameter 'gamma' at which predictions are required. Will use the same gamma for all models; can be a numeric value, '"gamma.min"' or '"gamma.1se"'. Default is '"gamma.min"'.}
 
 \item{return.link}{If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkoverall}, \code{linkpre} and \code{linkind}.}
 }

@@ -4,6 +4,7 @@
 #'
 #' @param fit fitted \code{"ptLasso"} or \code{"cv.ptLasso"} object.
 #' @param s the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".
+#' @param gamma for use only when 'relax = TRUE' was specified during training. The choice of 'gamma' to use. May be "gamma.min" or "gamma.1se". Default is "gamma.min".
 #' @param commonOnly whether to return the features that are chosen by all group-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.
 #' @param includeOverall whether to return the features that are chosen by the overall model and not the group-specific models (TRUE) or the features that are chosen by the overall model or the group-specific models (FALSE). Default is TRUE.
 #' @param groups which groups to include when computing the support. Default is to include all groups.
@@ -38,9 +39,9 @@
 #'
 #' @export
 #'
-get.pretrain.support <- function(fit, s="lambda.min", commonOnly = FALSE, includeOverall = TRUE, groups = 1:length(fit$fitind)) {
-    if(inherits(fit, "cv.ptLasso")) return(lapply(fit$fit, function(m) get.pretrain.or.individual.support(m, s=s, commonOnly=commonOnly, includeOverall=includeOverall, groups = groups, model="pretrain"))) 
-    get.pretrain.or.individual.support(fit, s=s, commonOnly=commonOnly, includeOverall=includeOverall, groups = groups, model="pretrain")
+get.pretrain.support <- function(fit, s="lambda.min", gamma="gamma.min", commonOnly = FALSE, includeOverall = TRUE, groups = 1:length(fit$fitind)) {
+    if(inherits(fit, "cv.ptLasso")) return(lapply(fit$fit, function(m) get.pretrain.or.individual.support(m, s=s, gamma=gamma, commonOnly=commonOnly, includeOverall=includeOverall, groups = groups, model="pretrain"))) 
+    get.pretrain.or.individual.support(fit, s=s, gamma=gamma, commonOnly=commonOnly, includeOverall=includeOverall, groups = groups, model="pretrain")
 }
 
 #' Get the support for individual models
@@ -49,6 +50,7 @@ get.pretrain.support <- function(fit, s="lambda.min", commonOnly = FALSE, includ
 #'
 #' @param fit fitted \code{"ptLasso"} or \code{"cv.ptLasso"} object.
 #' @param s the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".
+#' @param gamma for use only when 'relax = TRUE' was specified during training. The choice of 'gamma' to use. May be "gamma.min" or "gamma.1se". Default is "gamma.min".
 #' @param commonOnly whether to return the features that are chosen by all group-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.
 #' @param groups which groups to include when computing the support. Default is to include all groups.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
@@ -81,19 +83,23 @@ get.pretrain.support <- function(fit, s="lambda.min", commonOnly = FALSE, includ
 #'
 #' @export
 #'
-get.individual.support <- function(fit, s="lambda.min", commonOnly = FALSE, groups = 1:length(fit$fitind)) {
-    if(inherits(fit, "cv.ptLasso")) return(get.pretrain.or.individual.support(fit$fit[[1]], s=s, commonOnly=commonOnly, groups = groups, model="individual")) 
-    return(get.pretrain.or.individual.support(fit, s=s, commonOnly=commonOnly, groups = groups, model="individual"))
+get.individual.support <- function(fit, s="lambda.min", gamma="gamma.min", commonOnly = FALSE, groups = 1:length(fit$fitind)) {
+    if(inherits(fit, "cv.ptLasso")) return(get.pretrain.or.individual.support(fit$fit[[1]], s=s, gamma=gamma, commonOnly=commonOnly, groups = groups, model="individual")) 
+    return(get.pretrain.or.individual.support(fit, s=s, gamma=gamma, commonOnly=commonOnly, groups = groups, model="individual"))
 }
 
 #' Helper function to get support for pretrained or individual models.
 #' @noRd
-get.pretrain.or.individual.support <- function(fit, s="lambda.min", model="pretrain", groups = groups, includeOverall=TRUE, commonOnly = FALSE){
+get.pretrain.or.individual.support <- function(fit, s="lambda.min", gamma="gamma.min", model="pretrain", groups = groups, includeOverall=TRUE, commonOnly = FALSE){
     
     include.these = c()
     if((model == "pretrain") && (includeOverall == TRUE)){
         if(fit$alpha < 1) {
-            include.these = get.overall.support(fit, s=fit$fitoverall.lambda)
+            if("fitoverall.gamma" %in% names(fit)){
+                include.these = get.overall.support(fit, s=fit$fitoverall.lambda, gamma=fit$fitoverall.gamma)
+            } else {
+                include.these = get.overall.support(fit, s=fit$fitoverall.lambda)
+            }
         }
     }
 
@@ -105,22 +111,22 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", model="pretr
     for(kk in groups){
         if(fit$call$use.case == "inputGroups"){
             if(fit$call$family == "multinomial"){
-                bhatpre[[ix]] = coef(model[[kk]], s=s, exact=FALSE)
+                bhatpre[[ix]] = coef(model[[kk]], s=s, gamma=gamma, exact=FALSE)
                 bhatpre[[ix]] = do.call(cbind, bhatpre[[ix]])[-1, ]
                 
                 suppre[[ix]] = which(apply(bhatpre[[ix]], 1, function(x) sum(x != 0) > 0))
                 suppre[[ix]] = sort(unique(c(suppre[[ix]], include.these)))
             } else {
                 if(fit$call$family=="cox"){
-                    bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, exact=F))
+                    bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=F))
                 } else {
-                    bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, exact=F)[-1])
+                    bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=F)[-1])
                 }
                 suppre[[ix]]=sort(unique(c(which(bhatpre[[ix]]!=0), include.these)))
             }
         } else if(fit$call$use.case == "targetGroups"){
             # This should always be a binomial (one vs. rest) model:
-            bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, exact=F)[-1])
+            bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=F)[-1])
             suppre[[ix]] = sort(unique(c(which(bhatpre[[ix]]!=0), include.these)))
         }
       
@@ -140,6 +146,7 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", model="pretr
 #'
 #' @param fit fitted \code{"ptLasso"} or \code{"cv.ptLasso"} object.
 #' @param s the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".
+#' @param gamma for use only when 'relax = TRUE' was specified during training. The choice of 'gamma' to use. May be "gamma.min" or "gamma.1se". Default is "gamma.min".
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso}.
 #' @keywords models regression classification
@@ -163,16 +170,19 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", model="pretr
 #'
 #' @export
 #'
-get.overall.support <- function(fit, s="lambda.min"){
+get.overall.support <- function(fit, s="lambda.min", gamma="gamma.min"){
 
     if(inherits(fit, "cv.ptLasso")) {
         if(is.null(s)) s = fit$fitoverall.lambda
-        return(get.overall.support(fit$fit[[1]], s = s))
+        if("fitoverall.gamma" %in% names(fit)){
+            if(is.null(gamma)) gamma = fit$fitoverall.gamma
+        }
+        return(get.overall.support(fit$fit[[1]], s = s, gamma = gamma))
     }
 
     if(is.null(s)) stop("s cannot be null.")
     
-    coefs = coef(fit$fitoverall, s=s)
+    coefs = coef(fit$fitoverall, s=s, gamma = gamma)
     k = fit$k
     
     # multinomial

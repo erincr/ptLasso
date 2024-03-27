@@ -7,6 +7,7 @@
 get.individual.support(
   fit,
   s = "lambda.min",
+  gamma = "gamma.min",
   commonOnly = FALSE,
   groups = 1:length(fit$fitind)
 )
@@ -15,6 +16,8 @@ get.individual.support(
 \item{fit}{fitted \code{"ptLasso"} or \code{"cv.ptLasso"} object.}
 
 \item{s}{the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".}
+
+\item{gamma}{for use only when 'relax = TRUE' was specified during training. The choice of 'gamma' to use. May be "gamma.min" or "gamma.1se". Default is "gamma.min".}
 
 \item{commonOnly}{whether to return the features that are chosen by all group-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.}
 

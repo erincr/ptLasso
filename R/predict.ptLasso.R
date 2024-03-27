@@ -12,6 +12,7 @@
 #' @param alphatype Choice of '"fixed"' or '"varying"'. If '"fixed"', use the alpha that achieved best cross-validated performance. If '"varying"', each group uses the alpha that optimized the group-specific cross-validated performance.
 #' @param type Type of prediction required. Type '"link"' gives the linear predictors for '"binomial", '"multinomial"' or '"cox"' models; for '"gaussian"' models it gives the fitted values. Type '"response"' gives the fitted probabilities for '"binomial"' or '"multinomial"', and the fitted relative-risk for '"cox"'; for '"gaussian"' type '"response"' is equivalent to type '"link"'. Note that for '"binomial"' models, results are returned only for the class corresponding to the second level of the factor response. Type '"class"' applies only to '"binomial"' or '"multinomial"' models, and produces the class label corresponding to the maximum probability.
 #' @param s Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.
+#' @param gamma For use only when 'relax = TRUE' was specified during training. Value of the penalty parameter 'gamma' at which predictions are required. Will use the same gamma for all models; can be a numeric value, '"gamma.min"' or '"gamma.1se"'. Default is '"gamma.min"'.
 #' @param return.link If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkoverall}, \code{linkpre} and \code{linkind}.
 #' @return A list containing the requested predictions. If \code{ytest} is included, will also return error measures.
 #' \item{call}{The call that produced this object.}
@@ -68,7 +69,7 @@
 #' @method predict cv.ptLasso
 #' @export
 predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NULL, alphatype = c("fixed", "varying"),
-                            type = c("link", "response", "class"), s = "lambda.min", return.link = FALSE){
+                            type = c("link", "response", "class"), s = "lambda.min", gamma = "gamma.min", return.link = FALSE){
 
     if(missing("xtest")) stop("Please supply xtest.")
 
@@ -90,7 +91,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
        
         fit = cvfit$fit[[model.ix]]
 
-        out = predict.ptLasso(fit, xtest, groupstest=groupstest, ytest=ytest, type = type, s = s)
+        out = predict.ptLasso(fit, xtest, groupstest=groupstest, ytest=ytest, type = type, s = s, gamma = gamma)
         out$call = this.call
         
         return(out)
@@ -112,7 +113,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
                                                            xtest, ytest = ytest,
                                                            pred.groups = ix,
                                                            process.results = FALSE,
-                                                           type = type, s = s, return.link=TRUE)}
+                                                           type = type, s = s, gamma = gamma, return.link=TRUE)}
                              )
             phatall = results[[1]]$phatall
             phatpre = do.call(cbind, lapply(results, function(x) x$phatpre))
@@ -123,7 +124,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
             return(process.targetGroup.results(phatall = phatall, phatpre = phatpre, phatind = phatind,
                                         ytest = ytest, k = cvfit$fit[[1]]$k, type.measure = cvfit$type.measure,
                                         return.link = return.link, type = type,
-                                        alpha = alpha, s = s, call = this.call, fit = cvfit,
+                                        alpha = alpha, s = s, gamma = gamma, call = this.call, fit = cvfit,
                                         suppre.common = suppre.common, suppre.individual = suppre.individual
                                         )
 
@@ -138,7 +139,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
                                                            xtest[groupstest == ix, ],
                                                            groupstest=groupstest[groupstest == ix],
                                                            ytest=ytest[groupstest == ix],
-                                                           type = type, s = s, return.link=TRUE)}
+                                                           type = type, s = s, gamma = gamma, return.link=TRUE)}
                              )
 
         all.preds = pre.preds = ind.preds = rep(NA, nrow(xtest))
@@ -153,9 +154,13 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
             ind.link[groupstest == predgroups[kk]] = results[[kk]]$linkind
         }
         
-        suppre = lapply(predgroups, function(ix) get.pretrain.support(cvfit$fit[[model.ix[ix]]], groups = ix, includeOverall = FALSE, s = s))
+        suppre = lapply(predgroups, function(ix) get.pretrain.support(cvfit$fit[[model.ix[ix]]], groups = ix, includeOverall = FALSE, s = s, gamma = gamma))
         suppre = sort(unique(unlist(suppre)))
-        suppre.common =  get.overall.support(cvfit, s=cvfit$fitoverall.lambda)
+        if("fitoverall.gamma" %in% names(cvfit)){
+            suppre.common =  get.overall.support(cvfit, s=cvfit$fitoverall.lambda, gamma = cvfit$fitoverall.gamma)
+        } else {
+            suppre.common =  get.overall.support(cvfit, s=cvfit$fitoverall.lambda)
+        }
         suppre.individual = setdiff(suppre, suppre.common)
 
         if(!is.null(ytest)){
@@ -232,6 +237,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 #' @param ytest Response variable. Optional. If included, \code{"predict"} will compute performance measures for xtest using code{"type.measure"} from the cvfit object.
 #' @param type Type of prediction required. Type '"link"' gives the linear predictors for '"binomial", '"multinomial"' or '"cox"' models; for '"gaussian"' models it gives the fitted values. Type '"response"' gives the fitted probabilities for '"binomial"' or '"multinomial"', and the fitted relative-risk for '"cox"'; for '"gaussian"' type '"response"' is equivalent to type '"link"'. Note that for '"binomial"' models, results are returned only for the class corresponding to the second level of the factor response. Type '"class"' applies only to '"binomial"' or '"multinomial"' models, and produces the class label corresponding to the maximum probability.
 #' @param s Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.
+#' @param gamma For use only when 'relax = TRUE' was specified during training. Value of the penalty parameter 'gamma' at which predictions are required. Will use the same gamma for all models; can be a numeric value, '"gamma.min"' or '"gamma.1se"'. Default is '"gamma.min"'.
 #' @param return.link If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkoverall}, \code{linkpre} and \code{linkind}.
 #' 
 #' @return A list containing the requested predictions. If \code{ytest} is included, will also return error measures.
@@ -270,7 +276,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 #' @export
 predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL, 
                          type = c("link", "response", "class"),
-                         s="lambda.min", return.link=FALSE){
+                         s="lambda.min", gamma = "gamma.min", return.link=FALSE){
 
     this.call <- match.call()
     
@@ -303,8 +309,8 @@ predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL,
     }
 
     
-    if(fit$call$use.case=="inputGroups") out=predict.ptLasso.inputGroups(fit, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s, return.link=return.link, group.intercepts=group.intercepts)
-    if(fit$call$use.case=="targetGroups") out=predict.ptLasso.targetGroups(fit, xtest, ytest=ytest, type=type, call=this.call, family=family, type.measure=type.measure, s=s, return.link=return.link)
+    if(fit$call$use.case=="inputGroups") out=predict.ptLasso.inputGroups(fit, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s, gamma=gamma, return.link=return.link, group.intercepts=group.intercepts)
+    if(fit$call$use.case=="targetGroups") out=predict.ptLasso.targetGroups(fit, xtest, ytest=ytest, type=type, call=this.call, family=family, type.measure=type.measure, s=s, gamma=gamma, return.link=return.link)
     class(out)="predict.ptLasso"
     return(out)
 }
@@ -312,7 +318,7 @@ predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL,
 #' Predict function for input grouped data
 #' @noRd
 predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, type.measure, type, call, group.intercepts,
-                                     s="lambda.min", return.link=FALSE, ytest=NULL){
+                                     s="lambda.min", gamma="gamma.min", return.link=FALSE, ytest=NULL){
 
     if(is.null(groupstest)) stop("Need group IDs for test data.")
         
@@ -327,9 +333,9 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
         if(family != "cox") onehot.test = onehot.test[, 2:k, drop=FALSE]
     }
     
-    phatall = predict(fit$fitoverall, cbind(onehot.test, xtest), type="link", s=s) 
+    phatall = predict(fit$fitoverall, cbind(onehot.test, xtest), type="link", s=s, gamma=gamma) 
 
-    yhatoverall = predict(fit$fitoverall, cbind(onehot.test, xtest), type=type, s=s) 
+    yhatoverall = predict(fit$fitoverall, cbind(onehot.test, xtest), type=type, s=s, gamma=gamma) 
     
     if(!is.null(ytest)){
         if(family == "multinomial") {
@@ -365,12 +371,12 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
      
         test.ix  = groupstest == kk
 
-        phatind[test.ix, ] = predict(fit$fitind[[kk]], xtest[test.ix,], type="link", s=s) 
+        phatind[test.ix, ] = predict(fit$fitind[[kk]], xtest[test.ix,], type="link", s=s, gamma=gamma) 
 
         if(type == "class"){
-            yhatind[test.ix] = predict(fit$fitind[[kk]], xtest[test.ix,], type=type, s=s)
+            yhatind[test.ix] = predict(fit$fitind[[kk]], xtest[test.ix,], type=type, s=s, gamma=gamma)
         } else {
-            yhatind[test.ix, ] = predict(fit$fitind[[kk]], xtest[test.ix,], type=type, s=s) 
+            yhatind[test.ix, ] = predict(fit$fitind[[kk]], xtest[test.ix,], type=type, s=s, gamma=gamma) 
         }
 
         if(!is.null(ytest)){
@@ -392,19 +398,19 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
         test.ix = groupstest == kk
         
         # Pretraining predictions
-        offsetTest = (1-fit$alpha) * predict(fit$fitoverall, cbind(onehot.test[test.ix, ], xtest[test.ix,]), s=fit$fitoverall.lambda, type="link")
+        offsetTest = (1-fit$alpha) * predict(fit$fitoverall, cbind(onehot.test[test.ix, ], xtest[test.ix,]), s=fit$fitoverall.lambda, gamma=fit$fitoverall.gamma, type="link")
         if(family == "multinomial") offsetTest = offsetTest[, , 1]                             
-        phatpre[test.ix, ] = predict(fit$fitpre[[kk]], xtest[test.ix,], newoffset=offsetTest, type="link", s=s) 
+        phatpre[test.ix, ] = predict(fit$fitpre[[kk]], xtest[test.ix,], newoffset=offsetTest, type="link", s=s, gamma=gamma) 
 
         # Individual model predictions
-        phatind[test.ix, ] = predict(fit$fitind[[kk]], xtest[test.ix,], type="link", s=s)  
+        phatind[test.ix, ] = predict(fit$fitind[[kk]], xtest[test.ix,], type="link", s=s, gamma=gamma)  
         
         if(type == "class"){
-            yhatpre[test.ix] = predict(fit$fitpre[[kk]], xtest[test.ix,], newoffset=offsetTest, type=type, s=s) 
-            yhatind[test.ix] = predict(fit$fitind[[kk]], xtest[test.ix,], type=type, s=s)
+            yhatpre[test.ix] = predict(fit$fitpre[[kk]], xtest[test.ix,], newoffset=offsetTest, type=type, s=s, gamma=gamma) 
+            yhatind[test.ix] = predict(fit$fitind[[kk]], xtest[test.ix,], type=type, s=s, gamma=gamma)
         } else {
-            yhatpre[test.ix, ] = predict(fit$fitpre[[kk]], xtest[test.ix,], newoffset=offsetTest, type=type, s=s)
-            yhatind[test.ix, ] = predict(fit$fitind[[kk]], xtest[test.ix,], type=type, s=s) 
+            yhatpre[test.ix, ] = predict(fit$fitpre[[kk]], xtest[test.ix,], newoffset=offsetTest, type=type, s=s, gamma=gamma)
+            yhatind[test.ix, ] = predict(fit$fitind[[kk]], xtest[test.ix,], type=type, s=s, gamma=gamma) 
         }
 
         if(!is.null(ytest)){
@@ -448,16 +454,16 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
         }
     }
 
-    suppre.common     = get.overall.support(fit, s=fit$fitoverall.lambda)
-    suppre.individual = setdiff(get.pretrain.support(fit, s=s), suppre.common)
+    suppre.common     = get.overall.support(fit, s=fit$fitoverall.lambda, gamma=gamma)
+    suppre.individual = setdiff(get.pretrain.support(fit, s=s, gamma=gamma), suppre.common)
     
     out = enlist(yhatoverall = as.numeric(yhatoverall),
                  yhatind = as.numeric(yhatind),
                  yhatpre = as.numeric(yhatpre), 
                  suppre.common,
                  suppre.individual,
-                 supind  = get.individual.support(fit, s=s),
-                 supoverall  = get.overall.support(fit, s=s),
+                 supind  = get.individual.support(fit, s=s, gamma=gamma),
+                 supoverall  = get.overall.support(fit, s=s, gamma=gamma),
                  alpha = fit$alpha,
                  type.measure = type.measure,
                  call)
@@ -501,7 +507,7 @@ binomial.measure = function(newy, one.phat.column, measure = "deviance"){
 #' @noRd
 predict.ptLasso.targetGroups=function(fit, xtest, family, type.measure, type, call,
                                       return.link=FALSE, ytest=NULL, s="lambda.min",
-                                      pred.groups = 1:fit$k, process.results=TRUE){
+                                      gamma="gamma.min", pred.groups = 1:fit$k, process.results=TRUE){
    
     k=fit$k
     groups=fit$y
@@ -545,7 +551,7 @@ predict.ptLasso.targetGroups=function(fit, xtest, family, type.measure, type, ca
 process.targetGroup.results <- function(phatall, phatpre, phatind,
                                         ytest, k, type.measure,
                                         return.link, type,
-                                        alpha, s, call, fit,
+                                        alpha, s, gamma, call, fit,
                                         suppre.common,
                                         suppre.individual
                                         ){
@@ -582,8 +588,8 @@ process.targetGroup.results <- function(phatall, phatpre, phatind,
     out = enlist(yhatoverall, yhatind, yhatpre,
                  suppre.individual,
                  suppre.common,
-                 supind = get.individual.support(fit, s=s),
-                 supoverall = get.overall.support(fit, s=s),
+                 supind = get.individual.support(fit, s=s, gamma=gamma),
+                 supoverall = get.overall.support(fit, s=s, gamma=gamma),
                  alpha = alpha,
                  type.measure = type.measure,
                  call)

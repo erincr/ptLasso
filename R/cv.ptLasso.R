@@ -25,10 +25,11 @@ subset.y <- function(y, ix, family) {
 #' @param nfolds Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.
 #' @param foldid An optional vector of values between 1 and \code{nfold} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.
 #' @param s The choice of lambda to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "lambda.min". May be "lambda.1se", or a numeric value. (Use caution when supplying a numeric value: the same lambda will be used for all models.)
+#' @param gamma For use only when \code{relax = TRUE}. The choice of gamma to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "gamma.min". May also be "gamma.1se".
 #' @param alphahat.choice When choosing alphahat, we may prefer the best performance using all data (\code{alphahat.choice = "overall"}) or the best average performance across groups (\code{alphahat.choice = "mean"}). This is particularly useful when \code{type.measure} is "auc" or "C", because the average performance across groups is different than the performance with the full dataset. The default is "overall".
 #' @param use.case The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".
 #' @param verbose If \code{verbose=1}, print a statement showing which model is currently being fit.
-#' @param fitoverall An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.
+#' @param fitoverall An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argument keep = TRUE.
 #' @param fitind An optional list of cv.glmnet objects specifying the individual models. This should have been trained on the training data, with the argumnet keep = TRUE.
 #' @param group.intercepts For 'use.case = "inputGroups"' only. If `TRUE`, fit the overall model with a separate intercept for each group. If `FALSE`, ignore the grouping and fit one overall intercept. Default is `TRUE`.
 #' @param \dots Additional arguments to be passed to the `cv.glmnet` function. Notable choices include \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"cv.ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.
@@ -68,6 +69,22 @@ subset.y <- function(y, ix, family) {
 #' predict(cvfit, xtest, groupstest, s="lambda.min") # to predict with held out data
 #' predict(cvfit, xtest, groupstest, s="lambda.min", ytest=ytest) # to also measure performance
 #'
+#' # By default, we used s = "lambda.min" to compute CV performance.
+#' # We could instead use s = "lambda.1se":
+#' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
+#'                    s = "lambda.1se")
+#'
+#' # We could also use the glmnet option relax = TRUE:
+#' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
+#'                    relax = TRUE)
+#' # And, as we did with lambda, we may want to specify the choice of gamma to compute CV performance:
+#' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
+#'                    relax = TRUE, gamma = "gamma.1se")
+#'
+#' # Note that the first stage of pretraining uses "lambda.1se" and "gamma.1se" by default.
+#' # This behavior can be modified by specifying overall.lambda and overall.gamma;
+#' # see the documentation for ptLasso for more information.
+#' 
 #' # Now, we are ready to simulate slightly more realistic data.
 #' # This continuous outcome example has k = 5 groups, where each group has 200 observations.
 #' # There are scommon = 10 features shared across all groups, and
@@ -153,7 +170,8 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                        nfolds = 10, foldid = NULL,
                        verbose=FALSE,
                        fitoverall=NULL, fitind=NULL, 
-                       s = "lambda.min", 
+                       s = "lambda.min",
+                       gamma = "gamma.min",
                        alphahat.choice = "overall",
                        group.intercepts = TRUE,
                        ...) { 
@@ -215,7 +233,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
 
         if(use.case == "targetGroups"){
             # Get cross-validated predictions from all of the models, so we can compute a cross-validated performance measure
-            phat = do.call(cbind, lapply(fit[[ii]]$fitpre, function(m) m$fit.preval[, m$lambda == get.lamhat(m, s)]))
+            phat = do.call(cbind, lapply(fit[[ii]]$fitpre, function(m) get.preval(m, gamma = gamma)[, m$lambda == get.lamhat(m, s)]))
             err  = sapply(fit[[ii]]$fitpre, function(m) m$cvm[m$lambda == get.lamhat(m, s)])
             err  = c(mult.perf(phat, y, type.measure), mean(err), err) 
         }
@@ -230,9 +248,9 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                 lamhat = get.lamhat(m, s)
                 err = c(err, m$cvm[m$lambda == lamhat])
                 if(family == "multinomial"){
-                    pre.preds[groups == i, ] = m$fit.preval[, , m$lambda == lamhat]
+                    pre.preds[groups == i, ] = get.preval(m, gamma = gamma)[, , m$lambda == lamhat]
                 } else {
-                    pre.preds[groups == i]   = m$fit.preval[,   m$lambda == lamhat]
+                    pre.preds[groups == i]   = get.preval(m, gamma = gamma)[,   m$lambda == lamhat]
                 }
             }
             
@@ -254,7 +272,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
     
     if(use.case == "targetGroups"){
         # Individual models
-        phat = do.call(cbind, lapply(fit[[1]]$fitind, function(m) m$fit.preval[, m$lambda == get.lamhat(m, s)]))
+        phat = do.call(cbind, lapply(fit[[1]]$fitind, function(m) get.preval(m, gamma = gamma)[, m$lambda == get.lamhat(m, s)]))
         err.ind = sapply(fit[[1]]$fitind, function(m) f(m$cvm)) 
         err.ind = c(mult.perf(phat, y, type.measure), mean(err.ind), err.ind) # weighted.mean(err.ind, w = table(groups)/length(groups)),
 
@@ -272,9 +290,9 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
             lamhat = get.lamhat(m, s)
             err.ind = c(err.ind, m$cvm[m$lambda == lamhat])
             if(family == "multinomial"){
-                ind.preds[groups == i, ] = m$fit.preval[, , m$lambda == lamhat]
+                ind.preds[groups == i, ] = get.preval(m, gamma = gamma)[, , m$lambda == lamhat]
             } else {
-                ind.preds[groups == i]   = m$fit.preval[,   m$lambda == lamhat]
+                ind.preds[groups == i]   = get.preval(m, gamma = gamma)[,   m$lambda == lamhat]
             }   
         }
         if(family == "multinomial") dim(ind.preds) = c(dim(ind.preds), 1)
@@ -289,14 +307,14 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
         lamhat = get.lamhat(m, s)
         for(i in 1:k){
             if(family == "multinomial"){
-                overall.preds = m$fit.preval[groups == i, , m$lambda == lamhat]
+                overall.preds = get.preval(m, gamma = gamma)[groups == i, , m$lambda == lamhat]
                 dim(overall.preds) = c(dim(overall.preds), 1)
                 err.overall = c(err.overall,
                             as.numeric(assess.glmnet(overall.preds, newy = subset.y(y, groups==i, family), family=family)[type.measure])
                             )
             } else {
                 err.overall = c(err.overall,
-                                as.numeric(assess.glmnet(m$fit.preval[groups == i, m$lambda == lamhat], newy = subset.y(y, groups==i, family), family=family)[type.measure])
+                                as.numeric(assess.glmnet(get.preval(m, gamma = gamma)[groups == i, m$lambda == lamhat], newy = subset.y(y, groups==i, family), family=family)[type.measure])
                                 )
             }
         }
@@ -320,7 +338,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                fitoverall = fitoverall,
                fitoverall.lambda = fit[[1]]$fitoverall.lambda,
                fit)
-
+    if("fitoverall.gamma" %in% names(fit[[1]])) out$fitoverall.gamma = fit[[1]]$fitoverall.gamma
     class(out)="cv.ptLasso"
     return(out)
 }

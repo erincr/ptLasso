@@ -23,5 +23,9 @@ Depends:
 Suggests: 
     knitr,
     rmarkdown,
-    rpart
+    rpart,
+    survival,
+    xgboost,
+    sparsepca,
+    MASS
 VignetteBuilder: knitr
