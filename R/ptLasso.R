@@ -544,7 +544,7 @@ cvtype <- function(type.measure="mse",family="gaussian"){
     type.measure
 }
 
-#' Error checking for type.measure and family - modified from glmnet cvtype.R
+#' Get the prevalidated predictions from a model
 #' @noRd
 get.preval <- function(fit, gamma = "gamma.1se"){
     if("relaxed" %in% names(fit)){
@@ -560,4 +560,33 @@ get.preval <- function(fit, gamma = "gamma.1se"){
     }
             
 }
+
+#' Get the cv error from a relaxed model
+#' @noRd
+get.cvm <- function(fit, gamma = gamma){
+    if("relaxed" %in% names(fit)){
+        if(!(gamma %in% c("gamma.1se", "gamma.min"))) stop("gamma must be 'gamma.1se' or 'gamma.min'.")
+        if(gamma == "gamma.1se") ix = which(fit$relaxed$gamma == fit$relaxed$gamma.1se)
+        if(gamma == "gamma.min") ix = which(fit$relaxed$gamma == fit$relaxed$gamma.min)
+        if(is.numeric(gamma)) ix = which(abs(fit$relaxed$gamma - gamma) < 1e-5)
+        if(length(ix) < 1) stop("gamma must be in fit$relaxed$gamma.")
+        if(length(ix) > 1) ix = ix[1]
+        return(fit$relaxed$statlist[[ix]]$cvm)
+    } else {
+        return(fit$cvm)
+    } 
+}
+
+#' Transform groups in case the user doesn't supply all of them
+#' @noRd
+transform.groups <- function(groups){
+    original.groups = groups
+
+    groups = original.groups
+    group.legend = sort(unique(groups))
+    for(i in 1:length(group.legend)) groups[groups == group.legend[i]] = i
+
+    return(groups)
+}
+
     

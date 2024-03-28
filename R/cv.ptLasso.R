@@ -234,7 +234,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
         if(use.case == "targetGroups"){
             # Get cross-validated predictions from all of the models, so we can compute a cross-validated performance measure
             phat = do.call(cbind, lapply(fit[[ii]]$fitpre, function(m) get.preval(m, gamma = gamma)[, m$lambda == get.lamhat(m, s)]))
-            err  = sapply(fit[[ii]]$fitpre, function(m) m$cvm[m$lambda == get.lamhat(m, s)])
+            err  = sapply(fit[[ii]]$fitpre, function(m) get.cvm(m, gamma = gamma)[m$lambda == get.lamhat(m, s)])
             err  = c(mult.perf(phat, y, type.measure), mean(err), err) 
         }
 
@@ -246,7 +246,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                 m = fitpre[[ii]][[i]]
                 
                 lamhat = get.lamhat(m, s)
-                err = c(err, m$cvm[m$lambda == lamhat])
+                err = c(err, get.cvm(m, gamma = gamma)[m$lambda == lamhat])
                 if(family == "multinomial"){
                     pre.preds[groups == i, ] = get.preval(m, gamma = gamma)[, , m$lambda == lamhat]
                 } else {
@@ -273,11 +273,11 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
     if(use.case == "targetGroups"){
         # Individual models
         phat = do.call(cbind, lapply(fit[[1]]$fitind, function(m) get.preval(m, gamma = gamma)[, m$lambda == get.lamhat(m, s)]))
-        err.ind = sapply(fit[[1]]$fitind, function(m) f(m$cvm)) 
+        err.ind = sapply(fit[[1]]$fitind, function(m) f(get.cvm(m, gamma = gamma))) 
         err.ind = c(mult.perf(phat, y, type.measure), mean(err.ind), err.ind) # weighted.mean(err.ind, w = table(groups)/length(groups)),
 
         # Overall model
-        err.overall = c(f(fit[[1]]$fitoverall$cvm), rep(NA, length(err.ind) - 1))
+        err.overall = c(f(get.cvm(fit[[1]]$fitoverall, gamma = gamma)), rep(NA, length(err.ind) - 1))
         
         names(err.ind) = names(err.overall) = colnames(res)[2:ncol(res)]
     } else if(use.case == "inputGroups"){
@@ -288,7 +288,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
         for(i in 1:k){
             m = fit[[1]]$fitind[[i]]
             lamhat = get.lamhat(m, s)
-            err.ind = c(err.ind, m$cvm[m$lambda == lamhat])
+            err.ind = c(err.ind, get.cvm(m, gamma = gamma)[m$lambda == lamhat])
             if(family == "multinomial"){
                 ind.preds[groups == i, ] = get.preval(m, gamma = gamma)[, , m$lambda == lamhat]
             } else {
@@ -319,7 +319,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
             }
         }
         err.overall = c(mean(err.overall), weighted.mean(err.overall, w = table(groups)/length(groups)), err.overall)
-        err.overall = c(m$cvm[m$lambda == lamhat], err.overall)
+        err.overall = c(get.cvm(m, gamma = gamma)[m$lambda == lamhat], err.overall)
         names(err.ind) = names(err.overall) = colnames(res)[2:ncol(res)]                
     }  
 

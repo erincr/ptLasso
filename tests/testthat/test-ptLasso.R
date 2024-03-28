@@ -231,7 +231,7 @@ test_that("relax_gamma_min", {
 
 test_that("relax_gamma_1se", {
     expect_equal(unname(cvfit2$errpre[1, ]),
-                 c(0.0000, 1318, 1152, 1285, 1694, 1299, 971, 813, 982),
+                 c(0.0000, 1318, 1202, 1318, 1694, 1299, 1050, 818, 1152),
                  tolerance = test.tol)
 })
 
@@ -240,13 +240,13 @@ pred.cv2=predict(cvfit2,xtest,groupstest=groupstest, ytest=ytest, alphatype="var
 
 test_that("pred_gamma_min", {
     expect_equal(unname(pred.cv1$errpre),
-                 c(1346, 1189, 1346, 1517, 1686, 1166, 688, 888),
+                 c(1236, 1106, 1236, 1517, 1289, 1147, 688, 888),
                  tolerance = test.tol)
 })
 
 test_that("pred_gamma_1se", {
     expect_equal(unname(pred.cv2$errpre),
-                 c(1362, 1376, 1362, 1249, 1603, 1157, 833, 2037),
+                 c(1175, 1072, 1175, 1249, 1389, 1157, 694, 872),
                  tolerance = test.tol)
 })
 
