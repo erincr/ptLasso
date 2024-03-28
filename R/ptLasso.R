@@ -14,7 +14,7 @@
 #' @param fitoverall An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.
 #' @param fitind An optional list of cv.glmnet objects specifying the individual models. 
 #' @param nfolds Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.
-#' @param foldid An optional vector of values between 1 and \code{nfold} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.
+#' @param foldid An optional vector of values between 1 and \code{nfolds} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.
 #' @param standardize Should the predictors be standardized before fitting (default is TRUE). 
 #' @param verbose If \code{verbose=1}, print a statement showing which model is currently being fit with \code{cv.glmnet}.
 #' @param weights observation weights. Default is 1 for each observation.
