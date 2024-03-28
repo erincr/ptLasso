@@ -41,7 +41,7 @@ cv.ptLasso(
 
 \item{nfolds}{Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.}
 
-\item{foldid}{An optional vector of values between 1 and \code{nfold} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.}
+\item{foldid}{An optional vector of values between 1 and \code{nfolds} identifying what fold each observation is in. If supplied, \code{nfolds} can be missing.}
 
 \item{verbose}{If \code{verbose=1}, print a statement showing which model is currently being fit.}
 
