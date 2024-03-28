@@ -363,35 +363,6 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
     if(type == "class"){
         yhatpre = yhatind = rep(NA, nrow(xtest))
     }
-    
-    erroverallInd=NULL
-    
-    # individual group//class predictions
-    for(kk in predgroups){
-     
-        test.ix  = groupstest == kk
-
-        phatind[test.ix, ] = predict(fit$fitind[[kk]], xtest[test.ix,], type="link", s=s, gamma=gamma) 
-
-        if(type == "class"){
-            yhatind[test.ix] = predict(fit$fitind[[kk]], xtest[test.ix,], type=type, s=s, gamma=gamma)
-        } else {
-            yhatind[test.ix, ] = predict(fit$fitind[[kk]], xtest[test.ix,], type=type, s=s, gamma=gamma) 
-        }
-
-        if(!is.null(ytest)){
-            if( family == "multinomial" ){
-                errind[kk]=errFun(ytest[test.ix], phatind[test.ix, ])
-            } else if(family == "cox")   {
-                errind[kk]=errFun(ytest[test.ix,], phatind[test.ix, ,drop=FALSE] ) 
-            } else {
-                errind[kk]=errFun(ytest[test.ix], phatind[test.ix]) 
-            }
-        }
-
-    }
-    
-    if(!is.null(ytest)) errind.overall=errFun(ytest, phatind)
  
     # preTraining predictions
     for(kk in predgroups){
@@ -433,7 +404,7 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
                    mean( erroverall.classes),
                    weighted.mean( erroverall.classes, group.weights),
                    erroverall.classes)
-        errind = c(errind.overall,
+        errind = c(errFun(ytest, phatind),
                    mean(errind, na.rm=TRUE),
                    weighted.mean(errind[!is.na(errind)], group.weights),
                    errind[!is.na(errind)])
