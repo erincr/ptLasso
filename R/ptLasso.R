@@ -200,7 +200,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     if(min(groups) != 1) stop("Groups should be coded from 1 to k.")
     if(length(unique(groups)) < 2) stop("Need to have at least two groups.")
     if(length(unique(groups)) != k) stop(paste0("Expected ", k, " groups, found ", length(unique(groups)), "."))
-    if(all(sort(unique(groups)) != (1:k))) stop("Groups should be coded from 1 to k.")
+    if(!all(sort(unique(groups)) == (1:k))) stop("Groups should be coded from 1 to k.")
 
     for(argument in c("fit", "check.args", "offset", "intercept", "standardize.response")){
         if(argument %in% names(list(...))) stop(paste0("ptLasso does not support the argument '", argument, "'."))

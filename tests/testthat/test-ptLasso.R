@@ -214,6 +214,19 @@ test_that("wrong_training_data_individual", {
     expect_equal(err, "error")
 })
 
+groups[groups == 2] = 10
+err=tryCatch(ptLasso(x,y,groups=groups,alpha=0.9,family="gaussian",type.measure="mse",foldid=foldid, overall.lambda = "lambda.min"),
+             error = function(x) "error")
+test_that("wrong_group_encoding", {
+    expect_equal(err, "error")
+})
+err=tryCatch(cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5, overall.lambda = "lambda.min"),
+             error = function(x) "error")
+test_that("wrong_group_encoding_cv", {
+    expect_equal(err, "error")
+})
+groups[groups == 10] = 2
+
 
 cvfit1=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5,
                  overall.lambda = "lambda.min", overall.gamma = "gamma.min",
