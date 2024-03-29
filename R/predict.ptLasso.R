@@ -76,12 +76,17 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
     type = match.arg(type, several.ok = FALSE)
     
     this.call = match.call()
+
+    original.groups = groupstest
+    legend = cvfit$fit[[1]]$group.legend
+    groupstest = transform.groups(groupstest, legend = legend)
     
     alphatype = match.arg(alphatype)
     if(is.null(alpha)) {
         if(alphatype == "fixed")   alpha = cvfit$alphahat
         if(alphatype == "varying") alpha = cvfit$varying.alphahat
     }    
+
     close.enough = 1e-6
     if(length(alpha) == 1){      
         if(all(abs(alpha - cvfit$errpre[, "alpha"]) > close.enough)) stop("Not a valid choice of alpha. Please choose alpha from cvfit$alphalist.")
@@ -91,7 +96,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
        
         fit = cvfit$fit[[model.ix]]
 
-        out = predict.ptLasso(fit, xtest, groupstest=groupstest, ytest=ytest, type = type, s = s, gamma = gamma)
+        out = predict.ptLasso(fit, xtest, groupstest=original.groups, ytest=ytest, type = type, s = s, gamma = gamma)
         out$call = this.call
         
         return(out)
@@ -137,11 +142,11 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
         results = lapply(predgroups,
                              function(ix) {predict.ptLasso(cvfit$fit[[model.ix[ix]]],
                                                            xtest[groupstest == ix, ],
-                                                           groupstest=groupstest[groupstest == ix],
+                                                           groupstest=original.groups[groupstest == ix],
                                                            ytest=ytest[groupstest == ix],
                                                            type = type, s = s, gamma = gamma, return.link=TRUE)}
                              )
-
+        
         all.preds = pre.preds = ind.preds = rep(NA, nrow(xtest))
         all.link = pre.link = ind.link = rep(NA, nrow(xtest))
         for(kk in 1:length(predgroups)){
@@ -162,7 +167,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
             suppre.common =  get.overall.support(cvfit, s=cvfit$fitoverall.lambda)
         }
         suppre.individual = setdiff(suppre, suppre.common)
-
+        
         if(!is.null(ytest)){
             group.weights = table(groupstest)/length(groupstest)
             erroverall = sapply(results, function(r) r$erroverall[grepl("group", names(r$erroverall))])
@@ -183,7 +188,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
                        weighted.mean(errind, w = group.weights),
                        errind)
 
-            names(erroverall) = names(errpre) = names(errind) = c("overall", "mean", "wtdMean", paste0("group", 1:length(results)))
+            names(erroverall) = names(errpre) = names(errind) = c("overall", "mean", "wtdMean", paste0("group_", legend[predgroups]))
          }
         
         out = enlist(            
@@ -284,6 +289,10 @@ predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL,
     family = fit$call$family
     type.measure = fit$call$type.measure
     group.intercepts = fit$call$group.intercepts
+
+    original.groups = groupstest
+    legend = fit$group.legend
+    groupstest = transform.groups(groupstest, legend = legend)
     
     if(type == "class" & !(family %in% c("binomial", "multinomial")) ){
         stop("Class prediction is only valid for binomial and multinomial models.")
@@ -325,6 +334,7 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
     k=fit$k
     
     predgroups = sort(unique(groupstest))
+    group.names = fit$group.legend[predgroups]
 
     onehot.test = NULL
     if(group.intercepts == TRUE){
@@ -363,7 +373,7 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
     if(type == "class"){
         yhatpre = yhatind = rep(NA, nrow(xtest))
     }
- 
+    
     # preTraining predictions
     for(kk in predgroups){
         test.ix = groupstest == kk
@@ -412,7 +422,7 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
                    mean(errpre, na.rm=TRUE),
                    weighted.mean(errpre[!is.na(errpre)], group.weights),
                    errpre[!is.na(errpre)])
-        names(erroverall) = names(errpre) = names(errind) = c("allGroups", "mean", "wtdMean", paste0("group", sort(unique(groupstest))))
+        names(erroverall) = names(errpre) = names(errind) = c("allGroups", "mean", "wtdMean", paste0("group_", group.names))
         
         if(fit$call$family == "gaussian") {
             erroverall = erroverall[which(names(erroverall) != "wtdMean")]
@@ -546,7 +556,7 @@ process.targetGroup.results <- function(phatall, phatpre, phatind,
         errind = c(multinomialErrFun(ytest, phatind), mean(errind), errind)
         errpre = c(multinomialErrFun(ytest, phatpre), mean(errpre), errpre)
         erroverall = c(multinomialErrFun(ytest, phatall), NA, rep(NA, k))
-        names(erroverall) = names(errpre) = names(errind) = c("overall", "mean", paste0("group", as.character(1:k)))
+        names(erroverall) = names(errpre) = names(errind) = c("overall", "mean", paste0("group_", as.character(1:k)))
      }
     
     yhatind = phatind; yhatpre = phatpre; yhatoverall = phatall

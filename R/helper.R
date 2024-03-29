@@ -37,7 +37,7 @@ print.cv.ptLasso=function (x, ...)
     cat(c("alphahat (fixed) =",x$alphahat),fill=TRUE)
     cat("alphahat (varying):\n")
     alpha.disp = x$varying.alphahat
-    names(alpha.disp) = paste0("group", 1:length(x$varying.alphahat))
+    names(alpha.disp) = colnames(x$errpre)[grepl("group", colnames(x$errpre))]
     print(alpha.disp)
     #cat(paste(x$varying.alphahat, collapse=", "),fill=TRUE)
     
@@ -168,7 +168,7 @@ print.predict.cv.ptLasso=function (x, ...)
 
     if(length(x$alpha) > 1){
           alpha.disp = x$alpha
-          names(alpha.disp) = paste0("group", 1:length(x$alpha))
+          names(alpha.disp) = paste0("group_", 1:length(x$alpha))
           cat("alpha:\n")
           print(alpha.disp)
         } else {

@@ -169,6 +169,9 @@ test_that("input_groups_gaussian_cvfit_mae", {
                  tolerance = test.tol)
 })
 
+#################################
+# Check errors
+#################################
 check.type.default=cv.ptLasso(x,y,groups=groups,family="gaussian",foldid=NULL, nfolds=5, overall.lambda = "lambda.min")
 test_that("input_groups_gaussian_type_measure", {
     expect_equal(check.type.default$type.measure,
@@ -214,20 +217,10 @@ test_that("wrong_training_data_individual", {
     expect_equal(err, "error")
 })
 
-groups[groups == 2] = 10
-err=tryCatch(ptLasso(x,y,groups=groups,alpha=0.9,family="gaussian",type.measure="mse",foldid=foldid, overall.lambda = "lambda.min"),
-             error = function(x) "error")
-test_that("wrong_group_encoding", {
-    expect_equal(err, "error")
-})
-err=tryCatch(cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5, overall.lambda = "lambda.min"),
-             error = function(x) "error")
-test_that("wrong_group_encoding_cv", {
-    expect_equal(err, "error")
-})
-groups[groups == 10] = 2
 
-
+#################################
+# Relax = true
+#################################
 cvfit1=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5,
                  overall.lambda = "lambda.min", overall.gamma = "gamma.min",
                  relax=TRUE)
@@ -261,6 +254,121 @@ test_that("pred_gamma_1se", {
     expect_equal(unname(pred.cv2$errpre),
                  c(1175, 1072, 1175, 1249, 1389, 1157, 694, 872),
                  tolerance = test.tol)
+})
+
+# Not sure what to test here:
+groups[groups == 2] = 10
+cvfit = cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse", overall.lambda = "lambda.min")
+groups[groups == 10] = 2
+test_that("non-contiguous_groups", {
+    expect_equal(colnames(cvfit$errpre),
+                 c("alpha", "overall", "mean", "wtdMean", "group_1", "group_3", "group_4", "group_5", "group_10")
+                 )
+})
+
+#################################
+# String groups
+#################################
+groups.new = rep(NA, length(groups))
+groupstest.new = rep(NA, length(groupstest))
+groups.new[groups == 1] = "a"
+groups.new[groups == 2] = "b"
+groups.new[groups == 3] = "c"
+groups.new[groups == 4] = "d"
+groups.new[groups == 5] = "e"
+
+groupstest.new[groupstest == 1] = "a"
+groupstest.new[groupstest == 2] = "b"
+groupstest.new[groupstest == 3] = "c"
+groupstest.new[groupstest == 4] = "d"
+groupstest.new[groupstest == 5] = "e"
+set.seed(1234)
+cvfit.string=cv.ptLasso(x,y,groups=groups.new,family="gaussian",type.measure="mse", foldid=foldid, nfolds=5,
+                        overall.lambda = "lambda.min")
+set.seed(1234)
+cvfit=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse", foldid=foldid, nfolds=5,
+                        overall.lambda = "lambda.min")
+
+test_that("string_groups", {
+    expect_equal(unname(cvfit.string$errpre),
+                 unname(cvfit$errpre),
+                 tolerance = test.tol)
+})
+
+
+
+#################################
+# Non-contiguous groups
+#################################
+set.seed(1234)
+n=500; k=5; p=140
+
+scommon=10; sindiv=rep(10, 5)  #of individual important features
+class.sizes=rep(100, 5)
+del=rep(2.5,k); del2=rep(5, k)
+means = sample(1:k); sigma=20
+
+out=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+             class.sizes=class.sizes, beta.common=del, beta.indiv=del2,
+             intercepts=means, sigma=sigma)
+
+x=out$x; y=out$y; groups=out$groups
+
+nfolds=5
+foldid = rep(1, nrow(x))  
+for(kk in 1:k) foldid[groups == kk] = sample(1:nfolds, class.sizes[kk], replace=TRUE)
+
+out2=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
+             class.sizes=class.sizes, beta.common=del, beta.indiv=del2,
+             intercepts=means, sigma=sigma)
+xtest=out2$x; groupstest=out2$groups; ytest=out2$y
+
+groups.new = groups
+groupstest.new = groupstest
+groups.new[groups == 2] = 3
+groups.new[groups == 3] = 4
+groups.new[groups == 4] = 5
+groups.new[groups == 5] = 6
+
+set.seed(1234)
+cvfit.jumbled=cv.ptLasso(x,y,groups=groups.new,family="gaussian",type.measure="mse",foldid=foldid, nfolds=5,
+                        overall.lambda = "lambda.min")
+set.seed(1234)
+cvfit=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=foldid, nfolds=5,
+                        overall.lambda = "lambda.min")
+
+test_that("non_contiguous_groups", {
+    expect_equal(unname(cvfit.jumbled$errpre),
+                 unname(cvfit$errpre),
+                 tolerance = test.tol)
+})
+
+
+groups.new = groups - 2
+groupstest.new = groupstest - 2
+
+set.seed(1234)
+cvfit.jumbled=cv.ptLasso(x,y,groups=groups.new,family="gaussian",type.measure="mse",foldid=foldid, nfolds=5,
+                         overall.lambda = "lambda.min")
+preds.jumbled = predict(cvfit.jumbled, xtest, groupstest=groupstest.new, ytest=ytest)
+preds.jumbled.subset = predict(cvfit.jumbled, xtest[groupstest %in% c(1, 3), ],
+                               groupstest=groupstest.new[groupstest %in% c(1, 3)], ytest=ytest[groupstest %in% c(1, 3)])
+
+set.seed(1234)
+cvfit=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=foldid, nfolds=5,
+                        overall.lambda = "lambda.min")
+preds = predict(cvfit, xtest, groupstest, ytest)
+
+test_that("negative_groups", {
+    expect_equal(unname(cvfit.jumbled$errpre),
+                 unname(cvfit$errpre),
+                 tolerance = test.tol)
+})
+
+test_that("negative_groups_prednames", {
+    expect_equal(names(preds.jumbled$errpre),
+                 c("allGroups", "mean", "group_-1",  "group_0", "group_1", "group_2", "group_3", "r^2")
+                 )
 })
 
 
@@ -478,6 +586,7 @@ test_that("input_groups_multinomial_type_measure", {
                  "deviance")
 })
 
+
 ###########################################################################
 # Cox
 ###########################################################################
@@ -605,7 +714,6 @@ cvfit = cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="class", 
 cvfit2 = cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="deviance", use.case="targetGroups", foldid=NULL, nfolds=3, overall.lambda="lambda.min")
 pred2=predict(cvfit2,xtest,groupstest=groupstest, ytest=ytest)
 pred3=predict(cvfit2,xtest,groupstest=groupstest, ytest=ytest, alphatype = "varying")
-
 
 test_that("target_groups_misclassification_alphahat", {
     expect_equal(cvfit$alphahat,

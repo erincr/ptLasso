@@ -186,6 +186,10 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
     if(!(type.measure %in% names(this.call))) this.call$type.measure = type.measure
     if(!(use.case %in% names(this.call))) this.call$use.case = use.case
 
+    original.groups = groups
+    legend = group.legend(original.groups)
+    groups = transform.groups(groups, legend = legend)
+    
     # Warnings
     if((use.case == "inputGroups") & is.null(groups)) stop("For the input grouped setting, groups must be supplied.")
     if(!is.null(groups)) k = length(table(groups))
@@ -224,7 +228,8 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
         
         fit[[ii]]<- ptLasso(x,y,groups,alpha=alpha,family=family,type.measure=type.measure, use.case=use.case, foldid=foldid, nfolds=nfolds,
                             fitoverall = fitoverall, fitind = fitind, verbose = verbose, group.intercepts = group.intercepts, ...)
-
+        fit[[ii]]$group.legend = legend
+        
         type.measure = fit[[ii]]$call$type.measure
         
         if(is.null(fitoverall)) fitoverall = fit[[ii]]$fitoverall 
@@ -264,11 +269,11 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
 
     res=cbind(alphalist, errcvm)
     
-    if(fit[[1]]$call$use.case=="inputGroups")  colnames(res) = c("alpha", "overall", "mean", "wtdMean", paste("group", as.character(1:length(class.sizes)),sep=""))
-    if(fit[[1]]$call$use.case=="targetGroups") colnames(res) = c("alpha", "overall", "mean", paste("group", as.character(1:length(class.sizes)),sep=""))
+    if(fit[[1]]$call$use.case=="inputGroups")  colnames(res) = c("alpha", "overall", "mean", "wtdMean", paste("group_", as.character(legend),sep=""))
+    if(fit[[1]]$call$use.case=="targetGroups") colnames(res) = c("alpha", "overall", "mean", paste("group_", as.character(legend),sep=""))
     
     alphahat=if(alphahat.choice == "mean") { alphalist[which.f(res[, "mean"])] } else { alphalist[which.f(res[, "overall"])] }
-    varying.alphahat = sapply(1:k, function(kk) alphalist[which.f(res[, paste0("group", kk)])])
+    varying.alphahat = sapply(legend, function(kk) alphalist[which.f(res[, paste0("group_", kk)])])
     
     if(use.case == "targetGroups"){
         # Individual models

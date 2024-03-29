@@ -4,7 +4,7 @@
 #'
 #' @param x input matrix, of dimension nobs x nvars; each row is an observation vector. Can be in sparse matrix format (inherit from class '"sparseMatrix"' as in package 'Matrix'). Requirement: 'nvars >1'; in other words, 'x' should have 2 or more columns.
 #' @param y response variable. Quantitative for 'family="gaussian"'. For 'family="binomial"' should be either a factor with two levels, or a two-column matrix of counts or proportions (the second column is treated as the target class; for a factor, the last level in alphabetical order is the target class). For 'family="multinomial"', can be a 'nc>=2' level factor, or a matrix with 'nc' columns of counts or proportions. For either '"binomial"' or '"multinomial"', if 'y' is presented as a vector, it will be coerced into a factor. For 'family="cox"', preferably a 'Surv' object from the survival package: see Detail section for more information. For 'family="mgaussian"', 'y' is a matrix of quantitative responses.
-#' @param groups A vector of length nobs indicating to which group each observation belongs. For data with k groups, groups should be coded as integers 1 through k. 
+#' @param groups A vector of length nobs indicating to which group each observation belongs. 
 #' @param alpha The pretrained lasso hyperparameter, with \eqn{0\le\alpha\le 1}. The range of alpha is from 0 (which fits the overall model with fine tuning) to 1 (the individual models). The default value is 0.5, chosen mostly at random. To choose the appropriate value for your data, please either run \code{ptLasso} with a few choices of alpha and evaluate with a validation set, or use cv.ptLasso, which recommends a value of alpha using cross validation.
 #' @param family Either a character string representing one of the built-in families, or else a 'glm()' family object. For more information, see Details section below or the documentation for response type (above).
 #' @param type.measure loss to use for cross-validation within each individual, overall, or pretrained lasso model. Currently five options, not all available for all models. The default is 'type.measure="deviance"', which uses squared-error for gaussian models (a.k.a 'type.measure="mse"' there), deviance for logistic and poisson regression, and partial-likelihood for the Cox model. 'type.measure="class"' applies to binomial and multinomial logistic regression only, and gives misclassification error. 'type.measure="auc"' is for two-class logistic regression only, and gives area under the ROC curve. 'type.measure="mse"' or 'type.measure="mae"' (mean absolute error) can be used by all models except the '"cox"'; they measure the deviation from the fitted mean to the response. 'type.measure="C"' is Harrel's concordance measure, only available for 'cox' models.
@@ -189,6 +189,10 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     nobs=as.integer(np[1])
     nvars=as.integer(np[2])
 
+    original.groups = groups
+    legend = group.legend(original.groups)
+    groups = transform.groups(groups, legend = legend)
+    
     k = length(table(groups))
     
     ############################################################################################################
@@ -196,7 +200,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     ############################################################################################################
 
     if( (use.case == "targetGroups") && (family != "multinomial") ) stop("use.case = 'targetGroups' is only possible for family = 'multinomial'.")
-    
+
     if(min(groups) != 1) stop("Groups should be coded from 1 to k.")
     if(length(unique(groups)) < 2) stop("Need to have at least two groups.")
     if(length(unique(groups)) != k) stop(paste0("Expected ", k, " groups, found ", length(unique(groups)), "."))
@@ -499,7 +503,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     out=enlist(
         # Info about the initial call:
         call=this.call,
-        k, alpha, group.levels,
+        k, alpha, group.levels, group.legend = legend,
                
         # Fitted models
         fitoverall, fitind, fitpre,
@@ -579,14 +583,13 @@ get.cvm <- function(fit, gamma = gamma){
 
 #' Transform groups in case the user doesn't supply all of them
 #' @noRd
-transform.groups <- function(groups){
-    original.groups = groups
+transform.groups <- function(groups, legend = NULL){
+    if(is.null(legend)) legend = group.legend(groups)
+    groups.new = rep(NA, length(groups))
+    for(i in 1:length(legend)) groups.new[groups == legend[i]] = i
 
-    groups = original.groups
-    group.legend = sort(unique(groups))
-    for(i in 1:length(group.legend)) groups[groups == group.legend[i]] = i
-
-    return(groups)
+    return(groups.new)
 }
 
+group.legend <- function(groups) sort(unique(groups))
     
