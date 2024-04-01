@@ -31,7 +31,7 @@ sindiv=c(50,40,20,10,10)  #of individual important features
 class.sizes=c(100,80,60,30,30)
 del=rep(2.5,k)
 del2=rep(5, k)
-means = sample(1:k)
+means=sample(1:k)
 sigma=20
 
 out=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
@@ -717,7 +717,7 @@ pred3=predict(cvfit2,xtest,groupstest=groupstest, ytest=ytest, alphatype = "vary
 
 test_that("target_groups_misclassification_alphahat", {
     expect_equal(cvfit$alphahat,
-                 0.4,
+                 0.5,
                  tolerance = test.tol)
 })
 
@@ -729,7 +729,7 @@ test_that("target_groups_deviance_alphahat", {
 
 test_that("target_groups_misclassification_errind", {
     expect_equal(unname(pred$errind),
-                 c(0.03000000, 0.05555556, 0.05333333, 0.07000000, 0.04333333),
+                 c(0.03000000, 0.05555556, 0.050, 0.07000000, 0.04333333),
                  tolerance = test.tol)
 })
 
@@ -742,33 +742,33 @@ test_that("target_groups_deviance_errind", {
 
 test_that("target_groups_misclassification_errpre", {
     expect_equal(as.numeric(pred$errpre),
-                 c(0.03333333, 0.05000000, 0.05000000, 0.05000000, 0.05000000), 
+                 c(0.05666667, 0.04888889, 0.04666667, 0.04666667, 0.05333333), 
                  tolerance = test.tol)
 })
 
 test_that("target_groups_deviance_errpre", {
     expect_equal(as.numeric(pred2$errpre),
-                 c(0.2459651, 0.2565011, 0.2619418, 0.2756477, 0.2319137), 
+                 c(0.2558937, 0.2559069, 0.2767000, 0.2713083, 0.2197123), 
                  tolerance = test.tol)
 })
 
 test_that("target_groups_misclassification_erroverall", {
     expect_equal(as.numeric(pred$erroverall),
-                 c(0.04,   NA,   NA,   NA,   NA), 
+                 c(0.0366667,   NA,   NA,   NA,   NA), 
                  tolerance = test.tol)
 })
 
 
 test_that("target_groups_deviance_erroverall", {
     expect_equal(as.numeric(pred2$erroverall),
-                 c(0.2526715,   NA,   NA,   NA,   NA), 
+                 c(0.2529034,   NA,   NA,   NA,   NA), 
                  tolerance = test.tol)
 })
 
 
 test_that("target_groups_misclassification_varying_alpha", {
     expect_equal(unname(pred3$errpre),
-                 c(0.2380190, 0.2523420, 0.2579512, 0.2734330, 0.2256416), 
+                 c(0.2784226, 0.2585745, 0.2767000, 0.2768945, 0.2221291), 
                  tolerance = test.tol)
 })
 

@@ -12,7 +12,7 @@ ptLasso(
   family = c("gaussian", "multinomial", "binomial", "cox"),
   type.measure = c("default", "mse", "mae", "auc", "deviance", "class", "C"),
   use.case = c("inputGroups", "targetGroups"),
-  overall.lambda = "lambda.1se",
+  overall.lambda = c("lambda.1se", "lambda.min"),
   overall.gamma = "gamma.1se",
   foldid = NULL,
   nfolds = 10,
@@ -32,7 +32,7 @@ ptLasso(
 
 \item{y}{response variable. Quantitative for 'family="gaussian"'. For 'family="binomial"' should be either a factor with two levels, or a two-column matrix of counts or proportions (the second column is treated as the target class; for a factor, the last level in alphabetical order is the target class). For 'family="multinomial"', can be a 'nc>=2' level factor, or a matrix with 'nc' columns of counts or proportions. For either '"binomial"' or '"multinomial"', if 'y' is presented as a vector, it will be coerced into a factor. For 'family="cox"', preferably a 'Surv' object from the survival package: see Detail section for more information. For 'family="mgaussian"', 'y' is a matrix of quantitative responses.}
 
-\item{groups}{A vector of length nobs indicating to which group each observation belongs. For data with k groups, groups should be coded as integers 1 through k.}
+\item{groups}{A vector of length nobs indicating to which group each observation belongs.}
 
 \item{alpha}{The pretrained lasso hyperparameter, with \eqn{0\le\alpha\le 1}. The range of alpha is from 0 (which fits the overall model with fine tuning) to 1 (the individual models). The default value is 0.5, chosen mostly at random. To choose the appropriate value for your data, please either run \code{ptLasso} with a few choices of alpha and evaluate with a validation set, or use cv.ptLasso, which recommends a value of alpha using cross validation.}
 
@@ -42,7 +42,7 @@ ptLasso(
 
 \item{use.case}{The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".}
 
-\item{overall.lambda}{The choice of lambda to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value. This choice of lambda will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another lambda must be specified for the individual models, the second stage of pretraining and the overall model.}
+\item{overall.lambda}{The choice of lambda to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", could alternatively be "lambda.min". This choice of lambda will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another lambda must be specified for the individual models, the second stage of pretraining and the overall model.}
 
 \item{overall.gamma}{For use only when the option \code{relax = TRUE} is specified. The choice of gamma to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "gamma.1se", but "gamma.min" is also a good option. This choice of gamma will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another gamma must be specified for the individual models, the second stage of pretraining and the overall model.}
 
@@ -74,6 +74,7 @@ An object of class \code{"ptLasso"}, which is a list with the ingredients of the
 \item{k}{The number of groups.}
 \item{alpha}{The value of alpha used for pretraining.}
 \item{group.levels}{IDs for all of the groups used in training.}
+\item{group.legend}{Mapping from user-supplied group ids to numeric group ids. For internal use (e.g. with predict).}
 \item{fitoverall}{A fitted \code{cv.glmnet} object trained using the full data.}
 \item{fitpre}{A list of fitted (pretrained) \code{cv.glmnet} objects, one trained with each data group.}
 \item{fitind}{A list of fitted \code{cv.glmnet} objects, one trained with each group.}

@@ -9,7 +9,7 @@
 #' @param family Either a character string representing one of the built-in families, or else a 'glm()' family object. For more information, see Details section below or the documentation for response type (above).
 #' @param type.measure loss to use for cross-validation within each individual, overall, or pretrained lasso model. Currently five options, not all available for all models. The default is 'type.measure="deviance"', which uses squared-error for gaussian models (a.k.a 'type.measure="mse"' there), deviance for logistic and poisson regression, and partial-likelihood for the Cox model. 'type.measure="class"' applies to binomial and multinomial logistic regression only, and gives misclassification error. 'type.measure="auc"' is for two-class logistic regression only, and gives area under the ROC curve. 'type.measure="mse"' or 'type.measure="mae"' (mean absolute error) can be used by all models except the '"cox"'; they measure the deviation from the fitted mean to the response. 'type.measure="C"' is Harrel's concordance measure, only available for 'cox' models.
 #' @param use.case The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".
-#' @param overall.lambda The choice of lambda to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", but "lambda.min" is another good option. If known in advance, can alternatively supply a numeric value. This choice of lambda will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another lambda must be specified for the individual models, the second stage of pretraining and the overall model.
+#' @param overall.lambda The choice of lambda to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", could alternatively be "lambda.min". This choice of lambda will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another lambda must be specified for the individual models, the second stage of pretraining and the overall model.
 #' @param overall.gamma For use only when the option \code{relax = TRUE} is specified. The choice of gamma to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "gamma.1se", but "gamma.min" is also a good option. This choice of gamma will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another gamma must be specified for the individual models, the second stage of pretraining and the overall model.
 #' @param fitoverall An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.
 #' @param fitind An optional list of cv.glmnet objects specifying the individual models. 
@@ -30,6 +30,7 @@
 #' \item{k}{The number of groups.}
 #' \item{alpha}{The value of alpha used for pretraining.}
 #' \item{group.levels}{IDs for all of the groups used in training.}
+#' \item{group.legend}{Mapping from user-supplied group ids to numeric group ids. For internal use (e.g. with predict).}
 #' \item{fitoverall}{A fitted \code{cv.glmnet} object trained using the full data.}
 #' \item{fitpre}{A list of fitted (pretrained) \code{cv.glmnet} objects, one trained with each data group.}
 #' \item{fitind}{A list of fitted \code{cv.glmnet} objects, one trained with each group.}
@@ -160,7 +161,7 @@
 ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binomial","cox"),
                  type.measure=c("default", "mse", "mae", "auc","deviance","class", "C"),
                  use.case=c("inputGroups","targetGroups"),
-                 overall.lambda = "lambda.1se",
+                 overall.lambda = c("lambda.1se", "lambda.min"),
                  overall.gamma = "gamma.1se",
                  foldid=NULL,
                  nfolds=10,
@@ -179,6 +180,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     type.measure = match.arg(type.measure)
     if(type.measure == "default") type.measure = if(family == "gaussian") { "mse" } else { "deviance" }
     use.case = match.arg(use.case, c("inputGroups","targetGroups"), several.ok=FALSE)
+    overall.lambda = match.arg(overall.lambda, c("lambda.1se", "lambda.min"))
 
     if(!(family %in% names(this.call))) this.call$family = family
     if(!(use.case %in% names(this.call))) this.call$use.case = use.case
@@ -322,7 +324,6 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
 
     if(overall.lambda == "lambda.min") lamhat = fitoverall$lambda.min
     if(overall.lambda == "lambda.1se") lamhat = fitoverall$lambda.1se
-    if(is.numeric(overall.lambda)) lamhat = overall.lambda
 
     if(use.case=="inputGroups"){
         if(family == "multinomial"){
@@ -475,7 +476,8 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  myoffset = (1-alpha) * preval.offset[[kk]]
                  
                  pf = rep(1/alpha, p)
-                 pf[supall[[kk]]] = 1
+                 
+                 pf[supall] = 1
                  pf = pf * penalty.factor
 
                  yy=rep(0,nrow(x)) 
