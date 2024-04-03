@@ -1,14 +1,18 @@
 ---
 title: "Introduction"
 output: 
+  bookdown::html_document2:
+   fig_caption: yes
+   toc: false
   bookdown::pdf_document2:
+   fig_caption: yes
    toc: false
 bibliography: ptLasso.bib
 vignette: >
   %\VignetteIndexEntry{Introduction}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   % \VignetteDepends{rpart}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 ```{r, include=FALSE}
@@ -109,10 +113,10 @@ rownames(coef.table) = paste0("group ", 1:5)
 colnames(coef.table) = c("1-10", "11-20", "21-30", "31-40", "41-59", "51-60", "61-120")
 
 require(knitr)
+require(kableExtra)
 kable(
   coef.table, booktabs = TRUE,
-  caption = 'Coefficients for simulating input grouped data',
-  format = "latex"
+  caption = 'Coefficients for simulating input grouped data'
 )
 ```
 
