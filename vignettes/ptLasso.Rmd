@@ -1,0 +1,432 @@
+---
+title: "ptLasso Vignette"
+output: 
+  bookdown::pdf_document2:
+    fig_caption: yes
+    toc: true
+  bookdown::html_document2:
+    fig_caption: yes
+    toc: true
+bibliography: ptLasso.bib
+vignette: >
+  %\VignetteIndexEntry{ptLasso}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{xgboost, rpart, survival, sparsepca, MASS}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r child = 'Introduction.Rmd'}
+```
+
+# Other details
+```{r child = 'OtherDetails.Rmd'}
+```
+
+
+# Input grouped data
+## Base case: input grouped data with a binomial outcome
+
+In the Quick Start, we applied `ptLasso` to data with a continuous response. Here, we'll use data with a binary outcome. This creates a dataset with $k = 3$ groups (each with $100$ observations), 5 shared coefficients, and 5 coefficients specific to each group. 
+
+```{r}
+set.seed(1234)
+
+out = binomial.example.data()
+x = out$x; y = out$y; groups = out$groups
+
+outtest = binomial.example.data()
+xtest = outtest$x; ytest = outtest$y; groupstest = outtest$groups
+```
+
+We can fit and predict as before. By default, `predict.ptLasso` will compute and return the _deviance_ on the test set.
+```{r}
+fit = ptLasso(x, y, groups, alpha = 0.5, family = "binomial")
+
+predict(fit, xtest, groupstest, ytest = ytest)
+
+```
+
+We could instead compute the AUC by specifying the `type.measure` in the call to `ptLasso`. Note: `type.measure` is specified during model fitting and not prediction because it is used in each call to `cv.glmnet`.
+```{r}
+fit = ptLasso(x, y, groups, alpha = 0.5, family = "binomial", 
+              type.measure = "auc")
+
+predict(fit, xtest, groupstest, ytest = ytest)
+```
+
+To fit the overall and individual models, we can use elasticnet instead of lasso by defining the parameter `en.alpha`. (as in `glmnet` and described in the section "Fitting elasticnet or ridge models").
+```{r}
+fit = ptLasso(x, y, groups, alpha = 0.5, family = "binomial", 
+              type.measure = "auc", 
+              en.alpha = .5)
+predict(fit, xtest, groupstest, ytest = ytest)
+```
+
+Using cross validation is the same as in the Gaussian case:
+```{r}
+##################################################
+# Fit:
+##################################################
+fit = cv.ptLasso(x, y, groups, family = "binomial", type.measure = "auc")
+
+##################################################
+# Predict with a common alpha for all groups:
+##################################################
+predict(fit, xtest, groupstest, ytest = ytest)
+
+##################################################
+# Predict with a different alpha for each group:
+##################################################
+predict(fit, xtest, groupstest, ytest = ytest, alphatype = "varying")
+```
+
+## Base case: input grouped survival data
+```{r}
+require(survival)
+```
+
+```{r, echo=FALSE, eval=FALSE}
+set.seed(1234)
+
+n = 600; ntrain = 300
+p = 50
+
+x = matrix(rnorm(n*p), n, p)
+beta1 = c(runif(5, min = -0.2, max = 0.2), rep(0, p-5))
+beta1 = beta1 + c(rep(0, 5), 
+                  runif(5, min = -0.2, max = 0.2), 
+                  rep(0, p-10)) # Individual
+
+beta2 = c(beta1[1:5], rep(0, p-5))
+beta2 = beta2 + c(rep(0, 10), 
+                  runif(5, min = -0.2, max = 0.2), 
+                  rep(0, p-15)) # Individual
+
+beta3 = beta1
+beta3 = beta1 + c(rep(0, 15), 
+                  runif(5, min = 0, max = 0.2),
+                  rep(0, p-20)) # Individual
+
+# Continuous response
+y1.true = - log(runif(n)) / exp(x %*% beta1)
+y1.cens = runif(n)
+y1 = Surv(pmin(y1.true, y1.cens), y1.true <= y1.cens)
+
+# Group 2
+y2.true = - log(runif(n)) / exp(x %*% beta2)
+y2.cens = runif(n)
+y2 = Surv(pmin(y2.true, y2.cens), y2.true <= y2.cens)
+  
+# Group 3
+y3.true = - log(runif(n)) / exp(x %*% beta3)
+y3.cens = runif(n)
+y3 = Surv(pmin(y3.true, y3.cens), y3.true <= y3.cens)
+
+groups = c(sort(rep(1:3, 100)), sort(rep(1:3, 100)))
+
+y = y1
+y[groups == 2, ] = y2[groups == 2, ]
+y[groups == 3, ] = y3[groups == 3, ]
+
+xtest = x[-(1:300), ]
+ytest = y[-(1:300), ]
+groupstest = groups[-(1:300)]
+
+x = x[1:300, ]
+y = y[1:300, ]
+groups = groups[1:300]
+```
+
+Now, we will simulate survival times with 3 groups; the three groups have overlapping support, with 5 shared features and each has 5 individual features. To compute survival time, we start by computing $\text{survival} = X \beta + \epsilon$, where $\beta$ is specific to each group and $\epsilon$ is noise. Because survival times must be positive, we modify this to be $\text{survival} = \text{survival} + 1.1 * \text{abs}(\text{min}(\text{survival}))$.
+```{r}
+set.seed(1234)
+
+n = 600; ntrain = 300
+p = 50
+     
+x = matrix(rnorm(n*p), n, p)
+beta1 = c(rnorm(5), rep(0, p-5))
+
+beta2 = runif(p) * beta1 # Shared support
+beta2 = beta2 + c(rep(0, 5), rnorm(5), rep(0, p-10)) # Individual features
+
+beta3 = runif(p) * beta1 # Shared support
+beta3 = beta3 + c(rep(0, 10), rnorm(5), rep(0, p-15)) # Individual features
+
+# Randomly split into groups
+groups = sample(1:3, n, replace = TRUE)
+
+# Compute survival times:
+survival = x %*% beta1
+survival[groups == 2] = x[groups == 2, ] %*% beta2
+survival[groups == 3] = x[groups == 3, ] %*% beta3
+survival = survival + rnorm(n)
+survival = survival + 1.1 * abs(min(survival))
+
+# Censoring times from a random uniform distribution:
+censoring = runif(n, min = 1, max = 10)
+
+# Did we observe surivival or censoring?
+y = Surv(pmin(survival, censoring), survival <= censoring)
+
+# Split into train and test:
+xtest = x[-(1:300), ]
+ytest = y[-(1:300), ]
+groupstest = groups[-(1:300)]
+
+x = x[1:300, ]
+y = y[1:300, ]
+groups = groups[1:300]
+```
+
+
+Training with `ptLasso` is much the same as it was for the continuous and binomial cases; the only difference is that we specify `family = "cox"`. By default, `ptLasso` uses the partial likelihood for model selection. We could instead use the C index.
+```{r}
+############################################################
+# Default -- use partial likelihood as the type.measure:
+############################################################
+fit = ptLasso(x, y, groups, alpha = 0.5, family = "cox")
+predict(fit, xtest, groupstest, ytest = ytest)
+
+############################################################
+# Alternatively -- use the C index:
+############################################################
+fit = ptLasso(x, y, groups, alpha = 0.5, family = "cox", type.measure = "C")
+predict(fit, xtest, groupstest, ytest = ytest)
+```
+
+The call to `cv.ptLasso` is again much the same; we only need to specify `family` ("cox") and `type.measure` (if we want to use the C index instead of the partial likelihood).
+```{r}
+##################################################
+# Fit:
+##################################################
+fit = cv.ptLasso(x, y, groups, family = "cox", type.measure = "C")
+
+##################################################
+# Predict with a common alpha for all groups:
+##################################################
+predict(fit, xtest, groupstest, ytest = ytest)
+
+##################################################
+# Predict with a different alpha for each group:
+##################################################
+predict(fit, xtest, groupstest, ytest = ytest, alphatype = "varying")
+```
+
+## Different groups in train and test data
+```{r child = 'DifferentGroupsTrainAndTest.Rmd'}
+```
+
+## Learning the input groups
+```{r child = 'LearningTheInputGroups.Rmd'}
+```
+
+# Target grouped data
+Now we turn to the __target grouped__ setting. Suppose we have a dataset with a multinomial outcome, and no other grouping on the observations. For example, our data might look like the following:
+
+```{r}
+set.seed(1234)
+
+n = 500; p = 75; k = 3
+X = matrix(rnorm(n * p), nrow = n, ncol = p)
+y = sample(1:k, n, replace = TRUE)
+
+Xtest = matrix(rnorm(n * p), nrow = n, ncol = p)
+```
+
+Each row in $X$ belongs to class 1, 2 or 3, and we wish to predict class membership. We could fit a single multinomial model to the data:
+```{r}
+multinomial = cv.glmnet(X, y, family = "multinomial")
+
+multipreds  = predict(multinomial, Xtest, s = "lambda.min")
+multipreds.class = apply(multipreds, 1, which.max)
+```
+
+Or, we could fit 3 one-vs-rest models; at prediction time, we would assign observations to the class with the highest probability.
+```{r}
+class1 = cv.glmnet(X, y == 1, family = "binomial")
+class2 = cv.glmnet(X, y == 2, family = "binomial")
+class3 = cv.glmnet(X, y == 3, family = "binomial")
+
+ovrpreds = cbind(
+  predict(class1, Xtest, s = "lambda.min"),
+  predict(class2, Xtest, s = "lambda.min"),
+  predict(class3, Xtest, s = "lambda.min"))
+ovrpreds.class = apply(ovrpreds, 1, which.max)
+```
+
+Another alternative is to do pretraining, which fits something *in between* one model for all data and three separate models. `ptLasso` will do this for you, using the arguments `family = "multinomial"` and `use.case = "targetGroups"`.
+```{r}
+fit = ptLasso(X, y, groups = y, alpha = 0.5,
+              family = "multinomial", use.case = "targetGroups")
+```
+
+But what exactly is pretraining doing here? We'll walk through an example, doing pretraining "by hand". The steps are:
+
+1. Train an overall model: a multinomial model using a penalty on the coefficients $\beta$ so that each coefficient is either 0 or nonzero for all classes.
+2. Train individual one-vs-rest models using the penalty factor and offset defined by the overall model (as in the input grouped setting).
+
+To train the overall model, we use `cv.glmnet` with `type.multinomial = "grouped"`. This puts a penalty on $\beta$ to force coefficients to be _in_ or _out_ of the model for all classes. This is analogous to the overall model in the input grouped setting: we want to first learn __shared__ information.
+```{r}
+multinomial = cv.glmnet(X, y, family = "multinomial", 
+                        type.multinomial = "grouped",
+                        keep = TRUE)
+```
+
+Then, we fit 3 one-vs-rest models using the support and offset from the multinomial model. 
+```{r}
+# The support of the overall model:
+nonzero.coefs = which((coef(multinomial, s = "lambda.1se")[[1]] != 0)[-1])
+
+# The offsets - one for each class:
+offset = predict(multinomial, X, s = "lambda.1se")
+offset.class1 = offset[, 1, 1]
+offset.class2 = offset[, 2, 1]
+offset.class3 = offset[, 3, 1]
+```
+
+Now we have everything we need to train the one-vs-rest models. As always, we have the pretraining parameter $\alpha$ - for this example, let's use $\alpha = 0.5$:
+```{r}
+alpha = 0.5
+penalty.factor = rep(1/alpha, p)
+penalty.factor[nonzero.coefs] = 1
+
+class1 = cv.glmnet(X, y == 1, family = "binomial", 
+                   offset = (1-alpha) * offset.class1,
+                   penalty.factor = penalty.factor)
+class2 = cv.glmnet(X, y == 2, family = "binomial", 
+                   offset = (1-alpha) * offset.class2,
+                   penalty.factor = penalty.factor)
+class3 = cv.glmnet(X, y == 3, family = "binomial", 
+                   offset = (1-alpha) * offset.class3,
+                   penalty.factor = penalty.factor)
+```
+
+And we're done with pretraining! To predict, we again assign each row to the class with the highest prediction:
+```{r}
+newoffset = predict(multinomial, X, s = "lambda.1se")
+ovrpreds = cbind(
+  predict(class1, Xtest, s = "lambda.min", newoffset = newoffset[, 1, 1]),
+  predict(class2, Xtest, s = "lambda.min", newoffset = newoffset[, 2, 1]),
+  predict(class3, Xtest, s = "lambda.min", newoffset = newoffset[, 3, 1])
+)
+ovrpreds.class = apply(ovrpreds, 1, which.max)
+```
+
+This is all done automatically within `ptLasso`; we show a more detailed example in the next section. The example above is intended only to show how pretraining works for multinomial outcomes, and some technical details have been omitted. (For example, `ptLasso` takes care of crossfitting between the first and second steps.)
+
+## Base case: data with a multinomial outcome
+
+We will use `ptLasso` for data with a multinomial outcome. First, let's simulate multinomial data with 5 classes We start by drawing $X$ from a normal distribution (uncorrelated features), and then we shift the columns according to Table \@ref(tab:multicoefs)
+
+```{r multicoefs, echo = FALSE}
+coef.table = cbind(cbind(
+  1/10 * seq(-2, 2),
+  c(-0.1, rep(0, 4)),
+  c(0, -0.05, rep(0, 3)),
+  c(rep(0, 2), 0, rep(0, 2)),
+  c(rep(0, 3), 0.05, 0),
+  c(rep(0, 4), 0.1)
+), 0)
+rownames(coef.table) = paste0("group ", 1:5)
+colnames(coef.table) = c("1-3", "4-8", "9-13", "14-18", "19-23", "23-27", "27-75")
+
+require(knitr)
+kable(
+  coef.table, booktabs = TRUE,
+  caption = 'Coefficients for simulating target grouped data',
+  format = "latex"
+)
+```
+
+```{r}
+set.seed(1234)
+
+n = 500; p = 75; k = 5
+class.sizes = rep(n/k, k)
+ncommon = 3; nindiv = 5;
+shift.common = seq(-.2, .2, length.out = k)
+shift.indiv  = seq(-.1, .1, length.out = k)
+
+x     = matrix(rnorm(n * p), n, p)
+xtest = matrix(rnorm(n * p), n, p)
+y = ytest = c(sapply(1:length(class.sizes), function(i) rep(i, class.sizes[i])))
+
+start = ncommon + 1
+for (i in 1:k) {
+  end = start + nindiv - 1
+  x[y == i, 1:ncommon] = x[y == i, 1:ncommon] + shift.common[i]
+  x[y == i, start:end] = x[y == i, start:end] + shift.indiv[i]
+  
+  xtest[ytest == i, 1:ncommon] = xtest[ytest == i, 1:ncommon] + shift.common[i]
+  xtest[ytest == i, start:end] = xtest[ytest == i, start:end] + shift.indiv[i]
+  start = end + 1
+}
+```
+
+The calls to `ptLasso` and `cv.ptLasso` are almost the same as in the input grouped setting, only now we specify `use.case = "targetGroups"`. Note also that we use `groups = y`. The call to `predict` does not require a `groups` argument because the groups are unknown at prediction time.
+
+```{r}
+################################################################################
+# Fit the pretrained model.
+# By default, ptLasso uses type.measure = "deviance", but for ease of
+# interpretability, we use type.measure = "class" (the misclassification rate).
+################################################################################
+fit = ptLasso(x = x, y = y, groups = y, family = "multinomial", 
+              use.case = "targetGroups", type.measure = "class")
+
+################################################################################
+# Predict
+################################################################################
+predict(fit, xtest, ytest = ytest)
+
+################################################################################
+# Fit with CV to choose the alpha parameter
+################################################################################
+cvfit = cv.ptLasso(x = x, y = y, groups = y, family = "multinomial", 
+              use.case = "targetGroups", type.measure = "class")
+
+################################################################################
+# Predict using one alpha for all classes
+################################################################################
+predict(cvfit, xtest, ytest = ytest)
+
+################################################################################
+# Predict using a separate alpha for each class
+################################################################################
+predict(cvfit, xtest, ytest = ytest, alphatype = "varying")
+```
+
+## Time series data
+```{r child = 'TimeSeriesData.Rmd'}
+```
+
+## Multi-response data with mixed response types
+```{r child = 'MultiResponseData.Rmd'}
+```
+
+## Multi-task learning or coaching
+```{r child = 'MultitaskLearning.Rmd'}
+```
+
+
+# Conditional average treatment effect estimation
+```{r child = 'ConditionalAverageTreatmentEffect.Rmd'}
+```
+
+# Using non-linear bases
+```{r child = 'UsingNonlinearBases.Rmd'}
+```
+
+# Unsupervised pretraining
+```{r child = 'UnsupervisedPretraining.Rmd'}
+```
+
+# References
