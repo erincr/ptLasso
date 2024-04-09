@@ -104,7 +104,7 @@ test_that("input_groups_gaussian_suppre_individual_1se", {
 
 test_that("input_groups_gaussian_varying_alpha", {
     expect_equal(cvfit$varying.alphahat,
-                 c(0.7, 1.0, 0.8, 0.9, 0.9),
+                 c(0.9, 0.3, 1.0, 0.8, 1.0),
                  tolerance = test.tol)
 })
 
@@ -141,7 +141,7 @@ test_that("input_groups_gaussian_erroverall_classes", {
 
 test_that("input_groups_gaussian_erroverall_classes_mae", {
     expect_equal(unname(pred2$erroverall),
-                 c(30.07361, 28.13251, 33.17894, 33.70687, 26.47559, 21.75913, 25.54100, -0.04667227),
+                 c(29.544, 27.364, 33.133, 32.903, 26.473, 20.364, 23.948, -0.012),
                  tolerance = test.tol)
 })
 
@@ -153,19 +153,19 @@ test_that("input_groups_gaussian_errpre", {
 
 test_that("input_groups_gaussian_errpre_mae", {
     expect_equal(unname(pred2$errpre),
-                 c(26.91595, 25.52184, 29.18884, 29.32310, 24.57115, 20.49902, 24.02710, 0.1406901),
+                 c(27.553, 25.883, 31.052, 29.394, 24.667, 20.359, 23.942,  0.107),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_cvfit", {
     expect_equal(unname(cvfit$errpre[, "mean"]),
-                 c(1220.9146, 1188.0768, 1095.7855, 1154.4937, 1063.4857, 1077.6350, 1028.0313, 1003.9437, 1052.5944, 990.6146, 948.4639),
+                 c(1237.390, 1197.339, 1190.332, 1145.732, 1095.630, 1072.826 ,1102.869, 1012.151, 982.499,  984.229, 1040.0589),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_gaussian_cvfit_mae", {
     expect_equal(unname(cvfit2$errpre[, "mean"]),
-                 c(27.16340, 26.95087, 26.12019, 26.37963, 25.15874, 26.13136, 25.23187, 24.98620, 25.28564, 24.60671, 24.00805),
+                 c(25.579, 25.147,25.072, 24.448, 24.617, 24.657, 25.033, 24.619, 24.344, 24.934, 25.091),
                  tolerance = test.tol)
 })
 
@@ -246,13 +246,13 @@ pred.cv2=predict(cvfit2,xtest,groupstest=groupstest, ytest=ytest, alphatype="var
 
 test_that("pred_gamma_min", {
     expect_equal(unname(pred.cv1$errpre),
-                 c(1236, 1106, 1236, 1517, 1289, 1147, 688, 888),
+                 c(1266.092, 1130.242 ,1266.092 ,1426.481 ,1520.673, 1146.796,  684.844,  872.415),
                  tolerance = test.tol)
 })
 
 test_that("pred_gamma_1se", {
     expect_equal(unname(pred.cv2$errpre),
-                 c(1175, 1072, 1175, 1249, 1389, 1157, 694, 872),
+                 c( 1316.079, 1158.578 ,1316.079, 1642.365, 1419.973, 1169.087,  684.136,  877.332),
                  tolerance = test.tol)
 })
 

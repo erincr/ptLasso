@@ -249,14 +249,21 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     class.sizes=table(groups)
     
     if(is.null(foldid)){ 
-        foldid = rep(1, nrow(x))  
-        for(kk in 1:k) foldid[groups == kk] = sample(1:nfolds, class.sizes[kk], replace=TRUE)
-        
+        foldid = rep(1, nrow(x))
+        foldid.ixs = balanced.folds(groups, nfolds=nfolds)
+        nfolds = length(foldid.ixs)
+        for(kk in 1:nfolds) foldid[foldid.ixs[[kk]]] = kk
     }
 
     if(use.case=="inputGroups"){
         foldid2=vector("list", k)
-        for(kk in 1:k) foldid2[[kk]] = sample(rep(1:nfolds,trunc(class.sizes[kk]/nfolds)+1))[1:class.sizes[kk]]
+        for(kk in 1:k) {
+            foldid2[[kk]] = sample(rep(1:nfolds,trunc(class.sizes[kk]/nfolds)+1))[1:class.sizes[kk]]
+            original.labels = as.integer(names(table(foldid2[[kk]])))
+            nfolds = length(original.labels)
+            new.labels = 1:nfolds
+            for(ix in 1:nfolds) foldid2[[kk]][foldid2[[kk]] == original.labels[ix]] = new.labels[ix]
+        }
     } else if(use.case=="targetGroups"){
         foldid2=NULL
     }
