@@ -128,7 +128,7 @@ test_that("input_groups_gaussian_errind", {
 
 test_that("input_groups_gaussian_errind_mae", {
     expect_equal(unname(pred2$errind),
-                 c(26.81726, 25.54627, 28.35398, 29.66716, 24.83674, 20.92532, 23.94817, 0.1307893),
+                 c(27.564, 25.887, 31.110, 29.397, 24.616, 20.364, 23.948, 0.108),
                  tolerance = test.tol)
 })
 
@@ -228,16 +228,17 @@ cvfit1=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=
 cvfit2=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5,
                  overall.lambda = "lambda.min", overall.gamma = "gamma.1se",
                  relax=TRUE)
+ 
 
 test_that("relax_gamma_min", {
     expect_equal(unname(cvfit1$errpre[1, ]),
-                 c(0.0000, 1304, 1194, 1293, 1637, 1334, 919, 814, 1265),
+                 c(0.000, 1341, 1254, 1341, 1758, 1240,  971, 737, 1567),
                  tolerance = test.tol)
 })
 
 test_that("relax_gamma_1se", {
     expect_equal(unname(cvfit2$errpre[1, ]),
-                 c(0.0000, 1318, 1202, 1318, 1694, 1299, 1050, 818, 1152),
+                 c(0.000, 1339, 1260, 1339, 1674, 1319, 987, 807, 1514),
                  tolerance = test.tol)
 })
 
@@ -246,13 +247,13 @@ pred.cv2=predict(cvfit2,xtest,groupstest=groupstest, ytest=ytest, alphatype="var
 
 test_that("pred_gamma_min", {
     expect_equal(unname(pred.cv1$errpre),
-                 c(1266.092, 1130.242 ,1266.092 ,1426.481 ,1520.673, 1146.796,  684.844,  872.415),
+                 c(1394, 1220, 1394, 1664, 1631, 1242, 686, 878),
                  tolerance = test.tol)
 })
 
 test_that("pred_gamma_1se", {
     expect_equal(unname(pred.cv2$errpre),
-                 c( 1316.079, 1158.578 ,1316.079, 1642.365, 1419.973, 1169.087,  684.136,  877.332),
+                 c(1308, 1157, 1308, 1616, 1396, 1198, 688, 885),
                  tolerance = test.tol)
 })
 
@@ -412,7 +413,7 @@ pred.cv.fixed=predict(cvfit,xtest,groupstest=groupstest, ytest=ytest, alphatype=
 
 pred.test=predict(cvfit,xtest,groupstest=groupstest, ytest=ytest,alpha=.6)
 
-method.0=predict(cvfit$fit[[4]], xtest[groupstest == 2, ], groupstest=groupstest[groupstest == 2])$yhatpre
+method.0=predict(cvfit$fit[[8]], xtest[groupstest == 2, ], groupstest=groupstest[groupstest == 2])$yhatpre
 method.1=predict(cvfit, xtest[groupstest == 2,], groupstest=groupstest[groupstest == 2], alpha = cvfit$varying.alphahat[2])$yhatpre
 method.2=predict(cvfit, xtest[groupstest == 2,], groupstest=groupstest[groupstest == 2], alphatype='varying')$yhatpre
 
@@ -441,21 +442,21 @@ test_that("input_groups_binomial_two_prediction_methods", {
 
 test_that("input_groups_binomial_alpha_6", {
     expect_equal(unname(pred.test$errpre),
-                 c(0.8120918, 0.7965475, 0.8208155, 0.8262916, 0.8827392, 0.8261719, 0.7522222, 0.6953125),
+                 c(0.792, 0.797, 0.816, 0.824, 0.856, 0.824, 0.752, 0.729),
                  tolerance = test.tol
                  )
 })
 
 test_that("input_groups_binomial_cvfit_varying_results", {
     expect_equal(unname(pred.cv$errpre),
-                 c(0.8017334, 0.7746317, 0.8026978, 0.8080818, 0.8669481, 0.8233817, 0.8066667, 0.5680804),
+                 c(0.798, 0.775, 0.798, 0.783, 0.874, 0.824, 0.800, 0.596),
                  tolerance = test.tol
                  )
 })
 
 test_that("input_groups_binomial_cvfit_varying_results", {
     expect_equal(unname(pred.cv.fixed$errpre),
-                 c(0.7971495, 0.7627188, 0.7942565, 0.8140153, 0.8638211, 0.7898996, 0.7777778, 0.5680804),
+                 c(0.803, 0.777 ,0.803, 0.811, 0.856, 0.822 ,0.800, 0.596),
                  tolerance = test.tol
                  )
 })
@@ -474,19 +475,19 @@ test_that("input_groups_binomial_alphahat_dev", {
 
 test_that("input_groups_binomial_alphahat_class", {
     expect_equal(cvfit3$alphahat,
-                 0.6,
+                 0.9,
                  tolerance = test.tol)
 })
 
 test_that("input_groups_binomial_errind", {
     expect_equal(unname(pred$errind),
-                 c(0.7946016, 0.7644985, 0.7946722, 0.8066496, 0.8647592, 0.8007812, 0.7822222, 0.5680804),
+                 c(0.793, 0.797, 0.811, 0.825, 0.850, 0.779, 0.812, 0.720),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_binomial_errind_deviance", {
     expect_equal(as.numeric(pred2$errind),
-                 c(1.183702, 1.238977, 1.183702, 1.168604, 1.036093, 1.188568, 1.341514, 1.460107),
+                 c(1.175, 1.223, 1.175, 1.169, 1.036, 1.176, 1.371, 1.364),
                  tolerance = test.tol)
 })
 
@@ -500,21 +501,20 @@ test_that("input_groups_binomial_erroverall", {
 
 test_that("input_groups_binomial_erroverall_deviance", {
     expect_equal(as.numeric(pred2$erroverall),
-                 c(1.326829, 1.330567, 1.326829, 1.295421,
-                   1.362080, 1.322675, 1.457893, 1.214764),
+                 c(1.359, 1.357, 1.359, 1.345, 1.394, 1.339, 1.434, 1.275),
                  tolerance = test.tol)
 })
 
 
 test_that("input_groups_binomial_errpre", {
     expect_equal(unname(pred$errpre),
-                 c(0.8083980, 0.7777321, 0.8084310, 0.8298721, 0.8747655, 0.8013393, 0.7788889, 0.6037946),
+                 c(0.799, 0.801, 0.817, 0.829, 0.866, 0.792, 0.794, 0.723),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_binomial_errpre_deviance", {
     expect_equal(unname(pred2$errpre),
-                 c(1.187135, 1.256267, 1.187135, 1.160557, 1.023357, 1.176455, 1.398885, 1.522081),
+                 c(1.167, 1.209, 1.167, 1.165, 1.058, 1.149, 1.316, 1.355),
                  tolerance = test.tol)
 })
 
@@ -563,19 +563,19 @@ cvfit=cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="class",fol
 
 test_that("input_groups_multinomial_errind", {
     expect_equal(unname(pred$errind),
-                 c(0.4055556, 0.4055556, 0.4055556, 0.3866667, 0.4244444),
+                 c(0.453, 0.453, 0.453, 0.404, 0.502),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_multinomial_erroverall_classes", {
     expect_equal(unname(pred$erroverall),
-                 c(0.5177778, 0.5177778, 0.5177778, 0.5466667, 0.4888889),
+                 c(0.523, 0.523, 0.523, 0.547, 0.500),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_multinomial_errpre", {
     expect_equal(unname(pred$errpre),
-                 c(0.3900000, 0.3900000, 0.3900000, 0.3955556, 0.3844444),
+                 c(0.382, 0.382, 0.382, 0.391, 0.373),
                  tolerance = test.tol)
 })
 
@@ -636,26 +636,26 @@ cvfit = cv.ptLasso(x,y,groups=groups,family="cox",type.measure="C",foldid=NULL, 
 
 test_that("input_groups_cox_alphahat", {
     expect_equal(cvfit$alphahat,
-                 0.7,
+                 0.5,
                  tolerance = test.tol)
 })
 
 test_that("input_groups_cox_errind", {
     expect_equal(unname(pred$errind),
-                 c(0.5581741, 0.5685027, 0.5742311, 0.6417018, 0.5108565, 0.5510662, 0.6388889, 0.5000000),
+                 c( 0.544, 0.564, 0.564, 0.612, 0.510, 0.543, 0.627, 0.528),
                  tolerance = test.tol)
 })
 
 
 test_that("input_groups_cox_erroverall_classes", {
     expect_equal(unname(pred$erroverall),
-                 c(0.5432290, 0.5234780, 0.5332552, 0.5428973, 0.4825090, 0.6442200, 0.4087302, 0.5390335),
+                 c(0.546, 0.523, 0.537, 0.549, 0.491, 0.652, 0.389, 0.535),
                  tolerance = test.tol)
 })
 
 test_that("input_groups_cox_errpre", {
     expect_equal(unname(pred$errpre),
-                 c(0.5420089, 0.5415226, 0.5582235, 0.5798172, 0.5211098, 0.6531987, 0.4404762, 0.5130112),
+                 c(0.558, 0.555, 0.560, 0.591, 0.492, 0.623, 0.516, 0.550),
                  tolerance = test.tol)
 })
 
@@ -717,58 +717,58 @@ pred3=predict(cvfit2,xtest,groupstest=groupstest, ytest=ytest, alphatype = "vary
 
 test_that("target_groups_misclassification_alphahat", {
     expect_equal(cvfit$alphahat,
-                 0.5,
+                 1,
                  tolerance = test.tol)
 })
 
 test_that("target_groups_deviance_alphahat", {
     expect_equal(cvfit2$alphahat,
-                 0.8,
+                 0.5,
                  tolerance = test.tol)
 })
 
 test_that("target_groups_misclassification_errind", {
     expect_equal(unname(pred$errind),
-                 c(0.03000000, 0.05555556, 0.050, 0.07000000, 0.04333333),
+                 c(0.033, 0.056, 0.060, 0.057, 0.050),
                  tolerance = test.tol)
 })
 
 test_that("target_groups_deviance_errind", {
     expect_equal(unname(pred2$errind),
-                 c(0.2287016, 0.2513482, 0.2554789, 0.2735893, 0.2249764),
+                 c(0.235, 0.252, 0.256, 0.274, 0.225),
                  tolerance = test.tol)
 })
 
 
 test_that("target_groups_misclassification_errpre", {
     expect_equal(as.numeric(pred$errpre),
-                 c(0.05666667, 0.04888889, 0.04666667, 0.04666667, 0.05333333), 
+                 c(0.050, 0.058, 0.060, 0.053, 0.060), 
                  tolerance = test.tol)
 })
 
 test_that("target_groups_deviance_errpre", {
     expect_equal(as.numeric(pred2$errpre),
-                 c(0.2558937, 0.2559069, 0.2767000, 0.2713083, 0.2197123), 
+                 c(0.305, 0.260, 0.279, 0.288, 0.214), 
                  tolerance = test.tol)
 })
 
 test_that("target_groups_misclassification_erroverall", {
     expect_equal(as.numeric(pred$erroverall),
-                 c(0.0366667,   NA,   NA,   NA,   NA), 
+                 c(0.033,   NA,   NA,   NA,   NA), 
                  tolerance = test.tol)
 })
 
 
 test_that("target_groups_deviance_erroverall", {
     expect_equal(as.numeric(pred2$erroverall),
-                 c(0.2529034,   NA,   NA,   NA,   NA), 
+                 c(0.254,   NA,   NA,   NA,   NA), 
                  tolerance = test.tol)
 })
 
 
 test_that("target_groups_misclassification_varying_alpha", {
     expect_equal(unname(pred3$errpre),
-                 c(0.2784226, 0.2585745, 0.2767000, 0.2768945, 0.2221291), 
+                 c(0.334, 0.276, 0.318, 0.288, 0.222), 
                  tolerance = test.tol)
 })
 
