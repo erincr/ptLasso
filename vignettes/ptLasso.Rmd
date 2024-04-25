@@ -1,12 +1,8 @@
 ---
 title: "ptLasso Vignette and Manual"
 output: 
-  bookdown::html_document2:
-    fig_caption: yes
-    toc: true
-  bookdown::pdf_document2:
-    fig_caption: yes
-    toc: true
+  html_document:
+   toc: true
 pkgdown:
   as_is: true
 bibliography: ptLasso.bib
@@ -680,9 +676,9 @@ This is all done automatically within `ptLasso`; we show a more detailed example
 
 ## Base case: data with a multinomial outcome
 
-We will use `ptLasso` for data with a multinomial outcome. First, let's simulate multinomial data with 5 classes. We start by drawing $X$ from a normal distribution (uncorrelated features), and then we shift the columns according to Table \@ref(tab:multicoefs).
+We will use `ptLasso` for data with a multinomial outcome. First, let's simulate multinomial data with 5 classes. We start by drawing $X$ from a normal distribution (uncorrelated features), and then we shift the columns differently for each group.
 
-```{r multicoefs, echo = FALSE}
+```{r multicoefs, echo = FALSE, eval = FALSE}
 coef.table = cbind(cbind(
   1/10 * seq(-2, 2),
   c(-0.1, rep(0, 4)),

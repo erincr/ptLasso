@@ -1,8 +1,8 @@
 ---
 title: "Using nonlinear bases (glmnet only)"
 output: 
-  bookdown::pdf_document2:
-   toc: false
+  pdf_document:
+    toc: false
 bibliography: ptLasso.bib
 vignette: >
   %\VignetteIndexEntry{Using nonlinear bases}
