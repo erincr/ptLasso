@@ -1,0 +1,18 @@
+pandoc: 3.1.11
+pkgdown: 2.0.9
+pkgdown_sha: ~
+articles:
+  ConditionalAverageTreatmentEffect: ConditionalAverageTreatmentEffect.html
+  DifferentGroupsTrainAndTest: DifferentGroupsTrainAndTest.html
+  LearningTheInputGroups: LearningTheInputGroups.html
+  MultiResponseData: MultiResponseData.html
+  MultitaskLearning: MultitaskLearning.html
+  ptLasso: ptLasso.html
+  TimeSeriesData: TimeSeriesData.html
+  UnsupervisedPretraining: UnsupervisedPretraining.html
+  UsingNonlinearBases: UsingNonlinearBases.html
+last_built: 2024-04-25T23:34Z
+urls:
+  reference: https://erincr.github.io/ptLasso/reference
+  article: https://erincr.github.io/ptLasso/articles
+
