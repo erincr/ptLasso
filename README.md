@@ -1,58 +1,19 @@
-## Welcome!
-This README is very much a work-in-progress. Thank you for your patience!
+# Pretraining and the Lasso
 
-## Installation 
-### Dependencies
-To use this package, you will need the following: `glmnet`, `Matrix`, `stats`, `ggplot2` and `gridExtra`.
+This package fits pretrained generalized linear models for (1) data with grouped observations and (2) data without grouped observations, but with multinomial responses. Details of this method may be found in Craig et al. ([2024](#ref-ptlasso)).
 
+All model fitting in this package is done with `cv.glmnet`, and our syntax closely follows that of the `glmnet` package ([2010](#ref-glmnet)).
 
-### Installation
-Installation is a little harder while this is a private repo:
+# References
 
-```
-credentials::set_github_pat() (enter your PAT into the popup)
-remotes::install_github("erincr/ptLasso")
-```
+<div id="refs" class="references">
 
-Alternatively, you can download or clone this repo, cd into the directory containing it, and use: 
+<div id="ref-ptlasso">
 
-```R CMD build ptLasso```
+Craig, Erin, Mert Pilanci, Thomas Le Menestrel, Balasubramanian Narasimhan, Manuel Rivas, Roozbeh Dehghannasiri, Julia Salzman, Jonathan Taylor, and Robert Tibshirani. "Pretraining and the Lasso." arXiv preprint arXiv:2401.12911 (2024).
 
-followed by
+<div id="ref-glmnet">
 
-```R CMD INSTALL ptLasso_1.0.tar.gz```.
+Friedman, Jerome, Trevor Hastie, and Robert Tibshirani. 2010. “Regularization Paths for Generalized Linear Models via Coordinate Descent.” *Journal of Statistical Software, Articles* 33 (1): 1–22. <https://doi.org/10.18637/jss.v033.i01>.
 
-## Examples
-
-Given covariates ```x``` (nobs x nvars), outcome ```y``` (nobs), and group IDs ```groups``` (nobs, with group IDs from 1 to n_groups), you can call:
-
-```
-fit=ptLasso(x,y,groups=groups,alpha=0.9,family="gaussian",type.measure="mse")
-```
-
-To predict with data ```xtest```, ```groupstest``` and optionally ```ytest```:
-```
-pred=predict.ptLasso(fit,xtest,groupstest=groupstest, ytest=ytest)
-```
-
-The above assumes you have chosen a single value of ```alpha```. To tune this with CV, use:
-```
-cvfit=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5, overall.lambda = "lambda.min")
-```
-
-You can plot this:
-```
-plot(cvfit)
-```
-
-And you can predict using the single alpha that optimizes the overall performance:
-```
-pred.cv=predict(cvfit,xtest,groupstest=groupstest, ytest=ytest, alphatype="fixed")
-```
-
-or using a vector of alphas - one that optimizes the CV performance for each group:
-```
-pred.cv=predict(cvfit,xtest,groupstest=groupstest, ytest=ytest, alphatype="varying")
-```
-
-
+</div>
