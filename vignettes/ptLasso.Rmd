@@ -1,5 +1,5 @@
 ---
-title: "ptLasso Vignette"
+title: "ptLasso Vignette and Manual"
 output: 
   bookdown::html_document2:
     fig_caption: yes
@@ -7,6 +7,8 @@ output:
   bookdown::pdf_document2:
     fig_caption: yes
     toc: true
+pkgdown:
+  as_is: true
 bibliography: ptLasso.bib
 vignette: >
   %\VignetteIndexEntry{ptLasso}
@@ -20,14 +22,368 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+require(knitr)
+require(kableExtra)
 ```
 
-```{r child = 'Introduction.Rmd'}
+
+# Introduction to pretraining
+
+Suppose we have a dataset spanning ten cancers and we want to fit a lasso penalized Cox model to predict survival time. Some of the cancer classes in our dataset are large  (e.g. breast, lung) and some are small (e.g. head and neck). There are two obvious approaches: (1) fit a "pancancer model" to the entire training set and use it to make predictions for all cancer classes and (2) fit a separate (class specific) model for each cancer and use it to make predictions for that class only. 
+
+Pretraining (@craig2024pretraining) is a method that bridges these two options; it has a parameter that allows you to fit the pancancer model, the class specific models, and everything in between. `ptLasso` is a package that fits pretrained models using the `glmnet` package (@glmnet), including lasso, elasticnet and ridge models .
+
+Our example dataset consisting of ten different cancers is called __input grouped__. There is a grouping on the rows of $X$ and each row belongs to one of the cancer classes. Alternatively, data can be __target grouped__, where there is no grouping on the rows of $X$, but we have (for example) a multinomial outcome. We could fit one multinomial model, or we could fit a set of one-vs-rest models. Pretraining again bridges the two approaches, and this is described in detail in the section "Target grouped data". The remainder of this introduction describes the input grouped setting. 
+
+Importantly, pretraining is a general method to pass information from one model to another -- it has many uses beyond what has already been discussed here, including time series data, multi-response data with mixed response types, and multitask learning. Some of these modeling tasks are not supported by the `ptLasso` package, and this vignette shows how to do pretraining for them using the `glmnet` package. These sections are marked by the expression *"`glmnet` only"* in their title. 
+
+Before we describe pretraining in more detail, we will first give a quick review of the lasso.
+
+## Review of the lasso
+For the Gaussian family with data $(x_i,y_i), i=1,2,\ldots n$, the lasso has the form 
+\begin{equation}
+{\rm argmin}_{\beta_0, \beta} \frac{1}{2} \sum_{i=1}^n(y_i- \beta_0 -\sum_{j=1}^p x_{ij}\beta_j)^2 + \lambda \sum_{j=1}^p |\beta_j |.
+\end{equation}
+Varying the  regularization parameter $\lambda \ge 0$ yields a path of solutions: an optimal value
+$\hat\lambda$ is usually chosen by cross-validation, using for example the `cv.glmnet` function from the package `glmnet`.
+
+In GLMs and $\ell_1$-regularized GLMs, one can include an _offset_: a pre-specified $n$-vector that is included as an additional column to the feature matrix, but whose weight $\beta_j$ is fixed at 1. Secondly, one can generalize the $\ell_1$ norm to a weighted norm, taking the form
+ \begin{equation}
+ \sum_j {\rm pf}_j |\beta_j |
+ \end{equation}
+where each ${\rm pf}_j \ge 0$ is a __penalty factor__ for feature $j$. At the extremes, a penalty factor of zero implies no penalty and means that the feature will always be included in the model; a penalty factor of $+\infty$ leads to that feature being discarded (i.e., never entered into the model).
+
+## Details of pretraining
+Pretraining model fitting happens in two steps. First, train a model using the full data:
+\begin{equation}
+ 	\hat{\mu}_0, \hat{\theta}_1, \dots, \hat{\theta}_k, \hat{\beta}_0 = \arg \min_{\mu, \theta_1, \dots, \theta_k, \beta} \frac{1}{2} \sum_{k=1}^K \| y_k - \left(\mu \mathbf{1} + \theta_k \mathbf{1} + X_k \beta\right) \|_2^2 + \lambda ||\beta||_1,
+\end{equation}
+where:
+
+* $X_k, y_k$ are the observations in group $k$,
+* $\theta_k$ is the group specific intercept for group $k$ (by convention, $\hat{\theta}_1 = 0$),
+* $\mu, \beta$ are the overall intercept and coefficients, 
+* and $\lambda$ is a parameter that has been chosen (perhaps the value minimizing the CV error). 
+
+Define $S(\hat\beta_0)$ to be the support set (the nonzero coefficients) of $\hat{\beta}_0$. 
+
+Then, for each group $k$, fit an _individual_ model: find $\hat{\beta}_k$ and $\hat{\mu}_k$ such that
+\begin{eqnarray}
+&& \hat{\mu}_k, \hat{\beta}_k = \arg \min_{\mu, \beta} \frac{1}{2}  \| y_k - (1-\alpha) \left(\hat{\mu}_0 \mathbf{1} + \hat{\theta}_k \mathbf{1} + X_k \hat{\beta}_0\right) - (\mu \mathbf{1} + X_k \beta) \|_2^2 +
+\cr && \phantom{\hat{\mu}_k, \hat{\beta}_k} \lambda \sum_{j=1}^p \Bigl[ I(j \in S(\hat{\beta}_0))+ \frac{1}{\alpha} I(j \notin S(\hat{\beta}_0))  \Bigr] |\beta_{j}|,
+\label{eq:model}
+\end{eqnarray}
+where $\lambda > 0$ and $\alpha\in [0,1]$ are hyperparameters that may be chosen through cross validation. 
+
+This is a lasso linear regression model with _offset_ $(1-\alpha) \left(\hat{\mu}_0 \mathbf{1} + \hat{\theta}_k \mathbf{1} + X_k \hat{\beta}_0\right)$ and coefficient $j$ has _penalty factor_ 1 if $j \in S(\hat{\beta}_0)$ and $\frac{1}{\alpha}$ otherwise.
+
+Notice that when $\alpha=0$, this returns the overall model fine tuned for each group: this second stage model is only allowed to fit the residual $y_k - \left(\hat{\mu}_0 \mathbf{1} + \hat{\theta}_k \mathbf{1} + X_k \hat{\beta}_0\right)$, and the penalty factor only allows the use of $\beta_j$ if it was already selected by the overall model. 
+
+At the other extreme, when $\alpha=1$, this is equivalent to fitting a separate model for each class. There is no offset, and the lasso penalty is 1 for all features (the usual lasso penalty).
+
+## `ptLasso` under the hood
+All model fitting in `ptLasso` is done with `cv.glmnet`. The first step of pretraining is a straightforward call to `cv.glmnet`; the second step is done by calling `cv.glmnet` with:
+
+1. `offset` $(1-\alpha) \left(\hat{\mu_0} \mathbf{1} + \hat{\theta}_k \mathbf{1} + X_k \hat{\beta_0}\right)$ and
+2. `penalty.factor`, the $j^\text{th}$ entry of which is $1$ if $j \in S(\hat{\beta_0})$ and $\frac{1}{\alpha}$ otherwise.
+
+Because `ptLasso` uses `cv.glmnet`, it inherits most of the virtues of the `glmnet` package: for example, it handles sparse input-matrix formats, as well as range constraints on coefficients. 
+
+Additionally, one call to `ptLasso` fits an overall model, pretrained class specific models, and class specific models for each group (without pretraining). The `ptLasso` package also includes methods for prediction and plotting, and a function that performs K-fold cross-validation.
+
+# Quick start
+
+## ptLasso uses the same syntax as glmnet
+For those familiar with `glmnet`, `ptLasso` has a similar structure: `ptLasso` has functions to train, plot and predict, and it follows the syntax of `glmnet`. 
+
+Additionally, `ptLasso` has a parameter $\alpha$ that is analogous to the elasticnet parameter also called $\alpha$. To avoid confusion, we will refer to the elasticnet parameter as $\alpha_{\text{en}}$. As with $\alpha_{\text{en}}$ in `glmnet`, you must specify the value of $\alpha$ that you want to use when calling `ptLasso`; the default is $\alpha = 0.5$. 
+
+```{r, eval = FALSE}
+# The typical glmnet pipeline: train, plot and predict,
+# using elasticnet parameter 0.2.
+fit = glmnet(X, y, alpha = 0.2)
+plot(fit)
+test.preds = predict(fit, Xtest)
+
+# The typical ptLasso pipeline: train, plot and predict,
+# using pretraining parameter 0.5.
+fit = ptLasso(X, y, groups, alpha = 0.5)
+plot(fit)
+test.preds = predict(fit, Xtest, groupstest)
 ```
+
+There are a few big differences between `ptLasso` and `glmnet`:
+
+   * `ptLasso` calls `cv.glmnet` under the hood: cross validation over $\lambda$ is done automatically
+   * the `ptLasso` package includes `cv.ptLasso`: a function to do cross validation over $\alpha$.
+
+With cross validation, the typical `ptLasso` pipeline looks like:
+```{r, eval = FALSE}
+fit = cv.ptLasso(X, y, groups, alpha = 0.5)
+plot(fit)
+test.preds = predict(fit, Xtest, groupstest)
+```
+The `predict` function uses the value of $\alpha$ that achieved the best average CV performance across groups. But it is possible to instead use a different $\alpha$ for each group (specifically the $\alpha$ that achieved the best CV performance *for each group*). An example is at the end of this section.
+
+## An example
+
+First, we load the `ptLasso` package:
+```{r setup}
+require(ptLasso)
+```
+
+To show how to use `ptLasso`, we'll simulate data with 5 groups and a continuous response using the helper function `gaussian.example.data`. There are $n = 200$ observations in each group and $p = 120$ features. All groups share 10 informative features; though the features are shared, they have different coefficient values. Each group has 10 additional features that are specific to that group, and all other features are uninformative. <!--The coefficients for the 5 groups are in Table \@ref(tab:coefs).-->
+
+```{r coefs, echo = FALSE, eval = FALSE}
+coef.table = cbind(cbind(
+  3*(1:5),
+  c(3, rep(0, 4)),
+  c(0, 3, rep(0, 3)),
+  c(rep(0, 2), 3, rep(0, 2)),
+  c(rep(0, 3), 3, 0),
+  c(rep(0, 4), 3)
+), 0)
+rownames(coef.table) = paste0("group ", 1:5)
+colnames(coef.table) = c("1-10", "11-20", "21-30", "31-40", "41-59", "51-60", "61-120")
+
+kable(
+  coef.table, booktabs = TRUE,
+  caption = 'Coefficients for simulating input grouped data'
+)
+```
+
+
+```{r}
+set.seed(1234)
+
+out = gaussian.example.data()
+x = out$x; y = out$y; groups = out$groups
+
+outtest = gaussian.example.data()
+xtest = outtest$x; ytest = outtest$y; groupstest = outtest$groups
+
+```
+
+Now we are ready to fit a model using `ptLasso`. We'll use the pretraining parameter $\alpha = 0.5$ (randomly chosen). 
+
+```{r}
+fit <- ptLasso(x, y, groups, alpha = 0.5)
+```
+
+<!--In practice we recommend choosing $\alpha$ more thoughtfully by using (1) a validation set to measure performance for a few different choices of $\alpha$ (e.g. $0, 0.25, 0.5, 0.75, 1.0$), or (2) `cv.ptLasso`, which will recommend a choice of $\alpha$ based on CV performance.-->
+
+The function `ptLasso` used `cv.glmnet` to fit 11 models: 
+
+- the *overall* model (using all 5 groups), 
+- the 5 *pretrained* models (one for each group) and
+- the 5 *individual* models (one for each group).
+
+A call to `plot` displays the cross validation curves for each model. The top row shows the overall model, the middle row the pretrained models, and the bottom row the individual models.
+
+```{r, fig.width=7, fig.height=6, dpi=100}
+plot(fit)
+```
+
+`predict` makes predictions from all $11$ models. It returns a list containing:
+
+1. `yhatoverall` (predictions from the overall model), 
+2. `yhatpre` (predictions from the pretrained models) and 
+3. `yhatind` (predictions from the individual models).
+
+By default, `predict` uses `lambda.min` for all $11$ `cv.glmnet` models; you could instead specify `s = lambda.1se` or use a numeric value. Whatever value of $\lambda$ you choose will be used for all models (overall, pretrained and individual).
+
+```{r}
+preds = predict(fit, xtest, groupstest=groupstest)
+```
+
+If you also provide `ytest` (for model validation), `predict` will additionally compute performance measures. 
+<!---For continuous outcomes, `predict` computes the mean squared prediction error by default; the argument `type.measure = "mae"` would compute the mean absolute prediction error instead.--->
+
+```{r}
+preds = predict(fit, xtest, groupstest=groupstest, ytest=ytest)
+preds
+```
+
+To access the coefficients of the fitted models, use `coef` as usual. This returns a list with the coefficients of the individual models, pretrained models and overall models, as returned by `glmnet`.
+```{r}
+all.coefs = coef(fit, s= "lambda.min")
+names(all.coefs)
+```
+
+The entries for the individual and pretrained models are lists with one entry for each group. Because we have 5 groups, we'll have 5 sets of coefficients.
+```{r}
+length(all.coefs$pretrain)
+```
+
+The first few coefficients for group 1 from the pretrained model are:
+```{r}
+head(all.coefs$pretrain[[1]])
+```
+
+When we used `ptLasso` to fit a model, we chose $\alpha = 0.5$. In practice we recommend choosing $\alpha$ more thoughtfully by using (1) a validation set to measure performance for a few different choices of $\alpha$ (e.g. $0, 0.25, 0.5, 0.75, 1.0$) or (2) the function `cv.ptLasso`.
+
+The call to `cv.ptLasso` is nearly identical to that for `ptLasso`. By default, `cv.ptLasso` will try $\alpha = 0, 0.1, 0.2, \dots, 1$, but this can be changed with the argument `alphalist`. After fitting, printing the `cv.ptLasso` object shows the cross validated mean squared error for all models.
+
+```{r}
+cvfit <- cv.ptLasso(x, y, groups)
+cvfit
+```
+
+Plotting the `cv.ptLasso` object visualizes performance as a function of $\alpha$.
+```{r, fig.width=5, fig.height=4, dpi=100}
+plot(cvfit)
+```
+
+And, as with `ptLasso`, we can `predict`. By default, `predict` uses the $\alpha$ that minimized the cross validated MSE.
+```{r}
+preds = predict(cvfit, xtest, groupstest=groupstest, ytest=ytest)
+preds
+```
+
+We could instead use the argument `alphatype = "varying"` to use a different $\alpha$ for each group -- we choose the $\alpha$ that minimizes the CV MSE for each group:
+```{r}
+preds = predict(cvfit, xtest, groupstest=groupstest, ytest=ytest, 
+                alphatype="varying")
+preds
+```
+
 
 # Other details
-```{r child = 'OtherDetails.Rmd'}
+
+
+```{r, echo=FALSE}
+require(ptLasso)
+
+set.seed(1234)
+
+out = gaussian.example.data()
+x = out$x; y = out$y; groups = out$groups
+
+outtest = gaussian.example.data()
+xtest = outtest$x; ytest = outtest$y; groupstest = outtest$groups
 ```
+
+## Choosing $\alpha$, the pretraining parameter
+Selecting the parameter $\alpha$ is an important part of pretraining. The simplest way to do this is to use `cv.ptLasso` -- this will automatically perform pretraining for a range of $\alpha$ values and return the CV performance for each. The default values for $\alpha$  are $0, 0.1, 0.2, \dots, 1$. 
+
+```{r}
+cvfit <- cv.ptLasso(x, y, groups)
+cvfit
+```
+
+Of course, you can specify the values of $\alpha$ to consider:
+```{r}
+cvfit <- cv.ptLasso(x, y, groups, alphalist = c(0, 0.5, 1))
+cvfit
+```
+
+At prediction time, `cv.ptLasso` uses the $\alpha$ that had the best CV performance on average across all groups. We could instead choose to use a different $\alpha$ for each group, as `cv.ptLasso` already figured out which $\alpha$ optimizes the CV performance for each group. To use group-specific values of $\alpha$, specify `alphatype = "varying"` at prediction time. In this example, the best group-specific $\alpha$ values all happen to be $0.5$ -- the same as the overall $\alpha$.
+```{r}
+###############################################
+# Common alpha for all groups:
+###############################################
+predict(cvfit, xtest, groupstest, ytest=ytest)
+
+###############################################
+# Different alpha for each group:
+###############################################
+predict(cvfit, xtest, groupstest, ytest=ytest, alphatype = "varying")
+```
+
+## Choosing $\lambda$, the lasso path parameter, for the first stage of pretraining
+The first step of pretraining fits the overall model with `cv.glmnet` and selects a model along the $\lambda$ path. The second stage uses the overall model's support and predictions to train the group-specific models.
+
+At train time, we need to know choose a value of $\lambda$ to use for the first stage. This can be specified in `ptLasso` with the argument `overall.lambda`. The default value is "lambda.1se" -- this usually had slightly better performance in simulations and real data examples than "lambda.min". But this is easy to change: `overall.lambda` can accept "lambda.1se" or "lambda.min" (as in `predict.cv.glmnet`). 
+
+Whatever choice is made at train time will be automatically used at test time, and this cannot be changed. The fitted model from the second stage of pretraining expects the offset to have been computed using a particular model -- it does not make sense to compute the offset using a model with a different $\lambda$.
+```{r}
+# Default:
+fit <- ptLasso(x, y, groups, alpha = 0.5, overall.lambda = "lambda.1se")
+
+# Alternative:
+fit <- ptLasso(x, y, groups, alpha = 0.5, overall.lambda = "lambda.min")
+```
+
+## Fitting elasticnet or ridge models
+By default, `ptLasso` fits lasso penalized models; in `glmnet`, this corresponds to the elasticnet parameter $\alpha_\text{en} = 1$ (where the subscript `en` stands for "elasticnet"). Fitting pretrained elasticnet or ridge models is also possible with `ptLasso`: use argument `en.alpha` between $0$ (ridge) and $1$ (lasso). Here is an example using the pretraining parameter $\alpha = 0.5$ and the elasticnet parameter `en.alpha = 0.2`.
+```{r}
+fit <- ptLasso(x, y, groups, 
+               alpha = 0.5,    # pretraining parameter
+               en.alpha = 0.2) # elasticnet parameter
+```
+
+## Printing progress during model training 
+When models take a long time to train, it can be useful to print out progress during training. `ptLasso` has two ways to do this (and they can be combined). First, we can simply print out which model is being fitted using `verbose = TRUE`:
+```{r}
+fit <- ptLasso(x, y, groups, alpha = 0.5, verbose = TRUE)
+```
+
+We can also print out a progress bar for _each model_ that is being fit -- this functionality comes directly from `cv.glmnet`, and follows its notation. (To avoid cluttering this document, we do not run the following example.)
+```{r, eval = FALSE}
+fit <- ptLasso(x, y, groups, alpha = 0.5, trace.it = TRUE)
+```
+
+And of course, we can combine these to print out (1) which model is being trained and (2) the corresponding progress bar.
+```{r, eval = FALSE}
+fit <- ptLasso(x, y, groups, alpha = 0.5, verbose = TRUE, trace.it = TRUE)
+```
+
+## Using individual and overall models that were previously trained
+`ptLasso` will fit the overall and individual models. However, if you have already trained the overall or individual models, you can save compute time by passing them directly to `ptLasso` -- they will not be refitted.  **`ptLasso` expects that these models were fitted using the same training data that you pass to `ptLasso`, and that they were fitted with the argument `keep = TRUE`.** Here is an example. We will fit an overall model and individual models, and then we will show how to pass them to `ptLasso`. Using `verbose = TRUE` in the call to `ptLasso` shows us what models are being trained (and confirms that we are not refitting the overall and individual models). 
+```{r}
+overall.model = cv.glmnet(x, y, keep = TRUE)
+individual.models = lapply(1:5, 
+                           function(kk) cv.glmnet(x[groups == kk, ], 
+                                                  y[groups == kk], 
+                                                  keep = TRUE))
+
+fit <- ptLasso(x, y, groups, 
+               fitoverall = overall.model,
+               fitind = individual.models,
+               verbose = TRUE)
+```
+
+
+Of course we could pass just the overall *or* individual models to `ptLasso:
+```{r}
+fit <- ptLasso(x, y, groups, fitoverall = overall.model, verbose = TRUE)
+```
+
+```{r}
+fit <- ptLasso(x, y, groups, fitind = individual.models, verbose = TRUE)
+```
+
+## Fitting the overall model without group-specific intercepts
+When we fit the overall model with input grouped data, we solve the following:
+\begin{equation}
+ 	\hat{\mu_0}, \hat{\theta_2}, \dots, \hat{\theta_K}, \hat{\beta_0} = \arg \min_{\mu, \theta_2, \dots, \theta_k, \beta} \frac{1}{2} \sum_{k=1}^K \| y_k - \left(\mu \mathbf{1} + \theta_k \mathbf{1} + X_k \beta\right) \|_2^2 + \lambda ||\beta||_1,
+\end{equation}
+where $\hat{\theta_1}$ is defined to be $0$. We can instead omit $\theta_1, \dots, \theta_K$ and instead fit the following:
+\begin{equation}
+ 	\hat{\mu_0}, \hat{\beta_0} = \arg \min_{\mu, \beta} \frac{1}{2} \sum_{k=1}^K \| y_k - \left(\mu \mathbf{1} + X_k \beta\right) \|_2^2 + \lambda ||\beta||_1.
+\end{equation}
+This may be useful in settings where the groups are different between train and test sets (see "Different groups in train and test data" under "Input grouped data"). To do this, use the argument `group.intercepts = FALSE`. 
+
+```{r}
+cvfit <- cv.ptLasso(x, y, groups, group.intercepts = FALSE)
+cvfit
+```
+
+## Arguments for use in `cv.glmnet`
+Because model fitting is done with `cv.glmnet`, `ptLasso` can take and pass arguments to `cv.glmnet`. Notable choices include `penalty.factor`, `weights`, `upper.limits`, `lower.limits` and `en.alpha` (known as `alpha` in `glmnet`). Please refer to the `glmnet` documentation for more information on their use.
+
+`ptLasso` does not support the arguments `intercept`, `offset`, `fit` and `check.args`.
+
+## Parallelizing model fitting
+For large datasets, we can parallelize model fitting within the calls to `cv.glmnet`. As in `cv.glmnet`, pass the argument `parallel = TRUE`, and register parallel beforehand:
+
+```{r, eval=FALSE}
+require(doMC)
+registerDoMC(cores = 4)
+fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse", 
+              parallel=TRUE)
+```
+
 
 
 # Input grouped data
@@ -403,28 +759,28 @@ predict(cvfit, xtest, ytest = ytest)
 predict(cvfit, xtest, ytest = ytest, alphatype = "varying")
 ```
 
-## Time series data
+## Time series data (`glmnet` only)
 ```{r child = 'TimeSeriesData.Rmd'}
 ```
 
-## Multi-response data with mixed response types
+## Multi-response data with mixed response types (`glmnet` only)
 ```{r child = 'MultiResponseData.Rmd'}
 ```
 
-## Multi-task learning or coaching
+## Multi-task learning or coaching (`glmnet` only)
 ```{r child = 'MultitaskLearning.Rmd'}
 ```
 
 
-# Conditional average treatment effect estimation
+# Conditional average treatment effect estimation (`glmnet` only)
 ```{r child = 'ConditionalAverageTreatmentEffect.Rmd'}
 ```
 
-# Using non-linear bases
+# Using non-linear bases (`glmnet` only)
 ```{r child = 'UsingNonlinearBases.Rmd'}
 ```
 
-# Unsupervised pretraining
+# Unsupervised pretraining (`glmnet` only)
 ```{r child = 'UnsupervisedPretraining.Rmd'}
 ```
 

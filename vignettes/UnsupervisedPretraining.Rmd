@@ -1,5 +1,5 @@
 ---
-title: "Unsupervised pretraining"
+title: "Unsupervised pretraining (glmnet only)"
 output: 
   pdf_document:
    toc: false
@@ -20,7 +20,6 @@ knitr::opts_chunk$set(
 
 ```{r echo = FALSE}
 require(glmnet)
-require(ptLasso)
 ```
 
 Suppose we have a dataset with features $X$ and response $y$. Suppose we also have a large set of *unlabeled* data $X^*$. Here, we show how to _pretrain_ a model using $X^*$. The steps are:

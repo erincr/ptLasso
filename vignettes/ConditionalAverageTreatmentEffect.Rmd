@@ -1,5 +1,5 @@
 ---
-title: "Conditional average treatment effect estimation"
+title: "Conditional average treatment effect estimation (glmnet only)"
 output: 
   bookdown::pdf_document2:
    toc: false

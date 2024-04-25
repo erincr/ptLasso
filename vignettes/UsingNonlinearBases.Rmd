@@ -1,5 +1,5 @@
 ---
-title: "Using nonlinear bases"
+title: "Using nonlinear bases (glmnet only)"
 output: 
   bookdown::pdf_document2:
    toc: false

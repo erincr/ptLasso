@@ -1,5 +1,5 @@
 ---
-title: "Multi-response data with mixed response types"
+title: "Multi-response data with mixed response types (glmnet only)"
 output: 
   bookdown::pdf_document2:
    toc: false

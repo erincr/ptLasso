@@ -1,5 +1,5 @@
 ---
-title: "Multitask learning or coaching"
+title: "Multitask learning or coaching (glmnet only)"
 output: 
   bookdown::pdf_document2:
    toc: false
@@ -29,6 +29,8 @@ Pretraining is a natural choice for multitask learning -- it is a method to pass
 1. fit a multi-response Gaussian model,
 2. extract the support (shared across responses) and offsets (one for each response), and
 3. fit a model for each response, using the shared support and appropriate offset.
+
+Importantly, in Step 1, we will use regularization so that the multi-response Gaussian model is forced to choose the same support for all responses $y_1, \dots, y_j$. This encourages learning _across_ all responses in the first stage; in the second stage, then, we can find features that are specific to each individual response $y_k$.
 
 We will illustrate this with simulated data with two Gaussian responses; the two responses share the first 5 features, and they each have 5 features of their own. The two responses are quite related, with Pearson correlation around 0.5. 
 ```{r}

@@ -1,5 +1,5 @@
 ---
-title: "Time series data"
+title: "Time series data (glmnet only)"
 output: 
   bookdown::pdf_document2:
    toc: false
@@ -75,7 +75,7 @@ nfolds = 10
 foldid = sample(rep(1:10, trunc(nrow(x1)/nfolds)+1))[1:nrow(x1)]
 ```
 
-The first step is to fit a model for time 1 and extract the cross-fitted offset and support. Note that `cv.glmnet` will store cross-fitted predictions if we use the argument `keep = TRUE`.
+Now we have our simulated data and we are ready to train models. The first step is to fit a model for time 1 and extract the cross-fitted offset and support. Note that `cv.glmnet` will store cross-fitted predictions if we use the argument `keep = TRUE`.
 ```{r}
 y1_fit = cv.glmnet(x1, y1, keep=TRUE, foldid = foldid)
 

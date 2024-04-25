@@ -4,13 +4,16 @@ Title: Pretrained Lasso
 Description: Fit a pretrained lasso model.
 Version: 1.0
 Date:
-Author: Erin Craig and Rob Tibshirani
+Authors@R: c(person("Erin", "Craig", role=c("aut", "cre"), email = "erincr@stanford.edu"),
+	     person("Rob", "Tibshirani", role="aut"))
+Author: Erin Craig [aut, cre],
+ Rob Tibshirani [aut, cre]
 Maintainer: Erin Craig  <erincr@stanford.edu>
 License: GPL-2
 Encoding: UTF-8
-URL: 
+URL: https://erincr.github.io/ptLasso/
 Packaged: 
-Repository: CRAN
+Repository:
 Date/Publication:
 NeedsCompilation: yes
 RoxygenNote: 7.3.0
