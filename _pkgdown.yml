@@ -1,0 +1,31 @@
+url: https://erincr.github.io/ptLasso/
+template:
+  bootstrap: 5
+  bootswatch: cosmo
+authors:
+  Erin Craig:
+    href: http://www.erincraig.me
+  Rob Tibshirani:
+    href: http://statistics.stanford.edu/people/robert-tibshirani
+navbar:
+  components:
+    articles:
+      text: Articles
+      menu:
+      - text: Different groups in train and test data
+        href: articles/DifferentGroupsTrainAndTest.html
+      - text: Learning the input groups
+        href: articles/LearningTheInputGroups.html
+      - text: Multitask learning or coaching
+        href: articles/MultitaskLearning.html
+      - text: Multi-response data with mixed response types
+        href: articles/MultiResponseData.html
+      - text: Time series
+        href: articles/TimeSeriesData.html
+      - text: Pretraining with nonlinear bases
+        href: articles/UsingNonlinearBases.html
+      - text: Unsupervised pretraining
+        href: articles/UnsupervisedPretraining.html
+      - text: Conditional average treatment effects
+        href: articles/ConditionalAverageTreatmentEffect.html
+
