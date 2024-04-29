@@ -82,6 +82,7 @@ get.pretrain.support <- function(fit, s="lambda.min", gamma="gamma.min", commonO
 #' @return This returns a vector containing the indices of nonzero coefficients (excluding the intercept). 
 #'
 #' @export
+#' @importFrom stats coef
 #'
 get.individual.support <- function(fit, s="lambda.min", gamma="gamma.min", commonOnly = FALSE, groups = 1:length(fit$fitind)) {
     if(inherits(fit, "cv.ptLasso")) return(get.pretrain.or.individual.support(fit$fit[[1]], s=s, gamma=gamma, commonOnly=commonOnly, groups = groups, model="individual")) 
@@ -169,6 +170,7 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", gamma="gamma
 #' @return This returns a vector containing the indices of nonzero coefficients (excluding the intercept). 
 #'
 #' @export
+#' @importFrom stats coef
 #'
 get.overall.support <- function(fit, s="lambda.min", gamma="gamma.min"){
 
@@ -206,7 +208,7 @@ get.overall.support <- function(fit, s="lambda.min", gamma="gamma.min"){
 #' Get the coefficients from a fitted ptLasso model.
 #'
 #' @aliases coef.ptLasso 
-#' @param fit fitted \code{"ptLasso"} object.
+#' @param object fitted \code{"ptLasso"} object.
 #' @param model string indicating which coefficients to retrieve. Must be one of "all", "individual", "overall" or "pretrain".
 #' @param \dots other arguments to be passed to the \code{"coef"} function. May be e.g. \code{s = "lambda.min"}.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
@@ -229,13 +231,14 @@ get.overall.support <- function(fit, s="lambda.min", gamma="gamma.min"){
 #'
 #' @method coef ptLasso
 #' @export
+#' @importFrom stats coef
 #'
-coef.ptLasso=function(fit, model = c("all", "individual", "overall", "pretrain"), ...){
+coef.ptLasso=function(object, model = c("all", "individual", "overall", "pretrain"), ...){
     model = match.arg(model)
 
-    if((model == "all") | (model == "individual")) individual = lapply(fit$fitind, function(x) coef(x, ...))
-    if((model == "all") | (model == "pretrain"))   pretrain   = lapply(fit$fitpre, function(x) coef(x, ...))
-    if((model == "all") | (model == "overall"))    overall    = coef(fit$fitoverall, ...)
+    if((model == "all") | (model == "individual")) individual = lapply(object$fitind, function(x) coef(x, ...))
+    if((model == "all") | (model == "pretrain"))   pretrain   = lapply(object$fitpre, function(x) coef(x, ...))
+    if((model == "all") | (model == "overall"))    overall    = coef(object$fitoverall, ...)
 
     if(model == "all")        return(list( individual = individual,  pretrain = pretrain, overall = overall))
     if(model == "individual") return(individual)
@@ -249,7 +252,7 @@ coef.ptLasso=function(fit, model = c("all", "individual", "overall", "pretrain")
 #'
 #' 
 #' @aliases coef.cv.ptLasso 
-#' @param fit fitted \code{"cv.ptLasso"} object.
+#' @param object fitted \code{"cv.ptLasso"} object.
 #' @param model string indicating which coefficients to retrieve. Must be one of "all", "individual", "overall" or "pretrain".
 #' @param alpha value between 0 and 1, indicating which alpha to use. If \code{NULL}, return coefficients from all models.  Only impacts the results for model = "all" or model = "pretrain".
 #' @param \dots other arguments to be passed to the \code{"coef"} function. May be e.g. \code{s = "lambda.min"}.
@@ -271,19 +274,19 @@ coef.ptLasso=function(fit, model = c("all", "individual", "overall", "pretrain")
 #'
 #' @method coef cv.ptLasso
 #' @export
-coef.cv.ptLasso=function(fit, model = c("all", "individual", "overall", "pretrain"), alpha = NULL, ...){
+coef.cv.ptLasso=function(object, model = c("all", "individual", "overall", "pretrain"), alpha = NULL, ...){
     model = match.arg(model)
 
-    if((model == "all") | (model == "individual")) individual = lapply(fit$fitind, function(x) coef(x, ...))
-    if((model == "all") | (model == "overall"))    overall    = coef(fit$fitoverall, ...)
+    if((model == "all") | (model == "individual")) individual = lapply(object$fitind, function(x) coef(x, ...))
+    if((model == "all") | (model == "overall"))    overall    = coef(object$fitoverall, ...)
 
     if((model == "all") | (model == "pretrain")){
         if(is.null(alpha)){
-            pretrain = lapply(fit$fit, function(model) coef(model, "pretrain", ...))
+            pretrain = lapply(object$fit, function(model) coef(model, "pretrain", ...))
         } else {
-            which.alpha = which(alpha == fit$alphalist)
+            which.alpha = which(alpha == object$alphalist)
             if(length(which.alpha) == 0) stop("Please choose alpha from fit$alphalist")
-            pretrain    = coef(fit$fit[[which.alpha]], "pretrain", ...)
+            pretrain    = coef(object$fit[[which.alpha]], "pretrain", ...)
         }
     }
 

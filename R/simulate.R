@@ -43,6 +43,7 @@
 #'
 #'
 #' @export
+#' @importFrom stats rnorm rbinom runif var
 #'
 makedata=function(n, p, k, scommon, sindiv, class.sizes, beta.common, beta.indiv, intercepts = rep(0, k), sigma = 0,
                   outcome = c("gaussian", "binomial", "multinomial"), mult.classes = 3){
@@ -152,7 +153,7 @@ makedata=function(n, p, k, scommon, sindiv, class.sizes, beta.common, beta.indiv
 #'
 #'
 #' @export
-#'
+#' @importFrom stats rnorm 
 makedata.targetgroups=function(n, p, scommon, sindiv, class.sizes, shift.common, shift.indiv){  
     x=matrix(rnorm(n*p),n,p)
 

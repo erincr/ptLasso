@@ -4,10 +4,10 @@
 \alias{coef.ptLasso}
 \title{Get the coefficients from a fitted ptLasso model.}
 \usage{
-\method{coef}{ptLasso}(fit, model = c("all", "individual", "overall", "pretrain"), ...)
+\method{coef}{ptLasso}(object, model = c("all", "individual", "overall", "pretrain"), ...)
 }
 \arguments{
-\item{fit}{fitted \code{"ptLasso"} object.}
+\item{object}{fitted \code{"ptLasso"} object.}
 
 \item{model}{string indicating which coefficients to retrieve. Must be one of "all", "individual", "overall" or "pretrain".}
 

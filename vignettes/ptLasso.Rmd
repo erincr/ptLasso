@@ -19,7 +19,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 require(knitr)
-require(kableExtra)
 ```
 
 

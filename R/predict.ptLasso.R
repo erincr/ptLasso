@@ -4,7 +4,7 @@
 #' Return predictions and performance measures for a test set. 
 #' 
 #' @aliases predict.cv.ptLasso
-#' @param cvfit Fitted \code{"cv.ptLasso"} object.
+#' @param object Fitted \code{"cv.ptLasso"} object.
 #' @param xtest Input matrix, matching the form used by \code{"cv.ptLasso"} for model training.
 #' @param groupstest  A vector indicating to which group each observation belongs. Coding should match that used for model training. Will be NULL for target grouped data.
 #' @param ytest Response variable. Optional. If included, \code{"predict"} will compute performance measures for xtest using code{"type.measure"} from the cvfit object.
@@ -14,6 +14,7 @@
 #' @param s Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.
 #' @param gamma For use only when 'relax = TRUE' was specified during training. Value of the penalty parameter 'gamma' at which predictions are required. Will use the same gamma for all models; can be a numeric value, '"gamma.min"' or '"gamma.1se"'. Default is '"gamma.min"'.
 #' @param return.link If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkoverall}, \code{linkpre} and \code{linkind}.
+#' @param \dots other arguments to be passed to the \code{"predict"} function. 
 #' @return A list containing the requested predictions. If \code{ytest} is included, will also return error measures.
 #' \item{call}{The call that produced this object.}
 #' \item{alpha}{The value(s) of alpha used to generate predictions.}
@@ -66,10 +67,11 @@
 #' pred
 #'
 #' @import glmnet
+#' @importFrom stats weighted.mean predict
 #' @method predict cv.ptLasso
 #' @export
-predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NULL, alphatype = c("fixed", "varying"),
-                            type = c("link", "response", "class"), s = "lambda.min", gamma = "gamma.min", return.link = FALSE){
+predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=NULL, alphatype = c("fixed", "varying"),
+                            type = c("link", "response", "class"), s = "lambda.min", gamma = "gamma.min", return.link = FALSE, ...){
 
     if(missing("xtest")) stop("Please supply xtest.")
 
@@ -78,43 +80,43 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
     this.call = match.call()
 
     original.groups = groupstest
-    legend = cvfit$fit[[1]]$group.legend
+    legend = object$fit[[1]]$group.legend
     groupstest = transform.groups(groupstest, legend = legend)
     
     alphatype = match.arg(alphatype)
     if(is.null(alpha)) {
-        if(alphatype == "fixed")   alpha = cvfit$alphahat
-        if(alphatype == "varying") alpha = cvfit$varying.alphahat
+        if(alphatype == "fixed")   alpha = object$alphahat
+        if(alphatype == "varying") alpha = object$varying.alphahat
     }    
 
     close.enough = 1e-6
     if(length(alpha) == 1){      
-        if(all(abs(alpha - cvfit$errpre[, "alpha"]) > close.enough)) stop("Not a valid choice of alpha. Please choose alpha from cvfit$alphalist.")
+        if(all(abs(alpha - object$errpre[, "alpha"]) > close.enough)) stop("Not a valid choice of alpha. Please choose alpha from object$alphalist.")
         
-        model.ix = which(abs(cvfit$errpre[, "alpha"] - alpha) < close.enough)    
+        model.ix = which(abs(object$errpre[, "alpha"] - alpha) < close.enough)    
         if(length(model.ix) > 1) model.ix = model.ix[1]
        
-        fit = cvfit$fit[[model.ix]]
+        fit = object$fit[[model.ix]]
 
         out = predict.ptLasso(fit, xtest, groupstest=original.groups, ytest=ytest, type = type, s = s, gamma = gamma)
         out$call = this.call
         
         return(out)
     } else {
-        if(!all(sapply(alpha, function(x) any(abs(x - cvfit$errpre[, "alpha"]) < close.enough)))) {
-            stop("Includes at least one invalid choice of alpha. Please choose alpha from cvfit$alphalist.")
+        if(!all(sapply(alpha, function(x) any(abs(x - object$errpre[, "alpha"]) < close.enough)))) {
+            stop("Includes at least one invalid choice of alpha. Please choose alpha from object$alphalist.")
         }
         
         # TODO future: what if they have only e.g. one group at prediction time?
         # They shouldn't have to supply alphas for every group.
-        if(length(alpha) != cvfit$fit[[1]]$k) stop("Must have one alpha for each group.") 
+        if(length(alpha) != object$fit[[1]]$k) stop("Must have one alpha for each group.") 
         
-        model.ix = sapply(alpha, function(a) which(abs(a - cvfit$errpre[, "alpha"]) < close.enough))
+        model.ix = sapply(alpha, function(a) which(abs(a - object$errpre[, "alpha"]) < close.enough))
         model.ix = unname(model.ix)
 
-        if(cvfit$call$use.case == "targetGroups") {
-            results = lapply(1:cvfit$fit[[1]]$k,
-                             function(ix) {predict.ptLasso.targetGroups(cvfit$fit[[model.ix[ix]]],
+        if(object$call$use.case == "targetGroups") {
+            results = lapply(1:object$fit[[1]]$k,
+                             function(ix) {predict.ptLasso.targetGroups(object$fit[[model.ix[ix]]],
                                                            xtest, ytest = ytest,
                                                            pred.groups = ix,
                                                            process.results = FALSE,
@@ -127,9 +129,9 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
             suppre.individual = unique(sort(unlist(lapply(results, function(x) x$suppre.individual))))
             
             return(process.targetGroup.results(phatall = phatall, phatpre = phatpre, phatind = phatind,
-                                        ytest = ytest, k = cvfit$fit[[1]]$k, type.measure = cvfit$type.measure,
+                                        ytest = ytest, k = object$fit[[1]]$k, type.measure = object$type.measure,
                                         return.link = return.link, type = type,
-                                        alpha = alpha, s = s, gamma = gamma, call = this.call, fit = cvfit,
+                                        alpha = alpha, s = s, gamma = gamma, call = this.call, fit = object,
                                         suppre.common = suppre.common, suppre.individual = suppre.individual
                                         )
 
@@ -140,7 +142,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
         predgroups = sort(unique(groupstest))
 
         results = lapply(predgroups,
-                             function(ix) {predict.ptLasso(cvfit$fit[[model.ix[ix]]],
+                             function(ix) {predict.ptLasso(object$fit[[model.ix[ix]]],
                                                            xtest[groupstest == ix, ],
                                                            groupstest=original.groups[groupstest == ix],
                                                            ytest=ytest[groupstest == ix],
@@ -159,31 +161,31 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
             ind.link[groupstest == predgroups[kk]] = results[[kk]]$linkind
         }
         
-        suppre = lapply(predgroups, function(ix) get.pretrain.support(cvfit$fit[[model.ix[ix]]], groups = ix, includeOverall = FALSE, s = s, gamma = gamma))
+        suppre = lapply(predgroups, function(ix) get.pretrain.support(object$fit[[model.ix[ix]]], groups = ix, includeOverall = FALSE, s = s, gamma = gamma))
         suppre = sort(unique(unlist(suppre)))
-        if("fitoverall.gamma" %in% names(cvfit)){
-            suppre.common =  get.overall.support(cvfit, s=cvfit$fitoverall.lambda, gamma = cvfit$fitoverall.gamma)
+        if("fitoverall.gamma" %in% names(object)){
+            suppre.common =  get.overall.support(object, s=object$fitoverall.lambda, gamma = object$fitoverall.gamma)
         } else {
-            suppre.common =  get.overall.support(cvfit, s=cvfit$fitoverall.lambda)
+            suppre.common =  get.overall.support(object, s=object$fitoverall.lambda)
         }
         suppre.individual = setdiff(suppre, suppre.common)
         
         if(!is.null(ytest)){
             group.weights = table(groupstest)/length(groupstest)
             erroverall = sapply(results, function(r) r$erroverall[grepl("group", names(r$erroverall))])
-            erroverall = c(as.numeric(assess.glmnet(all.link, newy=ytest, family=cvfit$family)[cvfit$type.measure]),
+            erroverall = c(as.numeric(assess.glmnet(all.link, newy=ytest, family=object$family)[object$type.measure]),
                        mean(erroverall),
                        weighted.mean(erroverall, w = group.weights),
                        erroverall)
 
             errpre = sapply(results, function(r) r$errpre[grepl("group", names(r$errpre))])
-            errpre = c(as.numeric(assess.glmnet(pre.link, newy=ytest, family=cvfit$family)[cvfit$type.measure]),
+            errpre = c(as.numeric(assess.glmnet(pre.link, newy=ytest, family=object$family)[object$type.measure]),
                        mean(errpre),
                        weighted.mean(errpre, w = group.weights),
                        errpre)
 
             errind = sapply(results, function(r) r$errind[grepl("group", names(r$errind))])
-            errind = c(as.numeric(assess.glmnet(ind.link, newy=ytest, family=cvfit$family)[cvfit$type.measure]),
+            errind = c(as.numeric(assess.glmnet(ind.link, newy=ytest, family=object$family)[object$type.measure]),
                        mean(errind),
                        weighted.mean(errind, w = group.weights),
                        errind)
@@ -201,9 +203,9 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
             supoverall = results[[1]]$supoverall,
             supind = results[[1]]$supind,
 
-            use.case = cvfit$fit[[1]]$call$use.case,
+            use.case = object$fit[[1]]$call$use.case,
 
-            type.measure = cvfit$fit[[1]]$call$type.measure,
+            type.measure = object$fit[[1]]$call$type.measure,
 
             alpha,
             call = this.call
@@ -236,7 +238,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 #' Return predictions and performance measures for a test set. 
 #' 
 #' @aliases predict.ptLasso
-#' @param fit Fitted \code{"ptLasso"} object.
+#' @param object Fitted \code{"ptLasso"} object.
 #' @param xtest Input matrix, matching the form used by \code{"ptLasso"} for model training.
 #' @param groupstest  A vector indicating to which group each observation belongs. Coding should match that used for model training. Will be NULL for target grouped data.
 #' @param ytest Response variable. Optional. If included, \code{"predict"} will compute performance measures for xtest using code{"type.measure"} from the cvfit object.
@@ -244,6 +246,7 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 #' @param s Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.
 #' @param gamma For use only when 'relax = TRUE' was specified during training. Value of the penalty parameter 'gamma' at which predictions are required. Will use the same gamma for all models; can be a numeric value, '"gamma.min"' or '"gamma.1se"'. Default is '"gamma.min"'.
 #' @param return.link If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkoverall}, \code{linkpre} and \code{linkind}.
+#' @param \dots other arguments to be passed to the \code{"predict"} function. 
 #' 
 #' @return A list containing the requested predictions. If \code{ytest} is included, will also return error measures.
 #' \item{call}{The call that produced this object.}
@@ -277,21 +280,22 @@ predict.cv.ptLasso=function(cvfit, xtest,  groupstest=NULL, ytest=NULL, alpha=NU
 #' pred
 #'
 #' @import glmnet
+#' @importFrom stats weighted.mean model.matrix predict
 #' @method predict ptLasso
 #' @export
-predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL, 
+predict.ptLasso=function(object, xtest, groupstest=NULL, ytest=NULL, 
                          type = c("link", "response", "class"),
-                         s="lambda.min", gamma = "gamma.min", return.link=FALSE){
+                         s="lambda.min", gamma = "gamma.min", return.link=FALSE, ...){
 
     this.call <- match.call()
     
     type = match.arg(type)
-    family = fit$call$family
-    type.measure = fit$call$type.measure
-    group.intercepts = fit$call$group.intercepts
+    family = object$call$family
+    type.measure = object$call$type.measure
+    group.intercepts = object$call$group.intercepts
 
     original.groups = groupstest
-    legend = fit$group.legend
+    legend = object$group.legend
     groupstest = transform.groups(groupstest, legend = legend)
     
     if(type == "class" & !(family %in% c("binomial", "multinomial")) ){
@@ -318,8 +322,8 @@ predict.ptLasso=function(fit, xtest, groupstest=NULL, ytest=NULL,
     }
 
     
-    if(fit$call$use.case=="inputGroups") out=predict.ptLasso.inputGroups(fit, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s, gamma=gamma, return.link=return.link, group.intercepts=group.intercepts)
-    if(fit$call$use.case=="targetGroups") out=predict.ptLasso.targetGroups(fit, xtest, ytest=ytest, type=type, call=this.call, family=family, type.measure=type.measure, s=s, gamma=gamma, return.link=return.link)
+    if(object$call$use.case=="inputGroups") out=predict.ptLasso.inputGroups(object, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s, gamma=gamma, return.link=return.link, group.intercepts=group.intercepts)
+    if(object$call$use.case=="targetGroups") out=predict.ptLasso.targetGroups(object, xtest, ytest=ytest, type=type, call=this.call, family=family, type.measure=type.measure, s=s, gamma=gamma, return.link=return.link)
     class(out)="predict.ptLasso"
     return(out)
 }

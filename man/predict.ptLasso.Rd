@@ -5,18 +5,19 @@
 \title{Predict using a ptLasso object.}
 \usage{
 \method{predict}{ptLasso}(
-  fit,
+  object,
   xtest,
   groupstest = NULL,
   ytest = NULL,
   type = c("link", "response", "class"),
   s = "lambda.min",
   gamma = "gamma.min",
-  return.link = FALSE
+  return.link = FALSE,
+  ...
 )
 }
 \arguments{
-\item{fit}{Fitted \code{"ptLasso"} object.}
+\item{object}{Fitted \code{"ptLasso"} object.}
 
 \item{xtest}{Input matrix, matching the form used by \code{"ptLasso"} for model training.}
 
@@ -31,6 +32,8 @@
 \item{gamma}{For use only when 'relax = TRUE' was specified during training. Value of the penalty parameter 'gamma' at which predictions are required. Will use the same gamma for all models; can be a numeric value, '"gamma.min"' or '"gamma.1se"'. Default is '"gamma.min"'.}
 
 \item{return.link}{If \code{TRUE}, will additionally return the linear link for the overall, pretrained and individual models: \code{linkoverall}, \code{linkpre} and \code{linkind}.}
+
+\item{\dots}{other arguments to be passed to the \code{"predict"} function.}
 }
 \value{
 A list containing the requested predictions. If \code{ytest} is included, will also return error measures.

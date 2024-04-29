@@ -5,14 +5,14 @@
 \title{Get the coefficients from a fitted cv.ptLasso model.}
 \usage{
 \method{coef}{cv.ptLasso}(
-  fit,
+  object,
   model = c("all", "individual", "overall", "pretrain"),
   alpha = NULL,
   ...
 )
 }
 \arguments{
-\item{fit}{fitted \code{"cv.ptLasso"} object.}
+\item{object}{fitted \code{"cv.ptLasso"} object.}
 
 \item{model}{string indicating which coefficients to retrieve. Must be one of "all", "individual", "overall" or "pretrain".}
 
