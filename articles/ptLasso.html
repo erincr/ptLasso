@@ -346,7 +346,7 @@ individual).</p>
 <span><span class="va">preds</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.ptLasso(fit = fit, xtest = xtest, groupstest = groupstest,  </span></span>
+<span><span class="co">#&gt; predict.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -435,13 +435,7 @@ mean squared error for all models.</p>
 <p>Plotting the <code>cv.ptLasso</code> object visualizes performance as
 a function of <span class="math inline">\(\alpha\)</span>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvfit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in geom_text(aes(x = 0.2, y = err.pan["overall"], label = as.character(suppan), : All aesthetics have length 1, but the data has 33 rows.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please consider using `annotate()` or provide this layer with data containing</span></span>
-<span><span class="co">#&gt;   a single row.</span></span>
-<span><span class="co">#&gt; Warning in geom_text(aes(x = 0.2, y = err.ind["overall"], label = as.character(supind), : All aesthetics have length 1, but the data has 33 rows.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please consider using `annotate()` or provide this layer with data containing</span></span>
-<span><span class="co">#&gt;   a single row.</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvfit</span><span class="op">)</span></span></code></pre></div>
 <p><img src="ptLasso_files/figure-html/unnamed-chunk-13-1.png" width="500"></p>
 <p>And, as with <code>ptLasso</code>, we can <code>predict</code>. By
 default, <code>predict</code> uses the <span class="math inline">\(\alpha\)</span> that minimized the cross validated
@@ -451,7 +445,7 @@ MSE.</p>
 <span><span class="va">preds</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(cvfit = cvfit, xtest = xtest, groupstest = groupstest,  </span></span>
+<span><span class="co">#&gt; predict.cv.ptLasso(object = cvfit, xtest = xtest, groupstest = groupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -479,7 +473,7 @@ minimizes the CV MSE for each group:</p>
 <span><span class="va">preds</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(cvfit = cvfit, xtest = xtest, groupstest = groupstest,  </span></span>
+<span><span class="co">#&gt; predict.cv.ptLasso(object = cvfit, xtest = xtest, groupstest = groupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest, alphatype = "varying") </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -588,7 +582,7 @@ same as the overall <span class="math inline">\(\alpha\)</span>.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest<span class="op">=</span><span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(cvfit = cvfit, xtest = xtest, groupstest = groupstest,  </span></span>
+<span><span class="co">#&gt; predict.cv.ptLasso(object = cvfit, xtest = xtest, groupstest = groupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -613,7 +607,7 @@ same as the overall <span class="math inline">\(\alpha\)</span>.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest<span class="op">=</span><span class="va">ytest</span>, alphatype <span class="op">=</span> <span class="st">"varying"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(cvfit = cvfit, xtest = xtest, groupstest = groupstest,  </span></span>
+<span><span class="co">#&gt; predict.cv.ptLasso(object = cvfit, xtest = xtest, groupstest = groupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest, alphatype = "varying") </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -878,7 +872,7 @@ shared coefficients, and 5 coefficients specific to each group.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.ptLasso(fit = fit, xtest = xtest, groupstest = groupstest,  </span></span>
+<span><span class="co">#&gt; predict.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -908,7 +902,7 @@ prediction because it is used in each call to
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.ptLasso(fit = fit, xtest = xtest, groupstest = groupstest,  </span></span>
+<span><span class="co">#&gt; predict.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -937,7 +931,7 @@ ridge models”).</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.ptLasso(fit = fit, xtest = xtest, groupstest = groupstest,  </span></span>
+<span><span class="co">#&gt; predict.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -977,7 +971,7 @@ ridge models”).</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(cvfit = fit, xtest = xtest, groupstest = groupstest,  </span></span>
+<span><span class="co">#&gt; predict.cv.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1002,7 +996,7 @@ ridge models”).</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span>, alphatype <span class="op">=</span> <span class="st">"varying"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(cvfit = fit, xtest = xtest, groupstest = groupstest,  </span></span>
+<span><span class="co">#&gt; predict.cv.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest, alphatype = "varying") </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1091,7 +1085,7 @@ index.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.ptLasso(fit = fit, xtest = xtest, groupstest = groupstest,  </span></span>
+<span><span class="co">#&gt; predict.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1119,7 +1113,7 @@ index.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.ptLasso(fit = fit, xtest = xtest, groupstest = groupstest,  </span></span>
+<span><span class="co">#&gt; predict.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1153,7 +1147,7 @@ partial likelihood).</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(cvfit = fit, xtest = xtest, groupstest = groupstest,  </span></span>
+<span><span class="co">#&gt; predict.cv.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1178,7 +1172,7 @@ partial likelihood).</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span>, alphatype <span class="op">=</span> <span class="st">"varying"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(cvfit = fit, xtest = xtest, groupstest = groupstest,  </span></span>
+<span><span class="co">#&gt; predict.cv.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest, alphatype = "varying") </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1527,7 +1521,7 @@ as our grouping variable.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest</span>, <span class="va">predgroupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(cvfit = cvfit, xtest = xtest, groupstest = predgroupstest,  </span></span>
+<span><span class="co">#&gt; predict.cv.ptLasso(object = cvfit, xtest = xtest, groupstest = predgroupstest,  </span></span>
 <span><span class="co">#&gt;     ytest = ytest) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1714,7 +1708,7 @@ prediction time.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.ptLasso(fit = fit, xtest = xtest, ytest = ytest) </span></span>
+<span><span class="co">#&gt; predict.ptLasso(object = fit, xtest = xtest, ytest = ytest) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1745,7 +1739,7 @@ prediction time.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(cvfit = cvfit, xtest = xtest, ytest = ytest) </span></span>
+<span><span class="co">#&gt; predict.cv.ptLasso(object = cvfit, xtest = xtest, ytest = ytest) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1770,7 +1764,7 @@ prediction time.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest</span>, ytest <span class="op">=</span> <span class="va">ytest</span>, alphatype <span class="op">=</span> <span class="st">"varying"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(cvfit = cvfit, xtest = xtest, ytest = ytest,  </span></span>
+<span><span class="co">#&gt; predict.cv.ptLasso(object = cvfit, xtest = xtest, ytest = ytest,  </span></span>
 <span><span class="co">#&gt;     alphatype = "varying") </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
