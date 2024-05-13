@@ -337,14 +337,19 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
             preval.offset = get.preval(fitoverall, gamma = overall.gamma)[, , fitoverall$lambda == lamhat]
             bhatall=coef(fitoverall, s=lamhat, exact=FALSE)
             bhatall=do.call(cbind, bhatall)
-            bhatall=bhatall[-(1:(k+1)), ]
+            if(group.intercepts == TRUE) bhatall=bhatall[-(1:k), ]
             supall=which(apply(bhatall, 1, function(x) sum(x != 0) > 0))
             supall=unname(supall)
         } else {
             preval.offset = get.preval(fitoverall, gamma = overall.gamma)[, fitoverall$lambda == lamhat]
             bhatall=as.numeric(coef(fitoverall, s=lamhat, exact=FALSE))
-            if(family!="cox") supall=which(bhatall[-(1:(k+1))]!=0)
-            if(family=="cox") supall=which(bhatall[-(1:k)]!=0)
+            if(group.intercepts == TRUE){
+                if(family!="cox") supall=which(bhatall[-(1:k)]!=0) # one overall intercept and (k-1) group intercepts
+                if(family=="cox") supall=which(bhatall[-(1:k)]!=0) # no overall intercept, but k group intercepts
+            } else {
+                if(family!="cox") supall=which(bhatall[-1]!=0) # intercept
+                if(family=="cox") supall=which(bhatall!=0) # no intercept
+            }
         } 
     } else if(use.case=="targetGroups"){
         preval.offset=vector("list",k)
