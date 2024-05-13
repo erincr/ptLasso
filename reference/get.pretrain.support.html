@@ -119,96 +119,96 @@
 <span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="ptLasso.html">ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">get.pretrain.support</span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> </span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  17  18  19  20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  21  22  23  25  27  28  29  30  31  35  37  38  39  40  41  42  43  44  45</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  46  47  48  49  50  51  52  53  54  55  56  57  59  60  62  63  64  65  66</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  67  68  69  72  73  75  76  77  79  80  82  83  84  88  89  90  94  98  99</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  18  19  20  21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  22  23  25  27  28  29  30  31  32  34  35  37  38  39  41  42  43  44  45</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  46  47  48  49  50  51  52  53  54  55  56  57  59  60  62  64  65  66  67</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  68  69  72  73  75  76  77  79  80  82  83  84  88  89  90  94  97  98  99</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [77] 100 102 105 108 109 110 111 112 114 115 118 120</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># only return features common to all groups </span></span></span>
 <span class="r-in"><span><span class="fu">get.pretrain.support</span><span class="op">(</span><span class="va">fit</span>, commonOnly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  1  2  3  4  5  6  7  8  9 10 11 53 54 55 56 57 65 69 73 80 83 84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  1  2  3  4  5  6  7  8  9 10 11 51 54 56 57 65 69 80 83 84 88</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># group 1 only, don't include the overall model support</span></span></span>
 <span class="r-in"><span><span class="fu">get.pretrain.support</span><span class="op">(</span><span class="va">fit</span>, groups <span class="op">=</span> <span class="fl">1</span>, includeOverall <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> </span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   5  11  13  14  15  16  20  31  53  72  73  80  83  88  89  94 111 114</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   5  11  13  14  15  16  20  31  32  34  57  64  72  73  80  83  88  89</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  94 111 114</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># group 1 only, include the overall model support</span></span></span>
 <span class="r-in"><span><span class="fu">get.pretrain.support</span><span class="op">(</span><span class="va">fit</span>, groups <span class="op">=</span> <span class="fl">1</span>, includeOverall <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  20  31  53  54</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  56  57  69  72  73  80  83  84  88  89  94 111 114</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  20  31  32  34</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  54  56  57  64  69  72  73  80  83  84  88  89  94 111 114</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu"><a href="cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">get.pretrain.support</span><span class="op">(</span><span class="va">cvfit</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  26  27  34  35  36  37  38  44</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  45  49  50  51  52  53  54  55  56  57  60  61  62  63  68  69  79  80  83</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  84  88  99 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  27  35  36  38  45  50  52  54</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  56  57  61  62  63  69  80  84  88 100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  18  19  20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  22  25  26  27  29  31  32  34  35  36  37  38  39  41  42  43  44  45  46</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  47  48  49  50  51  52  53  54  55  56  57  58  59  60  61  62  63  64  65</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  66  67  68  69  70  71  72  73  75  77  79  80  81  83  84  87  88  89  90</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [77]  91  93  94  98  99 100 103 106 108 109 111 113 114 115 117 118 119</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  18  20  22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  24  25  27  29  31  32  34  35  36  37  38  43  45  47  48  50  52  53  54</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  72  73  75</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  80  83  84  88  89  90  91  93  94 100 103 106 108 111 113 114 115 117 118</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [77] 119</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[3]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  18  20  21  22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  23  26  27  29  30  31  32  34  35  36  37  38  41  42  43  44  45  46  47</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  48  49  50  51  52  53  54  55  56  57  58  59  60  61  62  63  64  65  66</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  67  68  69  72  73  75  77  79  80  81  82  83  84  87  88  89  90  91  94</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [77]  99 100 103 106 108 109 110 111 112 113 114 115 117 118 119 120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  23  25  27  29  30  31  32  34  35  36  37  38  43  45  46  47  48  50  51</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  52  53  54  55  56  57  58  59  60  61  62  63  64  65  66  67  69  70  72</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  73  75  80  82  83  84  88  89  91  94 100 103 106 108 110 111 113 114 115</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [77] 117 119 120</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[4]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  18  20  21  22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  23  25  26  27  29  30  31  32  34  35  36  37  38  41  42  43  44  45  46</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  47  48  49  50  51  52  53  54  55  56  57  59  60  61  62  63  64  65  66</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  67  68  69  72  73  77  79  80  82  83  84  87  88  89  90  91  94  99 100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [77] 106 108 109 110 111 112 113 114 115 117 118 119 120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  23  27  29  30  31  32  34  35  36  37  38  41  42  43  45  46  47  48  49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  50  51  52  53  54  55  56  57  60  61  62  63  64  65  66  67  69  72  73</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  75  79  80  83  84  88  89  90  91  94 100 106 108 109 110 111 114 115 117</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [77] 119 120</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[5]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  21  22  23  26  27  29</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  30  34  35  36  37  38  41  42  43  44  45  46  47  48  49  50  51  52  53</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  54  55  56  57  59  60  61  62  63  64  65  66  68  69  72  73  75  77  79</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  80  82  83  84  87  88  90  99 100 108 109 110 112 115 118 120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  20  21  22  23  25  27</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  29  30  32  35  36  37  38  41  42  43  45  46  47  48  49  50  51  52  53</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  54  55  56  57  59  60  61  62  63  65  69  75  79  80  82  83  84  88  90</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [58] 100 105 108 110 120</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[6]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  20  21  22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  23  25  26  27  29  30  31  32  34  35  36  37  38  40  41  42  43  44  45</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  46  47  48  49  50  51  52  53  54  55  56  57  59  60  61  62  63  64  65</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  66  67  68  69  72  73  75  77  79  80  82  83  84  87  88  89  90  91  94</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [77]  99 100 105 108 109 110 111 112 113 114 115 117 118 120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  20  21  22  23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  25  27  29  30  31  32  34  35  36  37  38  41  42  43  45  46  47  48  49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  50  51  52  53  54  55  56  57  59  60  61  62  63  64  65  66  69  72  73</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  75  76  77  79  80  83  84  88  89  90  94  99 100 108 109 110 111 112 114</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [77] 117 118 120</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[7]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  18  20  21  22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  23  25  26  27  29  30  31  32  34  35  36  37  38  39  41  42  43  44  45</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  46  47  48  49  50  51  52  53  54  55  56  57  59  60  61  62  63  64  65</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  66  67  68  69  72  73  75  76  79  80  82  83  84  87  88  89  90  91  94</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [77]  99 100 105 108 109 110 111 112 114 115 118 120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  23  25  27  28  29  30  31  32  34  35  36  37  38  39  40  41  42  43  44</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  45  46  47  48  49  50  51  52  53  54  55  56  57  59  60  61  62  63  64</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  65  66  67  68  69  72  73  75  76  77  79  80  82  83  84  88  89  90  91</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [77]  93  94  98  99 100 102 105 108 109 110 111 112 113 114 115 117 118 119 120</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[8]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  21  22  23  25  26  27  28  29  30  34  35  36  37  38  39  40  41  42  43</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  44  45  46  47  48  49  50  51  52  53  54  55  56  57  59  60  61  62  63</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  64  65  66  67  68  69  72  73  75  76  77  79  80  82  83  84  87  88  89</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [77]  90  93  94  98  99 100 102 105 108 109 110 111 112 114 115 118 120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  18  19  20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  21  22  23  25  27  28  29  30  31  32  34  35  36  37  38  39  40  41  42</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  43  44  45  46  47  48  49  50  51  52  53  54  55  56  57  59  60  61  62</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  63  64  65  66  67  68  69  72  73  75  76  77  79  80  82  83  84  88  89</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [77]  90  93  94  98  99 100 102 105 108 109 110 111 112 113 114 115 118 120</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[9]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  20  21  22  23  25  27  28  29  30  34  35  36  37  38  39  40  41  42  43</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  20  21  22  23  25  27  28  29  30  32  35  36  37  38  39  40  41  42  43</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [39]  44  45  46  47  48  49  50  51  52  53  54  55  56  57  59  60  61  62  63</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  64  65  66  67  68  69  72  73  75  76  77  79  80  82  83  84  87  88  89</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [77]  90  93  94  98  99 100 102 105 108 109 110 111 112 115 118 120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  64  65  66  67  68  69  72  73  75  76  77  79  80  82  83  84  88  89  90</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [77]  93  94  98  99 100 102 105 108 109 110 111 112 115 118 120</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[10]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [19]  19  20  21  22  23  25  27  28  29  30  31  32  33  34  35  36  37  38</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [37]  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54  55  56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [55]  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72  73  75</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [73]  76  77  78  79  80  82  83  84  87  88  89  90  91  92  93  94  95  97</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [91]  98  99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [109] 117 118 119 120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [19]  19  20  21  22  23  25  27  28  29  30  31  32  34  35  36  37  38  39</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [37]  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54  55  56  57</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [55]  58  59  60  61  62  63  64  65  66  67  68  69  70  72  73  75  76  77</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73]  78  79  80  82  83  84  87  88  89  90  91  92  93  94  95  97  98  99</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [91] 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 117 118</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [109] 119 120</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[11]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18</span>
@@ -221,51 +221,49 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">get.pretrain.support</span><span class="op">(</span><span class="va">cvfit</span>, groups <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> </span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  27  34  35  36  37  38  45  50</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  51  52  53  54  56  57  60  61  62  63  69  80  83  84  88 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  27  35  36  38  45  50  52  54</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  56  57  61  62  63  69  80  84  88 100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  18  19  20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  22  25  26  27  29  31  32  34  35  36  37  38  39  43  44  45  47  48  49</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  50  51  52  53  54  55  56  57  58  59  60  61  62  63  64  65  66  67  68</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  69  70  71  72  73  75  77  79  80  81  83  84  87  88  89  90  91  93  94</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [77]  98  99 100 103 106 108 111 113 114 115 117 118 119</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  18  20  22</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  24  25  27  29  31  32  34  35  36  37  38  43  45  47  48  50  52  54  56</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  57  58  59  60  61  62  63  64  65  66  67  68  69  70  72  73  75  80  83</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  84  88  89  90  91  93  94 100 103 106 108 111 113 114 115 117 118 119</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[3]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  18  20  22  26</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  27  29  31  32  34  35  36  37  38  44  45  47  48  50  51  52  53  54  56</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  57  58  59  60  61  62  63  64  66  67  68  69  72  73  75  79  80  81  83</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [58]  84  88  89  91  94  99 100 103 106 108 111 113 114 115 117 119</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  18  20  22  27</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  29  31  32  34  35  36  37  38  43  45  47  50  52  54  56  57  58  59  60</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  61  62  63  64  65  66  67  69  70  72  73  75  80  83  84  88  89  91  94</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [58] 100 103 106 108 111 113 114 115 117 119</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[4]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  18  20  26  27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  29  31  32  34  35  36  37  38  45  50  51  52  53  54  56  57  60  61  62</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  63  64  66  67  68  69  72  73  79  80  83  84  88  89  91  94 100 106 108</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [58] 111 113 114 115 117 119</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  18  20  27  31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  32  34  35  36  37  38  45  50  52  54  56  57  60  61  62  63  64  66  67</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  69  72  73  80  83  84  88  89  91  94 100 106 108 111 114 115 117 119</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[5]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  27  35  36  38  45  50  52  54</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  56  57  61  62  63  69  80  83  84  88 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  56  57  61  62  63  69  80  84  88 100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[6]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  20  27  31  32</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  34  35  36  37  38  45  50  52  53  54  56  57  60  61  62  63  64  66  67</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  69  72  73  80  83  84  88  89  91  94 100 108 111 113 114 117</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  34  35  36  37  38  45  50  52  54  56  57  61  62  63  64  66  69  72  73</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  80  83  84  88  89  94 100 108 111 114 117</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[7]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  20  27  31  32</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  34  35  36  37  38  45  50  52  54  56  57  60  61  62  63  64  66  69  72</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  73  80  83  84  88  89  91  94 100 111 114</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  18  20  27  29</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  31  32  34  35  36  37  38  45  50  52  54  56  57  60  61  62  63  64  66</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  67  69  72  73  80  83  84  88  89  91  93  94 100 108 111 113 114 115 117</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [58] 119</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[8]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  20  27  34  35</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  36  38  45  50  52  54  56  57  61  62  63  64  66  69  73  80  83  84  88</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  89  94 100 111 114</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  20  27  31  32</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  34  35  36  38  45  50  52  54  56  57  61  62  63  64  66  69  72  73  80</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39]  83  84  88  89  94 100 111 113 114</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[9]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  20  27  34  35</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  36  38  45  50  52  54  56  57  61  62  63  69  73  80  83  84  88  89  94</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39] 100 111</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  13  14  15  16  20  27  35  36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  38  45  50  52  54  56  57  61  62  63  69  80  83  84  88  89  94 100 111</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[10]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  18  20  22</span>

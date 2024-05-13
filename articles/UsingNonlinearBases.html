@@ -258,11 +258,11 @@ and (2) xgboost alone.</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"ptLasso with xgboost pretraining PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">preds</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ptLasso with xgboost pretraining PSE:  55.05684</span></span>
+<span><span class="co">#&gt; ptLasso with xgboost pretraining PSE:  55.1535</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"ptLasso without xgboost pretraining PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">preds.noboost</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ptLasso without xgboost pretraining PSE:  64.57606</span></span>
+<span><span class="co">#&gt; ptLasso without xgboost pretraining PSE:  66.37259</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"xgboost alone PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">xgbfit</span>, <span class="va">xtest</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>

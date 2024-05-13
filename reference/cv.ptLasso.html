@@ -349,23 +349,23 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            alpha overall  mean wtdMean group_1 group_2 group_3 group_4 group_5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Overall            699.7 699.7   699.7   748.4   501.9   575.6   663.0  1009.9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.0   545.4 545.4   545.4   466.9   504.9   608.7   535.1   611.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.1   523.6 523.6   523.6   467.9   472.1   586.0   530.6   561.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.2   517.5 517.5   517.5   409.3   477.8   608.9   538.4   553.0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.3   498.7 498.7   498.7   400.9   446.7   581.1   505.9   558.6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.4   498.1 498.1   498.1   384.0   450.0   581.8   509.5   565.2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.5   494.4 494.4   494.4   375.3   452.0   573.4   509.3   562.1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.6   509.7 509.7   509.7   390.1   468.7   612.4   526.2   551.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.7   518.5 518.5   518.5   400.1   475.1   603.7   487.3   626.3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.8   512.7 512.7   512.7   382.0   500.3   609.5   503.0   568.4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.9   503.9 503.9   503.9   405.9   486.4   586.3   486.8   554.2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.0   518.6 518.6   518.6   470.1   471.5   547.0   540.7   563.7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.1   506.0 506.0   506.0   429.7   452.1   538.7   551.1   558.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.2   495.3 495.3   495.3   393.6   460.6   565.5   530.9   526.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.3   490.4 490.4   490.4   390.4   436.5   546.3   511.6   567.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.4   487.5 487.5   487.5   383.7   438.8   545.6   509.4   560.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.5   481.2 481.2   481.2   364.9   429.7   548.5   513.4   549.7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.6   504.1 504.1   504.1   393.1   460.0   586.4   531.9   549.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.7   511.5 511.5   511.5   393.2   462.7   584.3   492.9   624.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.8   509.1 509.1   509.1   382.4   496.2   597.9   503.4   565.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.9   501.5 501.5   501.5   404.0   481.6   581.9   488.3   552.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     1.0   517.1 517.1   517.1   409.1   488.9   612.7   484.7   590.1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Individual         517.1 517.1   517.1   409.1   488.9   612.7   484.7   590.1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> alphahat (fixed) = 0.5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> alphahat (varying):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> group_1 group_2 group_3 group_4 group_5 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     0.5     0.3     0.5     1.0     0.6 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     0.5     0.5     0.1     1.0     0.2 </span>
 <span class="r-in"><span><span class="co"># plot(cvfit) # to see CV performance as a function of alpha </span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest<span class="op">=</span><span class="va">ytest</span>, s<span class="op">=</span><span class="st">"lambda.min"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -380,13 +380,13 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            allGroups  mean group_1 group_2 group_3 group_4 group_5    r^2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Overall        755.7 755.7   836.0   554.9   565.4   777.9  1044.0 0.5371</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain       490.6 490.6   528.5   430.2   528.0   490.2   476.0 0.6995</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain       500.2 500.2   539.0   443.8   553.5   502.5   462.4 0.6936</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Individual     532.8 532.8   584.1   443.2   567.2   550.5   518.9 0.6736</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Support size:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                          </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Overall    64                            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   94 (21 common + 73 individual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   92 (21 common + 71 individual)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Individual 109                           </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Now, we repeat with a binomial outcome.</span></span></span>
@@ -499,23 +499,23 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            alpha overall   mean wtdMean group_1 group_2 group_3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Overall           0.5770 0.5717  0.5717  0.6933  0.5994  0.4223</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.0  0.5233 0.6004  0.6004  0.6756  0.6549  0.4707</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.1  0.7005 0.7383  0.7383  0.8183  0.7264  0.6701</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.2  0.6588 0.7432  0.7432  0.8216  0.7500  0.6581</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.3  0.6617 0.7023  0.7023  0.8545  0.6864  0.5661</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.4  0.6322 0.7149  0.7149  0.8003  0.7721  0.5723</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.5  0.7128 0.7473  0.7473  0.7937  0.7713  0.6768</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.6  0.6794 0.7381  0.7381  0.7977  0.7535  0.6630</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.7  0.6521 0.7066  0.7066  0.7891  0.7742  0.5566</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.8  0.6303 0.7032  0.7032  0.7993  0.7568  0.5534</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.9  0.6759 0.7493  0.7493  0.8390  0.7842  0.6247</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.0  0.6272 0.6242  0.6242  0.8001  0.6819  0.3905</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.1  0.7223 0.7613  0.7613  0.8574  0.7504  0.6761</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.2  0.6486 0.7434  0.7434  0.8224  0.7625  0.6453</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.3  0.6919 0.7124  0.7124  0.8391  0.7060  0.5921</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.4  0.6665 0.7127  0.7127  0.8191  0.7501  0.5688</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.5  0.7311 0.7600  0.7600  0.8223  0.7798  0.6778</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.6  0.6856 0.7527  0.7527  0.8370  0.7576  0.6635</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.7  0.6641 0.6990  0.6990  0.7963  0.7441  0.5566</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.8  0.6637 0.7133  0.7133  0.8131  0.7571  0.5696</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     0.9  0.6741 0.7470  0.7470  0.8367  0.7809  0.6235</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain     1.0  0.5882 0.6894  0.6894  0.7896  0.7112  0.5673</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Individual        0.5882 0.6894  0.6894  0.7896  0.7112  0.5673</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alphahat (fixed) = 0.9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alphahat (fixed) = 0.1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> alphahat (varying):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> group_1 group_2 group_3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     0.3     0.9     0.5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     0.1     0.9     0.5 </span>
 <span class="r-in"><span><span class="co"># plot(cvfit) # to see CV performance as a function of alpha </span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest<span class="op">=</span><span class="va">ytest</span>, s<span class="op">=</span><span class="st">"lambda.1se"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -524,19 +524,19 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>     ytest = ytest, s = "lambda.1se") </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.9 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Performance (AUC):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            allGroups   mean wtdMean group_1 group_2 group_3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Overall       0.6070 0.6072  0.6072  0.5985  0.6764  0.5467</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain      0.6421 0.6626  0.6626  0.6765  0.7704  0.5410</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain      0.6372 0.6383  0.6383  0.6646  0.7061  0.5443</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Individual    0.6762 0.6435  0.6435  0.6663  0.7644  0.5000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Support size:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Overall    3                            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   31 (3 common + 28 individual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   23 (3 common + 20 individual)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Individual 7                            </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>

@@ -206,7 +206,7 @@ the predictions from <code>ptLasso</code> and the class predictions from
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">assess.glmnet</span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">pretrained.preds</span> <span class="op">*</span> <span class="va">class.preds</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span></span>
-<span><span class="co">#&gt; [1] 28.563</span></span>
+<span><span class="co">#&gt; [1] 28.17891</span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
 <span><span class="co">#&gt; [1] "Mean-Squared Error"</span></span></code></pre></div>
 <p>There are two reasonable baselines. The first is the overall model
@@ -263,7 +263,7 @@ do that here, using our so-far-untouched validation set.</p>
 <span>                       <span class="va">pretrained.preds</span> <span class="op">*</span> <span class="va">class.preds</span><span class="op">)</span></span>
 <span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">final.model</span>, <span class="va">pred.data.test</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span></span>
 <span><span class="co">#&gt; lambda.1se </span></span>
-<span><span class="co">#&gt;   28.71263 </span></span>
+<span><span class="co">#&gt;   28.28504 </span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
 <span><span class="co">#&gt; [1] "Mean-Squared Error"</span></span></code></pre></div>
 <p>Comparing performance of all models side-by-side shows that (1) using
@@ -283,7 +283,7 @@ recommend trying this with real data).</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Pretraining model PSE: "</span>, </span>
 <span>    <span class="fu">rd</span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">pretrained.preds</span><span class="op">*</span><span class="va">class.preds</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Pretraining model PSE:  28.56</span></span>
+<span><span class="co">#&gt; Pretraining model PSE:  28.18</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Pretraining model + final prediction model PSE: "</span>, </span>
 <span>    <span class="fu">rd</span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">final.model</span>, </span>
@@ -292,7 +292,7 @@ recommend trying this with real data).</p>
 <span>                                <span class="va">pretrained.preds</span> <span class="op">*</span> <span class="va">class.preds</span><span class="op">)</span></span>
 <span>                      <span class="op">)</span>, </span>
 <span>              newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Pretraining model + final prediction model PSE:  28.71</span></span></code></pre></div>
+<span><span class="co">#&gt; Pretraining model + final prediction model PSE:  28.29</span></span></code></pre></div>
   </main>
 </div>
 
