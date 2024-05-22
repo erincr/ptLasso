@@ -121,8 +121,9 @@ Pearson correlation around 0.5.</p>
 <span><span class="va">y</span>  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">mu</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">sigma</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, </span>
 <span>           <span class="va">mu</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="va">sigma</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"SNR for the two tasks:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">mu</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">y</span><span class="op">-</span><span class="va">mu</span><span class="op">)</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; SNR for the two tasks: 1.6 1.44</span></span>
-<span></span>
+<span><span class="co">#&gt; SNR for the two tasks: 1.6 1.44</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">xtest</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="va">ytest</span> <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span>, <span class="op">]</span></span>
 <span></span>
@@ -137,7 +138,7 @@ Pearson correlation around 0.5.</p>
 <span><span class="co">#&gt; Correlation between two tasks: 0.5218575</span></span></code></pre></div>
 <p>The first step of pretraining is to fit a multi-response Gaussian
 model and extract the offset and support.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mtask.fit</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"mgaussian"</span>, </span>
 <span>                      keep <span class="op">=</span> <span class="cn">TRUE</span>, </span>
 <span>                      foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
@@ -153,7 +154,7 @@ over values of <span class="math inline">\(\alpha\)</span> (<span class="math in
 using the offset and support defined above and modified by <span class="math inline">\(\alpha\)</span>. We also record the minimum CV
 mean squared error for each model – this is how we will perform model
 selection.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv.error</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NULL</span>, <span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="va">alphalist</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">11</span><span class="op">)</span></span>
 <span></span>
@@ -192,7 +193,7 @@ selection.</p>
 <p>The optimal values of <span class="math inline">\(\alpha\)</span> for
 the two responses are pretty close, and we could choose to use one <span class="math inline">\(\alpha\)</span> for both responses (say, the <span class="math inline">\(\alpha\)</span> that minimizes the average CV for
 both class). Here, we will choose to use two separate values of <span class="math inline">\(\alpha\)</span>. We train our final models:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">best.alpha.1</span> <span class="op">=</span> <span class="va">alphalist</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">cv.error</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="va">best.alpha.2</span> <span class="op">=</span> <span class="va">alphalist</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">cv.error</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
@@ -214,43 +215,47 @@ both class). Here, we will choose to use two separate values of <span class="mat
 <p>There are two natural baselines: one is the performance of the
 multi-response model used in the first step of pretraining, and the
 other is a separate model for each response:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">y1_fit_no_pretrain</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, </span>
 <span>                               family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">y2_fit_no_pretrain</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, </span>
 <span>                               family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span></code></pre></div>
 <p>Compare performance for task 1:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">test_offset</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mtask.fit</span>, <span class="va">xtest</span>, s <span class="op">=</span> <span class="st">"lambda.1se"</span><span class="op">)</span><span class="op">[</span>, , <span class="fl">1</span><span class="op">]</span></span>
 <span></span>
 <span><span class="va">test_mtask_pred</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mtask.fit</span>, <span class="va">xtest</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span><span class="op">[</span>, , <span class="fl">1</span><span class="op">]</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Response 1 MSE overall model:"</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="va">test_mtask_pred</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Response 1 MSE overall model: 4.25</span></span>
-<span></span>
+<span><span class="co">#&gt; Response 1 MSE overall model: 4.25</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Response 1 MSE with pretraining:"</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="va">y1_fit</span>, <span class="va">xtest</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, </span>
 <span>                        newoffset <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">best.alpha.1</span><span class="op">)</span> <span class="op">*</span> <span class="va">test_offset</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span>, </span>
 <span>          <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Response 1 MSE with pretraining: 4.26</span></span>
-<span></span>
+<span><span class="co">#&gt; Response 1 MSE with pretraining: 4.26</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Response 1 MSE individual model:"</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="va">y1_fit_no_pretrain</span>, <span class="va">xtest</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Response 1 MSE individual model: 4.48</span></span></code></pre></div>
 <p>And performance for task 2:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Response 2 MSE overall model:"</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="va">test_mtask_pred</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Response 2 MSE overall model: 5.21</span></span>
-<span></span>
+<span><span class="co">#&gt; Response 2 MSE overall model: 5.21</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Model 2 MSE with pretraining:"</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="va">y2_fit</span>, <span class="va">xtest</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>, </span>
 <span>                        newoffset <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">best.alpha.2</span><span class="op">)</span> <span class="op">*</span> <span class="va">test_offset</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span>, </span>
 <span>          <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Model 2 MSE with pretraining: 4.98</span></span>
-<span></span>
+<span><span class="co">#&gt; Model 2 MSE with pretraining: 4.98</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Model 2 MSE individual model:"</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="va">y2_fit_no_pretrain</span>, <span class="va">xtest</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Model 2 MSE individual model: 5.8</span></span></code></pre></div>

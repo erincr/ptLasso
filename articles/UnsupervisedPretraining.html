@@ -109,8 +109,9 @@ this example, we have 10 times as much unlabeled data as labeled data;
 this generally happens when labels are difficult to obtain.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">MASS</a></span><span class="op">)</span> <span class="co"># for mvrnorm</span></span>
-<span><span class="co">#&gt; Loading required package: MASS</span></span>
-<span></span>
+<span><span class="co">#&gt; Loading required package: MASS</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">n</span> <span class="op">=</span> <span class="fl">100</span>; <span class="va">p</span> <span class="op">=</span> <span class="fl">150</span>; </span>
@@ -135,10 +136,11 @@ this generally happens when labels are difficult to obtain.</p>
 and we identify the features with nonzero loadings in the first PC. The
 argument <span class="math inline">\(k = 1\)</span> means that we only
 obtain the first PC.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/erichson/spca" class="external-link">sparsepca</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: sparsepca</span></span>
-<span></span>
+<span><span class="co">#&gt; Loading required package: sparsepca</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">pcs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/sparsepca/man/spca.html" class="external-link">spca</a></span><span class="op">(</span><span class="va">xstar</span>, k <span class="op">=</span> <span class="fl">1</span>, verbose<span class="op">=</span><span class="cn">FALSE</span>, alpha<span class="op">=</span><span class="fl">1e-2</span>, beta<span class="op">=</span><span class="fl">1e-2</span><span class="op">)</span></span>
 <span><span class="va">nonzero.loadings</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">pcs</span><span class="op">$</span><span class="va">loadings</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <p>We set ourselves up for success: because of how we simulated our
@@ -146,7 +148,7 @@ data, we know that the first 10 features are those that explain the
 variance in <span class="math inline">\(X\)</span>. These are also the
 features that define the relationship between <span class="math inline">\(X\)</span> and <span class="math inline">\(y\)</span>. Let’s check that sparse PCA has found
 the right features:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nonzero.loadings</span></span>
 <span><span class="co">#&gt; [1]  1  2  3  4  5  6  7  8 10</span></span></code></pre></div>
 <p>Now, we are ready to model! We don’t need to call
@@ -160,7 +162,7 @@ coefficients.</p>
 Fortunately, <code>cv.glmnet</code> will record the CV MSE for each
 model in a vector called <code>cvm</code>; we just need to keep track of
 the minimum error from each model.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">alphalist</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">11</span><span class="op">)</span></span>
 <span></span>
@@ -192,7 +194,7 @@ the minimum error from each model.</p>
 <p>So, using CV performance as a metric, we choose <span class="math inline">\(\alpha = 0.2\)</span>. Now, we train our final
 model and predict and measure performance with our held-out data. We
 find that pretraining gives us a boost in performance.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">best.alpha</span>, <span class="va">p</span><span class="op">)</span></span>
 <span><span class="va">pf</span><span class="op">[</span><span class="va">nonzero.loadings</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
 <span></span>
@@ -206,8 +208,9 @@ find that pretraining gives us a boost in performance.</p>
 <span><span class="co">#&gt; lambda.min </span></span>
 <span><span class="co">#&gt;   11.10926 </span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
-<span><span class="co">#&gt; [1] "Mean-Squared Error"</span></span>
-<span></span>
+<span><span class="co">#&gt; [1] "Mean-Squared Error"</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">without.pretraining</span> <span class="op">=</span>  <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>,</span>
 <span>                                 foldid <span class="op">=</span> <span class="va">train.folds</span><span class="op">)</span></span>
 <span></span>

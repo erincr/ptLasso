@@ -152,8 +152,9 @@ treatment has been randomized – the true <span class="math inline">\(e^*(x_i) 
 <span><span class="va">mu</span> <span class="op">=</span> <span class="va">m</span> <span class="op">+</span> <span class="va">w</span> <span class="op">*</span> <span class="va">tau</span></span>
 <span><span class="va">y</span>  <span class="op">=</span> <span class="va">mu</span> <span class="op">+</span> <span class="fl">10</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Signal to noise ratio:"</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">mu</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">y</span><span class="op">-</span><span class="va">mu</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Signal to noise ratio: 2.301315</span></span>
-<span></span>
+<span><span class="co">#&gt; Signal to noise ratio: 2.301315</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># Split into train/test</span></span>
 <span><span class="va">xtest</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="va">tautest</span> <span class="op">=</span> <span class="va">tau</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span><span class="op">]</span> </span>
@@ -169,7 +170,7 @@ treatment has been randomized – the true <span class="math inline">\(e^*(x_i) 
 <p>We begin model fitting, starting with our estimate of <span class="math inline">\(e^*\)</span> (the probability of receiving the
 treatment). To fit <span class="math inline">\(\tau\)</span>, we will
 also need to record the cross-fitted <span class="math inline">\(\hat{e}^*(x)\)</span>.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">e_fit</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x</span>, <span class="va">w</span>, foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
 <span>                  family<span class="op">=</span><span class="st">"binomial"</span>, type.measure<span class="op">=</span><span class="st">"deviance"</span>,</span>
@@ -179,7 +180,7 @@ also need to record the cross-fitted <span class="math inline">\(\hat{e}^*(x)\)<
 <span><span class="va">e_hat</span> <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">e_hat</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Now, stage 1 of pretraining: fit a model for <span class="math inline">\(m^*\)</span> and record the support. As before, we
 also record the cross-fitted <span class="math inline">\(\hat{m}^*(x)\)</span>.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">m_fit</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, keep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -191,7 +192,7 @@ also record the cross-fitted <span class="math inline">\(\hat{m}^*(x)\)</span>.<
 <span class="math inline">\(\tilde{y} = y_i - \hat{m}^*(x_i)\)</span> on
 <span class="math inline">\(\tilde{x} = (w_i - \hat{e}^*(x_i))
 x_i\)</span>; we’ll define them here:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">y_tilde</span> <span class="op">=</span> <span class="va">y</span> <span class="op">-</span> <span class="va">m_hat</span></span>
 <span><span class="va">x_tilde</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">w</span> <span class="op">-</span> <span class="va">e_hat</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>And now, pretraining for <span class="math inline">\(\tau\)</span>.
@@ -200,7 +201,7 @@ Loop over <span class="math inline">\(\alpha = 0, 0.1, \dots,
 model for <span class="math inline">\(\tau\)</span> using the penalty
 factor defined by the support of <span class="math inline">\(\hat{m}\)</span> and <span class="math inline">\(\alpha\)</span>. We’ll keep track of our CV MSE at
 each step so that we can choose the <span class="math inline">\(\alpha\)</span> that minimizes the MSE.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv.error</span> <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="va">alphalist</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">11</span><span class="op">)</span></span>
 <span></span>
@@ -230,12 +231,13 @@ about a shared support between <span class="math inline">\(\tau\)</span>
 and <span class="math inline">\(m^*\)</span>. Based on the plot, we
 choose <span class="math inline">\(\alpha = 0.2\)</span> as our best
 performing model:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">best.alpha</span> <span class="op">=</span> <span class="va">alphalist</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">cv.error</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Chosen alpha:"</span>, <span class="va">best.alpha</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Chosen alpha: 0.2</span></span>
-<span></span>
+<span><span class="co">#&gt; Chosen alpha: 0.2</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">best.alpha</span>, <span class="va">p</span><span class="op">)</span></span>
 <span><span class="va">pf</span><span class="op">[</span><span class="va">support</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pf</span><span class="op">)</span></span>
@@ -245,20 +247,21 @@ performing model:</p>
 <span>                    standardize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>To concretely compare the pretrained R-learner with the usual
 R-learner, we’ll train the usual R-learner here:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tau_rlearner</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x_tilde</span>, <span class="va">y_tilde</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, </span>
 <span>                         penalty.factor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                         intercept <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                         standardize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>As anticipated, pretraining improves the prediction squared error
 relative to the R learner – this is how we designed our simulation:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">rlearner_preds</span>   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">tau_rlearner</span>, <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">xtest</span><span class="op">)</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"R-learner PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">rlearner_preds</span> <span class="op">-</span> <span class="va">tautest</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R-learner PSE:  45.85</span></span>
-<span></span>
+<span><span class="co">#&gt; R-learner PSE:  45.85</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">pretrained_preds</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">tau_fit</span>, <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">xtest</span><span class="op">)</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Pretrained R-learner PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">pretrained_preds</span> <span class="op">-</span> <span class="va">tautest</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
@@ -269,7 +272,7 @@ relative to the R learner – this is how we designed our simulation:</p>
 </h2>
 <p>Here, we repeat everything from above, only now there is no overlap
 in the support of <span class="math inline">\(m^*\)</span> and <span class="math inline">\(\tau\)</span>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">######################################################</span></span>
 <span><span class="co"># Simulate data</span></span>
 <span><span class="co">######################################################</span></span>
@@ -290,8 +293,9 @@ in the support of <span class="math inline">\(m^*\)</span> and <span class="math
 <span><span class="va">mu</span> <span class="op">=</span> <span class="va">m</span> <span class="op">+</span> <span class="va">w</span> <span class="op">*</span> <span class="va">tau</span></span>
 <span><span class="va">y</span>  <span class="op">=</span> <span class="va">mu</span> <span class="op">+</span> <span class="fl">10</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Signal to noise ratio:"</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">mu</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">y</span><span class="op">-</span><span class="va">mu</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Signal to noise ratio: 0.6938152</span></span>
-<span></span>
+<span><span class="co">#&gt; Signal to noise ratio: 0.6938152</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># Split into train/test</span></span>
 <span><span class="va">xtest</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="va">tautest</span> <span class="op">=</span> <span class="va">tau</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span><span class="op">]</span> </span>
@@ -345,8 +349,9 @@ in the support of <span class="math inline">\(m^*\)</span> and <span class="math
 <span><span class="co"># Our final model for tau:</span></span>
 <span><span class="va">best.alpha</span> <span class="op">=</span> <span class="va">alphalist</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">cv.error</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Chosen alpha:"</span>, <span class="va">best.alpha</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Chosen alpha: 1</span></span>
-<span></span>
+<span><span class="co">#&gt; Chosen alpha: 1</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">best.alpha</span>, <span class="va">p</span><span class="op">)</span></span>
 <span><span class="va">pf</span><span class="op">[</span><span class="va">support</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pf</span><span class="op">)</span></span>
@@ -369,8 +374,9 @@ in the support of <span class="math inline">\(m^*\)</span> and <span class="math
 <span><span class="va">rlearner_preds</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">tau_rlearner</span>, <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">xtest</span><span class="op">)</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"R-learner prediction squared error: "</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">rlearner_preds</span> <span class="op">-</span> <span class="va">tautest</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R-learner prediction squared error:  31.11</span></span>
-<span></span>
+<span><span class="co">#&gt; R-learner prediction squared error:  31.11</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">pretrained_preds</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">tau_fit</span>, <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">xtest</span><span class="op">)</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Pretrained R-learner prediction squared error: "</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">pretrained_preds</span> <span class="op">-</span> <span class="va">tautest</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>

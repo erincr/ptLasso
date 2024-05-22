@@ -218,8 +218,9 @@ outcome:</p>
 <span><span class="co">############################################################</span></span>
 <span><span class="va">best.alpha.y2</span> <span class="op">=</span> <span class="va">alphalist</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.max</a></span><span class="op">(</span><span class="va">cv.error.y2</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Chosen alpha (y_2):"</span>, <span class="va">best.alpha.y2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Chosen alpha (y_2): 0.3</span></span>
-<span></span>
+<span><span class="co">#&gt; Chosen alpha (y_2): 0.3</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">best.alpha.y2</span>, <span class="va">p</span><span class="op">)</span>; <span class="va">pf</span><span class="op">[</span><span class="va">support</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
 <span></span>
 <span><span class="va">y2_fit</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x</span>, <span class="va">y2</span>, </span>
@@ -234,8 +235,9 @@ outcome:</p>
 <span><span class="co">############################################################</span></span>
 <span><span class="va">best.alpha.y3</span> <span class="op">=</span> <span class="va">alphalist</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.max</a></span><span class="op">(</span><span class="va">cv.error.y3</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Chosen alpha (y_3):"</span>, <span class="va">best.alpha.y3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Chosen alpha (y_3): 0.7</span></span>
-<span></span>
+<span><span class="co">#&gt; Chosen alpha (y_3): 0.7</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">best.alpha.y3</span>, <span class="va">p</span><span class="op">)</span>; <span class="va">pf</span><span class="op">[</span><span class="va">support</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
 <span></span>
 <span><span class="va">y3_fit</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x</span>, <span class="va">y3</span>, </span>
@@ -246,7 +248,7 @@ outcome:</p>
 <span>                   type.measure <span class="op">=</span> <span class="st">"C"</span><span class="op">)</span></span></code></pre></div>
 <p>We will also train models for <span class="math inline">\(y_2\)</span> and <span class="math inline">\(y_3\)</span> <em>without</em> pretraining; this is
 a natural benchmark.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">y2_fit_no_pretrain</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x</span>, <span class="va">y2</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, </span>
 <span>                               family <span class="op">=</span> <span class="st">"binomial"</span>, type.measure <span class="op">=</span> <span class="st">"auc"</span><span class="op">)</span></span>
 <span></span>
@@ -255,26 +257,28 @@ a natural benchmark.</p>
 <span>                               family <span class="op">=</span> <span class="st">"cox"</span>, type.measure <span class="op">=</span> <span class="st">"C"</span><span class="op">)</span></span></code></pre></div>
 <p>All of our models have been trained. Let’s compare performance with
 and without pretraining; we’ll start with the model for <span class="math inline">\(y_2\)</span>.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">testoffset</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">y1_fit</span>, <span class="va">xtest</span>, s <span class="op">=</span> <span class="st">"lambda.1se"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Model 2 AUC with pretraining:"</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="va">y2_fit</span>, <span class="va">xtest</span>, newy <span class="op">=</span> <span class="va">y2test</span>, </span>
 <span>                        newoffset <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">best.alpha.y2</span><span class="op">)</span> <span class="op">*</span> <span class="va">testoffset</span><span class="op">)</span><span class="op">$</span><span class="va">auc</span>, <span class="fl">2</span><span class="op">)</span>,</span>
 <span>    fill<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Model 2 AUC with pretraining: 0.76</span></span>
-<span></span>
+<span><span class="co">#&gt; Model 2 AUC with pretraining: 0.76</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Model 2 AUC without pretraining:"</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="va">y2_fit_no_pretrain</span>, <span class="va">xtest</span>, newy <span class="op">=</span> <span class="va">y2test</span><span class="op">)</span><span class="op">$</span><span class="va">auc</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span><span class="co">#&gt; Model 2 AUC without pretraining: 0.66</span></span></code></pre></div>
 <p>And now, the models for <span class="math inline">\(y_3\)</span>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Model 3 C-index with pretraining:"</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="va">y3_fit</span>, <span class="va">xtest</span>, newy <span class="op">=</span> <span class="va">y3test</span>, </span>
 <span>                        newoffset <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">best.alpha.y3</span><span class="op">)</span> <span class="op">*</span> <span class="va">testoffset</span><span class="op">)</span><span class="op">$</span><span class="va">C</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Model 3 C-index with pretraining: 0.8</span></span>
-<span></span>
+<span><span class="co">#&gt; Model 3 C-index with pretraining: 0.8</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Model 3 C-index without pretraining:"</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="va">y3_fit_no_pretrain</span>, <span class="va">xtest</span>, newy <span class="op">=</span> <span class="va">y3test</span><span class="op">)</span><span class="op">$</span><span class="va">C</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
