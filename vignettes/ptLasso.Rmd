@@ -1,9 +1,9 @@
 ---
 title: "ptLasso Vignette and Manual"
 output:
-  pdf_document:
-    toc: true
   html_document:
+    toc: true
+  pdf_document:
     toc: true
 pkgdown:
   as_is: true
@@ -50,7 +50,7 @@ where each ${\rm pf}_j \ge 0$ is a __penalty factor__ for feature $j$. At the ex
 ## Details of pretraining
 Pretraining model fitting happens in two steps. First, train a model using the full data:
 \begin{equation}
- 	\hat{\mu}_0, \hat{\theta}_1, \dots, \hat{\theta}_k, \hat{\beta}_0 = \arg \min_{\mu, \theta_1, \dots, \theta_k, \beta} \frac{1}{2} \sum_{k=1}^K \| y_k - \left(\mu \mathbf{1} + \theta_k \mathbf{1} + X_k \beta\right) \|_2^2 + \lambda ||\beta||_1,
+ 	\hat{\mu}_0, \hat{\theta}_1, \dots, \hat{\theta}_k, \hat{\beta}_0 = \arg \min_{\mu_0, \theta_1, \dots, \theta_k, \beta_0} \frac{1}{2} \sum_{k=1}^K \| y_k - \left(\mu_0 \mathbf{1} + \theta_k \mathbf{1} + X_k \beta_0\right) \|_2^2 + \lambda ||\beta||_1,
 \end{equation}
 where:
 
@@ -64,12 +64,12 @@ Define $S(\hat\beta_0)$ to be the support set (the nonzero coefficients) of $\ha
 Then, for each group $k$, fit an _individual_ model: find $\hat{\beta}_k$ and $\hat{\mu}_k$ such that
 \begin{eqnarray}
 && \hat{\mu}_k, \hat{\beta}_k = \arg \min_{\mu_k, \beta_k} \frac{1}{2}  \| y_k - (1-\alpha) \left(\hat{\mu}_0 \mathbf{1} + \hat{\theta}_k \mathbf{1} + X_k \hat{\beta}_0\right) - (\mu_k \mathbf{1} + X_k \beta_k) \|_2^2 +
-\cr && \phantom{\hat{\mu}_k, \hat{\beta}_k} \lambda \sum_{j=1}^p \Bigl[ I(j \in S(\hat{\beta}_0))+ \frac{1}{\alpha} I(j \notin S(\hat{\beta}_0))  \Bigr] |\beta_{kj}|,
+\cr && \phantom{\hat{\mu}_k, \hat{\beta}_k} \lambda_2 \sum_{j=1}^p \Bigl[ I(j \in S(\hat{\beta}_0))+ \frac{1}{\alpha} I(j \notin S(\hat{\beta}_0))  \Bigr] |\beta_{kj}|,
 \label{eq:model}
 \end{eqnarray}
-where $\lambda > 0$ and $\alpha\in [0,1]$ are hyperparameters that may be chosen through cross validation. 
+where $\lambda_2 > 0$ and $\alpha\in [0,1]$ are hyperparameters that may be chosen through cross validation. 
 
-This is a lasso linear regression model with _offset_ $(1-\alpha) \left(\hat{\mu}_0 \mathbf{1} + \hat{\theta}_k \mathbf{1} + X_k \hat{\beta}_0\right)$ and coefficient $j$ has _penalty factor_ 1 if $j \in S(\hat{\beta}_0)$ and $\frac{1}{\alpha}$ otherwise.
+This is a lasso linear regression model with two additional components: _offset_ $(1-\alpha) \left(\hat{\mu}_0 \mathbf{1} + \hat{\theta}_k \mathbf{1} + X_k \hat{\beta}_0\right)$, and _penalty factor_ for coefficient $j$ which is 1 if $j \in S(\hat{\beta}_0)$ and $\frac{1}{\alpha}$ otherwise.
 
 Notice that when $\alpha=0$, this returns the overall model fine tuned for each group: this second stage model is only allowed to fit the residual $y_k - \left(\hat{\mu}_0 \mathbf{1} + \hat{\theta}_k \mathbf{1} + X_k \hat{\beta}_0\right)$, and the penalty factor only allows the use of $\beta_j$ if it was already selected by the overall model. 
 
