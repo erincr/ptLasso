@@ -1,16 +1,15 @@
 ---
 title: "ptLasso Vignette and Manual"
-output: 
+output:
+  pdf_document:
+    toc: true
   html_document:
-   toc: true
+    toc: true
 pkgdown:
   as_is: true
 bibliography: ptLasso.bib
-vignette: >
-  %\VignetteIndexEntry{ptLasso}
-  %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{xgboost, rpart, survival, sparsepca, MASS}
-  %\VignetteEngine{knitr::rmarkdown}
+vignette: "%\\VignetteIndexEntry{ptLasso} %\\VignetteEncoding{UTF-8} %\\VignetteDepends{xgboost,
+  rpart, survival, sparsepca, MASS} %\\VignetteEngine{knitr::rmarkdown}\n"
 ---
 
 ```{r, include = FALSE}
@@ -64,8 +63,8 @@ Define $S(\hat\beta_0)$ to be the support set (the nonzero coefficients) of $\ha
 
 Then, for each group $k$, fit an _individual_ model: find $\hat{\beta}_k$ and $\hat{\mu}_k$ such that
 \begin{eqnarray}
-&& \hat{\mu}_k, \hat{\beta}_k = \arg \min_{\mu, \beta} \frac{1}{2}  \| y_k - (1-\alpha) \left(\hat{\mu}_0 \mathbf{1} + \hat{\theta}_k \mathbf{1} + X_k \hat{\beta}_0\right) - (\mu \mathbf{1} + X_k \beta) \|_2^2 +
-\cr && \phantom{\hat{\mu}_k, \hat{\beta}_k} \lambda \sum_{j=1}^p \Bigl[ I(j \in S(\hat{\beta}_0))+ \frac{1}{\alpha} I(j \notin S(\hat{\beta}_0))  \Bigr] |\beta_{j}|,
+&& \hat{\mu}_k, \hat{\beta}_k = \arg \min_{\mu_k, \beta_k} \frac{1}{2}  \| y_k - (1-\alpha) \left(\hat{\mu}_0 \mathbf{1} + \hat{\theta}_k \mathbf{1} + X_k \hat{\beta}_0\right) - (\mu_k \mathbf{1} + X_k \beta_k) \|_2^2 +
+\cr && \phantom{\hat{\mu}_k, \hat{\beta}_k} \lambda \sum_{j=1}^p \Bigl[ I(j \in S(\hat{\beta}_0))+ \frac{1}{\alpha} I(j \notin S(\hat{\beta}_0))  \Bigr] |\beta_{kj}|,
 \label{eq:model}
 \end{eqnarray}
 where $\lambda > 0$ and $\alpha\in [0,1]$ are hyperparameters that may be chosen through cross validation. 
