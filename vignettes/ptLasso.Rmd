@@ -8,8 +8,11 @@ output:
 pkgdown:
   as_is: true
 bibliography: ptLasso.bib
-vignette: "%\\VignetteIndexEntry{ptLasso} %\\VignetteEncoding{UTF-8} %\\VignetteDepends{xgboost,
-  rpart, survival, sparsepca, MASS} %\\VignetteEngine{knitr::rmarkdown}\n"
+vignette: >
+  %\VignetteIndexEntry{ptLasso}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{rpart, xgboost, survival, sparsepca, MASS}
 ---
 
 ```{r, include = FALSE}
