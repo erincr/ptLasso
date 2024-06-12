@@ -34,7 +34,7 @@ Pretraining is a natural choice for multitask learning -- it allows us to pass i
 
 Importantly, in Step 1, we use regularization so that the multi-response Gaussian model is forced to choose the same support for all responses $y_1, \dots, y_j$. This encourages learning _across_ all responses in the first stage; in the second stage, then, we find features that are specific to each individual response $y_k$.
 
-This is all done with the function \texttt{ptLassoMult} (for multi-response ptLasso).
+This is all done with the function `ptLassoMult` ("Mult" stands for multi-response ptLasso).
 
 We will illustrate this with simulated data with two Gaussian responses; the two responses share the first 5 features, and they each have 5 features of their own. The two responses are quite related, with Pearson correlation around 0.5. 
 ```{r}
@@ -51,15 +51,19 @@ beta2 = c(rep(1, 5), rep(0, 5), rep(0.5, 5), rep(0, p - 15))
 mu = cbind(x %*% beta1, x %*% beta2)
 y  = cbind(mu[, 1] + sigma * rnorm(n), 
            mu[, 2] + sigma * rnorm(n))
-cat("SNR for the two tasks:", round(diag(var(mu)/var(y-mu)), 2))
 
+cat("SNR for the two tasks:", round(diag(var(mu)/var(y-mu)), 2))
+cat("Correlation between two tasks:", cor(y[, 1], y[, 2]))
+
+# Split into train and test
 xtest = x[-(1:ntrain), ]
 ytest = y[-(1:ntrain), ]
 
 x = x[1:ntrain, ]
 y = y[1:ntrain, ]
+```
+```{r}
 
-cat("Correlation between two tasks:", cor(y[, 1], y[, 2]))
 ```
 
 Now, we are ready to call `ptLassoMult` with our covariates `x` and response matrix `y`. (The syntax is nearly identical to that of `ptLasso`, and as in `ptLasso`, the default value of $\alpha = 0.5$.) A call to `plot` shows the CV curves over the lasso parameter $\lambda$ for each model.
