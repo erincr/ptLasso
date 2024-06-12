@@ -27,7 +27,7 @@ cv.ptLasso(
 \arguments{
 \item{x}{\code{x} matrix as in \code{ptLasso}.}
 
-\item{y}{\code{y} matrix as in \code{ptLasso}.}
+\item{y}{\code{y} vector as in \code{ptLasso}.}
 
 \item{groups}{A vector of length nobs indicating to which group each observation belongs. For data with k groups, groups should be coded as integers 1 through k.}
 
@@ -47,7 +47,7 @@ cv.ptLasso(
 
 \item{fitoverall}{An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argument keep = TRUE.}
 
-\item{fitind}{An optional list of cv.glmnet objects specifying the individual models. This should have been trained on the training data, with the argumnet keep = TRUE.}
+\item{fitind}{An optional list of cv.glmnet objects specifying the individual models. These should have been trained on the training data, with the argumnet keep = TRUE.}
 
 \item{s}{The choice of lambda to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "lambda.min". May be "lambda.1se", or a numeric value. (Use caution when supplying a numeric value: the same lambda will be used for all models.)}
 

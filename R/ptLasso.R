@@ -182,9 +182,10 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     use.case = match.arg(use.case, c("inputGroups","targetGroups"), several.ok=FALSE)
     overall.lambda = match.arg(overall.lambda, c("lambda.1se", "lambda.min"))
 
-    if(!(family %in% names(this.call))) this.call$family = family
-    if(!(use.case %in% names(this.call))) this.call$use.case = use.case
-    
+    this.call$family = family
+    this.call$use.case = use.case
+    this.call$group.intercepts = group.intercepts
+
     np=dim(x)
     ##check dims
     if(is.null(np)|(np[2]<=1))stop("x should be a matrix with 2 or more columns")

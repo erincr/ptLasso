@@ -129,6 +129,10 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", gamma="gamma
             # This should always be a binomial (one vs. rest) model:
             bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=F)[-1])
             suppre[[ix]] = sort(unique(c(which(bhatpre[[ix]]!=0), include.these)))
+        } else if(fit$call$use.case == "multiresponse"){
+            # This should always be a gaussian:
+            bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=F)[-1])
+            suppre[[ix]] = sort(unique(c(which(bhatpre[[ix]]!=0), include.these)))
         }
       
       ix = ix + 1
@@ -187,21 +191,41 @@ get.overall.support <- function(fit, s="lambda.min", gamma="gamma.min"){
     coefs = coef(fit$fitoverall, s=s, gamma = gamma)
     k = fit$k
     
+    
     # multinomial
     if(is.list(coefs)){
         if(fit$call$use.case == "inputGroups"){
-            if(fit$call$family == "cox"){
+            if(fit$call$group.intercepts == TRUE){
                 return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-(1:k)] != 0)))))) # first k are group indicators
-             } else {
-                 return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-(1:k)] != 0)))))) # first is intercept, next k-1 are indicators
-             }
+            } else {
+                return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-1] != 0)))))) # no group indicators
+            }
         } else if(fit$call$use.case == "targetGroups") {
             return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-1] != 0)))))) # no group indicators, only an intercept
         }
     }
-    
+    #if(is.list(coefs)){
+    #    if(fit$call$use.case == "inputGroups"){
+    #        if(fit$call$family == "cox"){
+    #            return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-(1:k)] != 0)))))) # first k are group indicators
+    #         } else {
+    #             return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-(1:k)] != 0)))))) # first is intercept, next k-1 are indicators
+    #         }
+    #    } else if(fit$call$use.case == "targetGroups") {
+    #        return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-1] != 0)))))) # no group indicators, only an intercept
+    #    }
+    #}
+
     # other
-    return(which(coefs[-(1:k)] != 0))
+    if(fit$call$use.case == "inputGroups"){
+        if(fit$call$group.intercepts == TRUE){
+            return(which(coefs[-(1:k)] != 0)) # first is intercept, next k-1 are group indicators -- if Cox, no intercept and k group indicators
+        } else {
+            return(which(coefs[-1] != 0)) # no group indicators
+        }
+    } else if(fit$call$use.case == "multiresponse"){
+        return(which(rowSums(do.call(cbind, coefs)[-1, ]) != 0))
+    }
 }
 
 

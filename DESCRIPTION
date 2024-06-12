@@ -16,7 +16,7 @@ Packaged:
 Repository:
 Date/Publication:
 NeedsCompilation: yes
-RoxygenNote: 7.3.0
+RoxygenNote: 7.3.1
 Depends: 
     ggplot2,
     glmnet,

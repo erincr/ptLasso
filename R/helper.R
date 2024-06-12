@@ -37,7 +37,11 @@ print.cv.ptLasso=function (x, ...)
     cat(c("alphahat (fixed) =",x$alphahat),fill=TRUE)
     cat("alphahat (varying):\n")
     alpha.disp = x$varying.alphahat
-    names(alpha.disp) = colnames(x$errpre)[grepl("group", colnames(x$errpre))]
+    if("nresps" %in% names(x$fit[[1]])){
+        names(alpha.disp) = colnames(x$errpre)[grepl("response", colnames(x$errpre))]
+    } else {
+        names(alpha.disp) = colnames(x$errpre)[grepl("group", colnames(x$errpre))]
+    }
     print(alpha.disp)
     #cat(paste(x$varying.alphahat, collapse=", "),fill=TRUE)
     

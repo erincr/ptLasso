@@ -34,7 +34,7 @@ yaxis.name = function(x){
 #'
 #'
 plot.cv.ptLasso = function(x, plot.alphahat = TRUE, ...){
-    if(x$call$use.case == "inputGroups")  ggplot.ptLasso.inputGroups(x,  plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
+    if(x$call$use.case %in% c("inputGroups", "multiresponse"))  ggplot.ptLasso.inputGroups(x,  plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
     if(x$call$use.case == "targetGroups") ggplot.ptLasso.targetGroups(x, plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
 }
 
@@ -81,7 +81,7 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
     nudge = .1 * (ylims[2] - ylims[1])
     ylims[2] = ylims[2] + nudge
     ylims[1] = ylims[1] - nudge
-    browser()
+    
     plot1 <- ggplot() +
         geom_line(aes(x=forplot$alpha, y=forplot$overall,
                       group = forplot$model, color = forplot$model)) +
@@ -122,23 +122,25 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
     }
     
     gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.75, 1))
-    #print(plot1 + plot2 + plot_layout(widths = c(9, 9)))
-
 }
 
 
 #' Plot function for input grouped data
 #' @noRd
 ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
+
+    nm = "group"
+    if(x$call$use.case == "multiresponse") nm = "response"
+    
     k = length(x$fit[[1]]$fitind)
     err.pre = x$errpre
     err.pan = x$erroverall
     err.ind = x$errind
-
+    
     suppre = sapply(x$fit, function(ff) length(get.pretrain.support(ff, commonOnly = FALSE)))
     supind = length(get.individual.support(x, commonOnly = FALSE))
     suppan = length(get.overall.support(x))
-
+    
     n.alpha = nrow(err.pre)
 
     forplot = data.frame(
@@ -150,14 +152,14 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
     nudge = .1 * (ylims[2] - ylims[1])
     ylims[2] = ylims[2] + nudge
     ylims[1] = ylims[1] - nudge
- 
+
     plot1 <- ggplot() +
         geom_line(aes(x=forplot$alpha, y=forplot$overall,
                       group = forplot$model, color = forplot$model)) +
         geom_text(aes(x=.2, y=err.pan["overall"], label=as.character(suppan), vjust=-1), size=3, color="#666666") +
         geom_text(aes(x=.2, y=err.ind["overall"], label=as.character(supind), vjust=-1), size=3, color="#666666") +
         scale_x_continuous(sec.axis = dup_axis(breaks = err.pre[, "alpha"][c(TRUE, FALSE)], labels = as.character(suppre)[c(TRUE, FALSE)], name = "")) + 
-        labs(x = expression(alpha), y = y.label, color = "", title=paste0(as.character(k)," group problem")) +
+        labs(x = expression(alpha), y = y.label, color = "", title=paste0(as.character(k), " ", nm, " problem")) +
         ylim(ylims[1], ylims[2]) +
         theme_minimal(base_size = 12) +
         scale_color_manual(values = c(overall.color, pretrain.color, individual.color), breaks = c("Overall", "Pretrain", "Individual"))
@@ -195,7 +197,6 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
     }
 
     gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.8, 1))
-    #print(plot1 + plot2 + plot_layout(widths = c(9, 9)))
 }
 
 
@@ -220,6 +221,9 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 #' @method plot ptLasso
 #' @export
 plot.ptLasso = function(x, ...){
+    if("nresps" %in% names(x)) x$k = x$nresps
+    nm = "Group"
+    if("nresps" %in% names(x)) nm = "Response"
     lo = matrix(
         c(1:x$k,                  # Overall model
           (1 + x$k) : (2*x$k),    # Pretrained models
@@ -237,9 +241,9 @@ plot.ptLasso = function(x, ...){
     for(kk in 1:x$k){
         plot(x$fitpre[[kk]]);
         if(kk == 1) {
-           graphics::title(paste0("Pretrained\nGroup ", kk), line=line.nudge)
+           graphics::title(paste0("Pretrained\n", nm, " ", kk), line=line.nudge)
         } else {
-           graphics::title(paste0("Group ", kk), line=line.nudge)
+           graphics::title(paste0(nm, " ", kk), line=line.nudge)
         }
         
     }
@@ -247,9 +251,9 @@ plot.ptLasso = function(x, ...){
     for(kk in 1:x$k){
         plot(x$fitind[[kk]]);
         if(kk == 1) {
-            graphics::title(paste0("Individual\nGroup ", kk), line=line.nudge)
+            graphics::title(paste0("Individual\n", nm, " ", kk), line=line.nudge)
         } else {
-            graphics::title(paste0("Group ", kk), line=line.nudge)
+            graphics::title(paste0(nm, " ", kk), line=line.nudge)
         }
     }
 }

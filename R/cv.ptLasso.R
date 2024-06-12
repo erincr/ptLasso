@@ -17,7 +17,7 @@ subset.y <- function(y, ix, family) {
 #' This function runs \code{ptLasso} once for each requested choice of alpha, and returns the cross validated performance.
 #'
 #' @param x \code{x} matrix as in \code{ptLasso}.
-#' @param y \code{y} matrix as in \code{ptLasso}.
+#' @param y \code{y} vector as in \code{ptLasso}.
 #' @param groups A vector of length nobs indicating to which group each observation belongs. For data with k groups, groups should be coded as integers 1 through k. 
 #' @param alphalist A vector of values of the pretraining hyperparameter alpha. Defaults to \code{seq(0, 1, length.out=11)}. This function will do pretraining for each choice of alpha in alphalist and return the CV performance for each alpha.
 #' @param family Response type as in \code{ptLasso}.
@@ -30,7 +30,7 @@ subset.y <- function(y, ix, family) {
 #' @param use.case The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".
 #' @param verbose If \code{verbose=1}, print a statement showing which model is currently being fit.
 #' @param fitoverall An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argument keep = TRUE.
-#' @param fitind An optional list of cv.glmnet objects specifying the individual models. This should have been trained on the training data, with the argumnet keep = TRUE.
+#' @param fitind An optional list of cv.glmnet objects specifying the individual models. These should have been trained on the training data, with the argumnet keep = TRUE.
 #' @param group.intercepts For 'use.case = "inputGroups"' only. If `TRUE`, fit the overall model with a separate intercept for each group. If `FALSE`, ignore the grouping and fit one overall intercept. Default is `TRUE`.
 #' @param \dots Additional arguments to be passed to the `cv.glmnet` function. Notable choices include \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{cv.glmnet}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. Importantly, \code{"cv.ptLasso"} does not support the arguments \code{"intercept"}, \code{"offset"}, \code{"fit"} and \code{"check.args"}.
 #' 
@@ -194,6 +194,8 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
     if((use.case == "inputGroups") & is.null(groups)) stop("For the input grouped setting, groups must be supplied.")
     if(!is.null(groups)) k = length(table(groups))
     if(is.null(groups))  k = length(table(y))
+
+    if(length(alphalist) < 2) stop("Need more than one alpha in alphalist.")
     
     n <- nrow(x)
     p <- ncol(x)
@@ -329,6 +331,9 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
     }  
 
     this.call$type.measure = type.measure
+    this.call$family = family
+    this.call$use.case = use.case
+    this.call$group.intercepts = group.intercepts
     
     out=enlist(
                errpre = res, errind = err.ind, erroverall = err.overall,

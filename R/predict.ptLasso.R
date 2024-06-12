@@ -88,7 +88,7 @@ predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=N
         if(alphatype == "fixed")   alpha = object$alphahat
         if(alphatype == "varying") alpha = object$varying.alphahat
     }    
-
+    
     close.enough = 1e-6
     if(length(alpha) == 1){      
         if(all(abs(alpha - object$errpre[, "alpha"]) > close.enough)) stop("Not a valid choice of alpha. Please choose alpha from object$alphalist.")
@@ -97,7 +97,7 @@ predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=N
         if(length(model.ix) > 1) model.ix = model.ix[1]
        
         fit = object$fit[[model.ix]]
-
+        
         out = predict.ptLasso(fit, xtest, groupstest=original.groups, ytest=ytest, type = type, s = s, gamma = gamma)
         out$call = this.call
         
@@ -108,12 +108,20 @@ predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=N
         }
         
         # TODO future: what if they have only e.g. one group at prediction time?
-        # They shouldn't have to supply alphas for every group.
-        if(length(alpha) != object$fit[[1]]$k) stop("Must have one alpha for each group.") 
+                                        # They shouldn't have to supply alphas for every group.
+        if(object$call$use.case == "multiresponse"){
+            if(length(alpha) != object$fit[[1]]$nresps) stop("Must have one alpha for each response.")
+        } else {
+            if(length(alpha) != object$fit[[1]]$k) stop("Must have one alpha for each group.")
+        }
         
         model.ix = sapply(alpha, function(a) which(abs(a - object$errpre[, "alpha"]) < close.enough))
         model.ix = unname(model.ix)
 
+
+        ########################################################################################################
+        # Target groups
+        ########################################################################################################
         if(object$call$use.case == "targetGroups") {
             results = lapply(1:object$fit[[1]]$k,
                              function(ix) {predict.ptLasso.targetGroups(object$fit[[model.ix[ix]]],
@@ -138,89 +146,168 @@ predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=N
                    )
         }
 
-        
-        predgroups = sort(unique(groupstest))
+        ########################################################################################################
+        # Multiresponse
+        ########################################################################################################
+        if(object$call$use.case == "multiresponse") {
 
-        results = lapply(predgroups,
+            k = object$fit[[1]]$nresps
+            results = lapply(1:k,
+                             function(ix) {predict.ptLasso.multiresponse(object$fit[[model.ix[ix]]],
+                                                           xtest, 
+                                                           type = type,
+                                                           call = this.call,
+                                                           s = s, gamma = gamma)}
+                             )
+            
+            phatall = results[[1]]$yhatoverall
+            phatpre = do.call(cbind, lapply(1:k, function(i) results[[i]]$yhatpre[, i, 1]))
+            dim(phatpre) = c(dim(phatpre), 1)
+            phatind = do.call(cbind, lapply(1:k, function(i) results[[i]]$yhatind[, i, 1]))
+            dim(phatind) = c(dim(phatind), 1)
+            suppre.individual = unique(sort(unlist(lapply(results, function(x) x$suppre.individual))))
+
+            if(!is.null(ytest)){
+                type.measure = object$call$type.measure
+                
+                errpre = errind = erroverall.classes = rep(NA, object$fit[[1]]$nresps)
+                for(kk in 1:k){
+                    errpre[kk] = as.numeric(assess.glmnet(phatpre[, kk, 1], newy=ytest[, kk], family="gaussian")[type.measure])
+                    errind[kk] = as.numeric(assess.glmnet(phatind[, kk, 1], newy=ytest[, kk], family="gaussian")[type.measure])
+                    erroverall.classes[kk] = as.numeric(assess.glmnet(phatall[, kk, 1], newy=ytest[, kk], family="gaussian")[type.measure])
+                }
+                
+                erroverall = c(as.numeric(assess.glmnet(phatall, newy=ytest, family="mgaussian")[type.measure]),
+                               mean( erroverall.classes),
+                               erroverall.classes)
+                errind = c(as.numeric(assess.glmnet(phatind, newy=ytest, family="mgaussian")[type.measure]),
+                           mean(errind, na.rm=TRUE),
+                           errind[!is.na(errind)])
+                errpre = c(as.numeric(assess.glmnet(phatpre, newy=ytest, family="mgaussian")[type.measure]),
+                           mean(errpre, na.rm=TRUE),
+                           errpre[!is.na(errpre)])
+                names(erroverall) = names(errpre) = names(errind) = c("allGroups", "mean", paste0("response_", 1:k))
+                
+            }
+            
+            out = enlist(            
+                yhatoverall = phatall,
+                yhatind = phatind, 
+                yhatpre = phatpre,
+
+                suppre.common = results[[1]]$suppre.common,
+                suppre.individual,
+                supoverall = results[[1]]$supoverall,
+                supind = results[[1]]$supind,
+
+                use.case = object$fit[[1]]$call$use.case,
+
+                type.measure = object$fit[[1]]$call$type.measure,
+
+                alpha,
+                call = this.call
+            )
+
+            if(return.link){
+                out$linkoverall = phatall
+                out$linkind = phatind
+                out$linkpre = phatpre
+            }
+            
+            if(!is.null(ytest)){
+                out$errpre = errpre
+                out$errind = errind
+                out$erroverall = erroverall
+            }
+        }
+
+        ########################################################################################################
+        # Input groups
+        ########################################################################################################
+        if(object$call$use.case == "inputGroups") {
+            predgroups = sort(unique(groupstest))
+
+            results = lapply(predgroups,
                              function(ix) {predict.ptLasso(object$fit[[model.ix[ix]]],
                                                            xtest[groupstest == ix, ],
                                                            groupstest=original.groups[groupstest == ix],
                                                            ytest=ytest[groupstest == ix],
                                                            type = type, s = s, gamma = gamma, return.link=TRUE)}
                              )
-        
-        all.preds = pre.preds = ind.preds = rep(NA, nrow(xtest))
-        all.link = pre.link = ind.link = rep(NA, nrow(xtest))
-        for(kk in 1:length(predgroups)){
-            all.preds[groupstest == predgroups[kk]] = results[[kk]]$yhatoverall
-            pre.preds[groupstest == predgroups[kk]] = results[[kk]]$yhatpre
-            ind.preds[groupstest == predgroups[kk]] = results[[kk]]$yhatind
+            
+            all.preds = pre.preds = ind.preds = rep(NA, nrow(xtest))
+            all.link = pre.link = ind.link = rep(NA, nrow(xtest))
+            for(kk in 1:length(predgroups)){
+                all.preds[groupstest == predgroups[kk]] = results[[kk]]$yhatoverall
+                pre.preds[groupstest == predgroups[kk]] = results[[kk]]$yhatpre
+                ind.preds[groupstest == predgroups[kk]] = results[[kk]]$yhatind
 
-            all.link[groupstest == predgroups[kk]] = results[[kk]]$linkoverall
-            pre.link[groupstest == predgroups[kk]] = results[[kk]]$linkpre
-            ind.link[groupstest == predgroups[kk]] = results[[kk]]$linkind
-        }
-        
-        suppre = lapply(predgroups, function(ix) get.pretrain.support(object$fit[[model.ix[ix]]], groups = ix, includeOverall = FALSE, s = s, gamma = gamma))
-        suppre = sort(unique(unlist(suppre)))
-        if("fitoverall.gamma" %in% names(object)){
-            suppre.common =  get.overall.support(object, s=object$fitoverall.lambda, gamma = object$fitoverall.gamma)
-        } else {
-            suppre.common =  get.overall.support(object, s=object$fitoverall.lambda)
-        }
-        suppre.individual = setdiff(suppre, suppre.common)
-        
-        if(!is.null(ytest)){
-            group.weights = table(groupstest)/length(groupstest)
-            erroverall = sapply(results, function(r) r$erroverall[grepl("group", names(r$erroverall))])
-            erroverall = c(as.numeric(assess.glmnet(all.link, newy=ytest, family=object$family)[object$type.measure]),
-                       mean(erroverall),
-                       weighted.mean(erroverall, w = group.weights),
-                       erroverall)
+                all.link[groupstest == predgroups[kk]] = results[[kk]]$linkoverall
+                pre.link[groupstest == predgroups[kk]] = results[[kk]]$linkpre
+                ind.link[groupstest == predgroups[kk]] = results[[kk]]$linkind
+            }
+            
+            suppre = lapply(predgroups, function(ix) get.pretrain.support(object$fit[[model.ix[ix]]], groups = ix, includeOverall = FALSE, s = s, gamma = gamma))
+            suppre = sort(unique(unlist(suppre)))
+            if("fitoverall.gamma" %in% names(object)){
+                suppre.common =  get.overall.support(object, s=object$fitoverall.lambda, gamma = object$fitoverall.gamma)
+            } else {
+                suppre.common =  get.overall.support(object, s=object$fitoverall.lambda)
+            }
+            suppre.individual = setdiff(suppre, suppre.common)
+            
+            if(!is.null(ytest)){
+                group.weights = table(groupstest)/length(groupstest)
+                erroverall = sapply(results, function(r) r$erroverall[grepl("group", names(r$erroverall))])
+                erroverall = c(as.numeric(assess.glmnet(all.link, newy=ytest, family=object$family)[object$type.measure]),
+                               mean(erroverall),
+                               weighted.mean(erroverall, w = group.weights),
+                               erroverall)
 
-            errpre = sapply(results, function(r) r$errpre[grepl("group", names(r$errpre))])
-            errpre = c(as.numeric(assess.glmnet(pre.link, newy=ytest, family=object$family)[object$type.measure]),
-                       mean(errpre),
-                       weighted.mean(errpre, w = group.weights),
-                       errpre)
+                errpre = sapply(results, function(r) r$errpre[grepl("group", names(r$errpre))])
+                errpre = c(as.numeric(assess.glmnet(pre.link, newy=ytest, family=object$family)[object$type.measure]),
+                           mean(errpre),
+                           weighted.mean(errpre, w = group.weights),
+                           errpre)
 
-            errind = sapply(results, function(r) r$errind[grepl("group", names(r$errind))])
-            errind = c(as.numeric(assess.glmnet(ind.link, newy=ytest, family=object$family)[object$type.measure]),
-                       mean(errind),
-                       weighted.mean(errind, w = group.weights),
-                       errind)
+                errind = sapply(results, function(r) r$errind[grepl("group", names(r$errind))])
+                errind = c(as.numeric(assess.glmnet(ind.link, newy=ytest, family=object$family)[object$type.measure]),
+                           mean(errind),
+                           weighted.mean(errind, w = group.weights),
+                           errind)
 
-            names(erroverall) = names(errpre) = names(errind) = c("overall", "mean", "wtdMean", paste0("group_", legend[predgroups]))
-         }
-        
-        out = enlist(            
-            yhatoverall = all.preds,
-            yhatind = ind.preds, 
-            yhatpre = pre.preds,
+                names(erroverall) = names(errpre) = names(errind) = c("overall", "mean", "wtdMean", paste0("group_", legend[predgroups]))
+            }
+            
+            out = enlist(            
+                yhatoverall = all.preds,
+                yhatind = ind.preds, 
+                yhatpre = pre.preds,
 
-            suppre.common,
-            suppre.individual,
-            supoverall = results[[1]]$supoverall,
-            supind = results[[1]]$supind,
+                suppre.common,
+                suppre.individual,
+                supoverall = results[[1]]$supoverall,
+                supind = results[[1]]$supind,
 
-            use.case = object$fit[[1]]$call$use.case,
+                use.case = object$fit[[1]]$call$use.case,
 
-            type.measure = object$fit[[1]]$call$type.measure,
+                type.measure = object$fit[[1]]$call$type.measure,
 
-            alpha,
-            call = this.call
-        )
+                alpha,
+                call = this.call
+            )
 
-        if(return.link){
-            out$linkoverall = all.link
-            out$linkind = ind.link
-            out$linkpre = pre.link
-        }
-        
-        if(!is.null(ytest)){
-            out$errpre = errpre
-            out$errind = errind
-            out$erroverall = erroverall
+            if(return.link){
+                out$linkoverall = all.link
+                out$linkind = ind.link
+                out$linkpre = pre.link
+            }
+            
+            if(!is.null(ytest)){
+                out$errpre = errpre
+                out$errind = errind
+                out$erroverall = erroverall
+            }
         }
         
         class(out) = "predict.cv.ptLasso"
@@ -291,6 +378,7 @@ predict.ptLasso=function(object, xtest, groupstest=NULL, ytest=NULL,
     
     type = match.arg(type)
     family = object$call$family
+    if(object$call$use.case == "multiresponse") family = "mgaussian"
     type.measure = object$call$type.measure
     group.intercepts = object$call$group.intercepts
 
@@ -323,8 +411,93 @@ predict.ptLasso=function(object, xtest, groupstest=NULL, ytest=NULL,
 
     
     if(object$call$use.case=="inputGroups") out=predict.ptLasso.inputGroups(object, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s, gamma=gamma, return.link=return.link, group.intercepts=group.intercepts)
+    if(object$call$use.case=="multiresponse") out=predict.ptLasso.multiresponse(object, xtest, ytest=ytest, type=type, call=this.call, type.measure=type.measure, s=s, gamma=gamma)
     if(object$call$use.case=="targetGroups") out=predict.ptLasso.targetGroups(object, xtest, ytest=ytest, type=type, call=this.call, family=family, type.measure=type.measure, s=s, gamma=gamma, return.link=return.link)
     class(out)="predict.ptLasso"
+    return(out)
+}
+
+#' Predict function for multiresponse data
+#' @noRd
+predict.ptLasso.multiresponse = function(fit, xtest, type, call, type.measure = fit$call$type.measure, s="lambda.min", gamma="gamma.min", ytest=NULL, return.link = FALSE, ...){
+    
+    k=fit$nresps
+
+    mgaussian = function(y, predmat){
+            as.numeric(assess.glmnet(predmat, newy=y, family="mgaussian")[type.measure])
+    }
+    gaussian = function(y, predmat){
+            as.numeric(assess.glmnet(predmat, newy=y, family="gaussian")[type.measure])
+         }
+    
+    phatall = predict(fit$fitoverall, xtest, type="link", s=s, gamma=gamma) 
+    
+    if(!is.null(ytest)){
+        erroverall=mgaussian(ytest, phatall)
+        erroverall.classes=sapply(1:k, function(kk) gaussian(ytest[, kk], phatall[, kk, 1]))
+    }
+    
+    errpre=errind=rep(NA,k)
+    
+    phatpre=array(NA, c(nrow(xtest), k, 1))
+    phatind=array(NA, c(nrow(xtest), k, 1))
+    
+    # preTraining predictions
+    offsetTest = (1-fit$alpha) * predict(fit$fitoverall, xtest, s=fit$fitoverall.lambda, gamma=fit$fitoverall.gamma, type="link")[, , 1]
+    
+    for(kk in 1:k){
+        # Pretraining predictions
+        phatpre[, kk, 1] = predict(fit$fitpre[[kk]], xtest, newoffset=offsetTest[, kk], type="link", s=s, gamma=gamma) 
+
+        # Individual model predictions
+        phatind[, kk, 1] = predict(fit$fitind[[kk]], xtest, type="link", s=s, gamma=gamma)  
+
+        if(!is.null(ytest)){
+            errpre[kk] = gaussian(ytest[, kk], phatpre[, kk, 1])
+            errind[kk] = gaussian(ytest[, kk], phatind[, kk, 1])
+        }
+    }
+    
+    if(!is.null(ytest)){
+        erroverall = c(erroverall,
+                   mean( erroverall.classes),
+                   erroverall.classes)
+        errind = c(mgaussian(ytest, phatind),
+                   mean(errind, na.rm=TRUE),
+                   errind[!is.na(errind)])
+        errpre = c(mgaussian(ytest, phatpre),
+                   mean(errpre, na.rm=TRUE),
+                   errpre[!is.na(errpre)])
+        names(erroverall) = names(errpre) = names(errind) = c("allGroups", "mean", paste0("response_", 1:k))
+    }
+
+    suppre.common     = get.overall.support(fit, s=fit$fitoverall.lambda, gamma=gamma)
+    suppre.individual = setdiff(get.pretrain.support(fit, s=s, gamma=gamma), suppre.common)
+    
+    out = enlist(yhatoverall = phatall,
+                 yhatind = phatind,
+                 yhatpre = phatpre, 
+                 suppre.common,
+                 suppre.individual,
+                 supind  = get.individual.support(fit, s=s, gamma=gamma),
+                 supoverall  = get.overall.support(fit, s=s, gamma=gamma),
+                 alpha = fit$alpha,
+                 gamma = fit$gamma,
+                 type.measure = type.measure,
+                 call)
+    
+    if(!is.null(ytest)) {
+        out$erroverall = erroverall
+        out$errind = errind
+        out$errpre = errpre
+    }
+
+    if(return.link){
+        out$linkoverall = phatall
+        out$linkind = phatind
+        out$linkpre = phatpre 
+    }
+
     return(out)
 }
 
