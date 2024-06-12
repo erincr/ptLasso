@@ -83,7 +83,9 @@ ptLassoMult=function(x,y,alpha=0.5,
     this.call$group.intercepts = FALSE
     
     type.measure = match.arg(type.measure, c("default", "mse", "mae", "deviance"))
-    if(type.measure == "default") type.measure = "mse" 
+    if(type.measure == "default") type.measure = "mse"
+    this.call$type.measure = type.measure
+    
     overall.lambda = match.arg(overall.lambda, c("lambda.1se", "lambda.min"))
 
     ############################################################################################################
@@ -337,7 +339,7 @@ cv.ptLassoMult <- function(x, y, alphalist=seq(0,1,length=11),
     
     this.call <- match.call()
 
-    if(!(type.measure %in% names(this.call))) this.call$type.measure = type.measure
+    this.call$type.measure = type.measure
     this.call$use.case = "multiresponse"
 
     if(length(alphalist) < 2) stop("Need more than one alpha in alphalist.")
