@@ -52,6 +52,9 @@
     <loc>https://erincr.github.io/ptLasso/reference/cv.ptLasso.html</loc>
   </url>
   <url>
+    <loc>https://erincr.github.io/ptLasso/reference/cv.ptLassoMult.html</loc>
+  </url>
+  <url>
     <loc>https://erincr.github.io/ptLasso/reference/gaussian.example.data.html</loc>
   </url>
   <url>
@@ -98,5 +101,8 @@
   </url>
   <url>
     <loc>https://erincr.github.io/ptLasso/reference/ptLasso.html</loc>
+  </url>
+  <url>
+    <loc>https://erincr.github.io/ptLasso/reference/ptLassoMult.html</loc>
   </url>
 </urlset>

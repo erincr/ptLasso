@@ -86,7 +86,7 @@
 
 
 <dt>y</dt>
-<dd><p><code>y</code> matrix as in <code>ptLasso</code>.</p></dd>
+<dd><p><code>y</code> vector as in <code>ptLasso</code>.</p></dd>
 
 
 <dt>groups</dt>
@@ -126,7 +126,7 @@
 
 
 <dt>fitind</dt>
-<dd><p>An optional list of cv.glmnet objects specifying the individual models. This should have been trained on the training data, with the argumnet keep = TRUE.</p></dd>
+<dd><p>An optional list of cv.glmnet objects specifying the individual models. These should have been trained on the training data, with the argumnet keep = TRUE.</p></dd>
 
 
 <dt>s</dt>
@@ -224,7 +224,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cv.ptLasso(x = x, y = y, groups = groups, family = "gaussian",  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     type.measure = "mse", use.case = "inputGroups") </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     type.measure = "mse", use.case = "inputGroups", group.intercepts = TRUE) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -340,7 +340,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cv.ptLasso(x = x, y = y, groups = groups, family = "gaussian",  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     type.measure = "mse", use.case = "inputGroups") </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     type.measure = "mse", use.case = "inputGroups", group.intercepts = TRUE) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -491,7 +491,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cv.ptLasso(x = x, y = y, groups = groups, family = "binomial",  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     type.measure = "auc", nfolds = 3, verbose = TRUE, alphahat.choice = "mean",  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     use.case = "inputGroups") </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     use.case = "inputGroups", group.intercepts = TRUE) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> type.measure:  auc </span>
