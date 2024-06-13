@@ -805,7 +805,8 @@ x = x[1:ntrain, ]
 y = y[1:ntrain, ]
      
 # Now, we can fit a ptLasso multiresponse model:
-fit = ptLassoMult(x, y, alpha = 0.5, type.measure = "mse")
+#fit = ptLassoMult(x, y, alpha = 0.5, type.measure = "mse")
+fit = ptLasso(x, y, alpha = 0.5, type.measure = "mse", use.case = "multiresponse")
 # plot(fit) # to see all of the cv.glmnet models trained
 preds = predict(fit, xtest, ytest=ytest) # to predict on new data
 
@@ -865,7 +866,7 @@ test_that("multresponse_errall", {
 
 
 set.seed(1234)
-fit = ptLassoMult(x, y, alpha = 0.5, type.measure = "mae")
+fit = ptLasso(x, y, alpha = 0.5, type.measure = "mae", use.case = "multiresponse")
 # plot(fit) # to see all of the cv.glmnet models trained
 preds = predict(fit, xtest, ytest=ytest) # to predict on new data
 
@@ -927,7 +928,7 @@ test_that("multresponse_mae_errall", {
 
 
 set.seed(1234)
-fit = cv.ptLassoMult(x, y, type.measure = "mae")
+fit = cv.ptLasso(x, y, type.measure = "mae", use.case = "multiresponse")
 preds = predict(fit, xtest, ytest=ytest) # to predict on new data
 
 test_that("multresponse_cv_suppre.common", {

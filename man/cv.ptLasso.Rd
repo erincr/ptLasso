@@ -10,7 +10,7 @@ cv.ptLasso(
   groups = NULL,
   alphalist = seq(0, 1, length = 11),
   family = c("gaussian", "multinomial", "binomial", "cox"),
-  use.case = c("inputGroups", "targetGroups"),
+  use.case = c("inputGroups", "targetGroups", "multiresponse"),
   type.measure = c("default", "mse", "mae", "auc", "deviance", "class", "C"),
   nfolds = 10,
   foldid = NULL,
@@ -27,15 +27,15 @@ cv.ptLasso(
 \arguments{
 \item{x}{\code{x} matrix as in \code{ptLasso}.}
 
-\item{y}{\code{y} vector as in \code{ptLasso}.}
+\item{y}{\code{y} vector or matrix as in \code{ptLasso}.}
 
-\item{groups}{A vector of length nobs indicating to which group each observation belongs. For data with k groups, groups should be coded as integers 1 through k.}
+\item{groups}{A vector of length nobs indicating to which group each observation belongs. For data with k groups, groups should be coded as integers 1 through k. Only for 'use.case = "inputGroups"'.}
 
 \item{alphalist}{A vector of values of the pretraining hyperparameter alpha. Defaults to \code{seq(0, 1, length.out=11)}. This function will do pretraining for each choice of alpha in alphalist and return the CV performance for each alpha.}
 
 \item{family}{Response type as in \code{ptLasso}.}
 
-\item{use.case}{The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".}
+\item{use.case}{The type of grouping observed in the data. Can be one of "inputGroups", "targetGroups" or "multiresponse".}
 
 \item{type.measure}{Measure computed in \code{cv.glmnet}, as in \code{ptLasso}.}
 
@@ -185,6 +185,42 @@ cvfit = cv.ptLasso(x, y, groups = groups, family = "binomial",
 cvfit
 # plot(cvfit) # to see CV performance as a function of alpha 
 predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.1se")
+
+# Multiresponse pretraining
+set.seed(1234)
+n = 1000; ntrain = 500;
+p = 500
+sigma = 2
+     
+x = matrix(rnorm(n*p), n, p)
+beta1 = c(rep(1, 5), rep(0.5, 5), rep(0, p - 10))
+beta2 = c(rep(1, 5), rep(0, 5), rep(0.5, 5), rep(0, p - 15))
+
+mu = cbind(x \%*\% beta1, x \%*\% beta2)
+y  = cbind(mu[, 1] + sigma * rnorm(n), 
+           mu[, 2] + sigma * rnorm(n))
+cat("SNR for the two tasks:", round(diag(var(mu)/var(y-mu)), 2), fill=TRUE)
+cat("Correlation between two tasks:", cor(y[, 1], y[, 2]), fill=TRUE)
+
+xtest = x[-(1:ntrain), ]
+ytest = y[-(1:ntrain), ]
+
+x = x[1:ntrain, ]
+y = y[1:ntrain, ]
+
+# Now, we can fit a ptLasso model:
+fit = cv.ptLasso(x, y, type.measure = "mse", use.case = "multiresponse")
+# plot(fit) # to see the cv curve.
+predict(fit, xtest) # to predict on new data
+predict(fit, xtest, ytest=ytest) # if ytest is included, we also measure performance
+# By default, we used s = "lambda.min" to compute CV performance.
+# We could instead use s = "lambda.1se":
+cvfit = cv.ptLasso(x, y, type.measure = "mse", s = "lambda.1se", use.case = "multiresponse")
+
+# We could also use the glmnet option relax = TRUE:
+cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, use.case = "multiresponse")
+# And, as we did with lambda, we may want to specify the choice of gamma to compute CV performance:
+cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, gamma = "gamma.1se", use.case = "multiresponse")
 
 \dontrun{
 ### Model fitting with parallel = TRUE

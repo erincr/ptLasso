@@ -3,16 +3,16 @@
 #' Fits a pretrained lasso model using the glmnet package, for a fixed choice of the pretraining hyperparameter alpha. Additionally fits an "overall" model (using all data) and "individual" models (use each individual group). Can fit input-grouped data with Gaussian, multinomial, binomial or Cox outcomes, and target-grouped data, which necessarily has a multinomial outcome. Many ptLasso arguments are passed directly to glmnet, and therefore the glmnet documentation is another good reference for ptLasso.
 #'
 #' @param x input matrix, of dimension nobs x nvars; each row is an observation vector. Can be in sparse matrix format (inherit from class '"sparseMatrix"' as in package 'Matrix'). Requirement: 'nvars >1'; in other words, 'x' should have 2 or more columns.
-#' @param y response variable. Quantitative for 'family="gaussian"'. For 'family="binomial"' should be either a factor with two levels, or a two-column matrix of counts or proportions (the second column is treated as the target class; for a factor, the last level in alphabetical order is the target class). For 'family="multinomial"', can be a 'nc>=2' level factor, or a matrix with 'nc' columns of counts or proportions. For either '"binomial"' or '"multinomial"', if 'y' is presented as a vector, it will be coerced into a factor. For 'family="cox"', preferably a 'Surv' object from the survival package: see Detail section for more information. For 'family="mgaussian"', 'y' is a matrix of quantitative responses.
-#' @param groups A vector of length nobs indicating to which group each observation belongs. 
+#' @param y response variable. Quantitative for 'family="gaussian"'. For 'family="binomial"' should be either a factor with two levels, or a two-column matrix of counts or proportions (the second column is treated as the target class; for a factor, the last level in alphabetical order is the target class). For 'family="multinomial"', can be a 'nc>=2' level factor, or a matrix with 'nc' columns of counts or proportions. For either '"binomial"' or '"multinomial"', if 'y' is presented as a vector, it will be coerced into a factor. For 'family="cox"', preferably a 'Surv' object from the survival package: see Detail section for more information. For 'use.case = "multiresponse", 'y' is a matrix of quantitative responses. 
+#' @param groups A vector of length nobs indicating to which group each observation belongs. Only for 'use.case = "inputGroups"'.
 #' @param alpha The pretrained lasso hyperparameter, with \eqn{0\le\alpha\le 1}. The range of alpha is from 0 (which fits the overall model with fine tuning) to 1 (the individual models). The default value is 0.5, chosen mostly at random. To choose the appropriate value for your data, please either run \code{ptLasso} with a few choices of alpha and evaluate with a validation set, or use cv.ptLasso, which recommends a value of alpha using cross validation.
 #' @param family Either a character string representing one of the built-in families, or else a 'glm()' family object. For more information, see Details section below or the documentation for response type (above).
 #' @param type.measure loss to use for cross-validation within each individual, overall, or pretrained lasso model. Currently five options, not all available for all models. The default is 'type.measure="deviance"', which uses squared-error for gaussian models (a.k.a 'type.measure="mse"' there), deviance for logistic and poisson regression, and partial-likelihood for the Cox model. 'type.measure="class"' applies to binomial and multinomial logistic regression only, and gives misclassification error. 'type.measure="auc"' is for two-class logistic regression only, and gives area under the ROC curve. 'type.measure="mse"' or 'type.measure="mae"' (mean absolute error) can be used by all models except the '"cox"'; they measure the deviation from the fitted mean to the response. 'type.measure="C"' is Harrel's concordance measure, only available for 'cox' models.
-#' @param use.case The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".
+#' @param use.case The type of grouping observed in the data. Can be one of "inputGroups", "targetGroups" or "multiresponse".
 #' @param overall.lambda The choice of lambda to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", could alternatively be "lambda.min". This choice of lambda will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another lambda must be specified for the individual models, the second stage of pretraining and the overall model.
 #' @param overall.gamma For use only when the option \code{relax = TRUE} is specified. The choice of gamma to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "gamma.1se", but "gamma.min" is also a good option. This choice of gamma will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another gamma must be specified for the individual models, the second stage of pretraining and the overall model.
-#' @param fitoverall An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.
-#' @param fitind An optional list of cv.glmnet objects specifying the individual models. 
+#' @param fitoverall An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argument 'keep = TRUE'.
+#' @param fitind An optional list of cv.glmnet objects specifying the individual models. These should have been trained on the original training data, with the argument 'keep = TRUE'.
 #' @param nfolds Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.
 #' @param foldid An optional vector of values between 1 and \code{nfolds} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.
 #' @param standardize Should the predictors be standardized before fitting (default is TRUE). 
@@ -20,7 +20,7 @@
 #' @param weights observation weights. Default is 1 for each observation.
 #' @param penalty.factor Separate penalty factors can be applied to each coefficient. This is a number that multiplies 'lambda' to allow differential shrinkage. Can be 0 for some variables,  which implies no shrinkage, and that variable is always included in the model. Default is 1 for all variables (and implicitly infinity for variables listed in 'exclude'). For more information, see \code{?glmnet}. For pretraining, the user-supplied penalty.factor will be multiplied by the penalty.factor computed by the overall model.
 #' @param en.alpha The elasticnet mixing parameter, with 0 <= en.alpha <= 1. The penalty is defined as (1-alpha)/2||beta||_2^2+alpha||beta||_1. 'alpha=1' is the lasso penalty, and 'alpha=0' the ridge penalty. Default is `en.alpha = 1` (lasso).
-#' @param group.intercepts For 'use.case = "inputGroups"' only. If `TRUE`, fit the overall model with a separate intercept for each group. If `FALSE`, ignore the grouping and fit one overall intercept. Default is `TRUE`.
+#' @param group.intercepts For 'use.case = "inputGroups"' only. If `TRUE`, fit the overall model with a separate intercept for each group. If `FALSE`, ignore the grouping and fit one overall intercept. Default is `TRUE`. 
 #' @param \dots Additional arguments to be passed to the cv.glmnet functions. Notable choices include \code{"trace.it"} and \code{"parallel"}. If \code{trace.it = TRUE}, then a progress bar is displayed for each call to \code{"cv.glmnet"}; useful for big models that take a long time to fit. If \code{parallel = TRUE}, use parallel \code{foreach} to fit each fold.  Must register parallel before hand, such as \code{doMC} or others. ptLasso does not support the arguments \code{intercept}, \code{offset}, \code{fit} and \code{check.args}.
 #'
 #' 
@@ -35,6 +35,7 @@
 #' \item{fitpre}{A list of fitted (pretrained) \code{cv.glmnet} objects, one trained with each data group.}
 #' \item{fitind}{A list of fitted \code{cv.glmnet} objects, one trained with each group.}
 #' \item{fitoverall.lambda}{Lambda used with fitoverall, to compute the offset for pretraining.}
+#' \item{fitoverall.gamma}{Gamma used with fitoverall when 'relax = TRUE', to compute the offset for pretraining.}
 #' 
 #' @examples
 #' # Getting started. First, we simulate data: we need covariates x, response y and group IDs.
@@ -151,6 +152,43 @@
 #' fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse", parallel=TRUE)
 #' }
 #' 
+#' # Now let's consider the case of a multiresponse outcome. We'll start by simulating data:
+#' set.seed(1234)
+#' n = 1000; ntrain = 500;
+#' p = 500
+#' sigma = 2
+#'      
+#' x = matrix(rnorm(n*p), n, p)
+#' beta1 = c(rep(1, 5), rep(0.5, 5), rep(0, p - 10))
+#' beta2 = c(rep(1, 5), rep(0, 5), rep(0.5, 5), rep(0, p - 15))
+#' 
+#' mu = cbind(x %*% beta1, x %*% beta2)
+#' y  = cbind(mu[, 1] + sigma * rnorm(n), 
+#'            mu[, 2] + sigma * rnorm(n))
+#' cat("SNR for the two tasks:", round(diag(var(mu)/var(y-mu)), 2), fill=TRUE)
+#' cat("Correlation between two tasks:", cor(y[, 1], y[, 2]), fill=TRUE)
+#' 
+#' xtest = x[-(1:ntrain), ]
+#' ytest = y[-(1:ntrain), ]
+#' 
+#' x = x[1:ntrain, ]
+#' y = y[1:ntrain, ]
+#'
+#' # Now, we can fit a ptLasso multiresponse model:
+#' fit = cv.ptLasso(x, y, type.measure = "mse", use.case = "multiresponse")
+#' # plot(fit) # to see the cv curve.
+#' predict(fit, xtest) # to predict on new data
+#' predict(fit, xtest, ytest=ytest) # if ytest is included, we also measure performance
+#' # By default, we used s = "lambda.min" to compute CV performance.
+#' # We could instead use s = "lambda.1se":
+#' cvfit = cv.ptLasso(x, y, type.measure = "mse", s = "lambda.1se", use.case = "multiresponse")
+#'
+#' # We could also use the glmnet option relax = TRUE:
+#' cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, use.case = "multiresponse")
+#' # And, as we did with lambda, we may want to specify the choice of gamma to compute CV performance:
+#' cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, gamma = "gamma.1se", use.case = "multiresponse")
+#' 
+#' 
 #' 
 #' @import glmnet Matrix
 #' @export
@@ -160,7 +198,7 @@
 #' 
 ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binomial","cox"),
                  type.measure=c("default", "mse", "mae", "auc","deviance","class", "C"),
-                 use.case=c("inputGroups","targetGroups"),
+                 use.case=c("inputGroups","targetGroups", "multiresponse"),
                  overall.lambda = c("lambda.1se", "lambda.min"),
                  overall.gamma = "gamma.1se",
                  foldid=NULL,
@@ -179,7 +217,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     family = match.arg(family)
     type.measure = match.arg(type.measure)
     if(type.measure == "default") type.measure = if(family == "gaussian") { "mse" } else { "deviance" }
-    use.case = match.arg(use.case, c("inputGroups","targetGroups"), several.ok=FALSE)
+    use.case = match.arg(use.case, c("inputGroups","targetGroups", "multiresponse"), several.ok=FALSE)
     overall.lambda = match.arg(overall.lambda, c("lambda.1se", "lambda.min"))
 
     this.call$family = family
@@ -192,6 +230,25 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
     nobs=as.integer(np[1])
     nvars=as.integer(np[2])
 
+    if(use.case == "multiresponse") {
+        return(ptLassoMult(x,y,
+                           alpha=alpha,
+                           type.measure=type.measure,
+                           overall.lambda = overall.lambda,
+                           overall.gamma = overall.gamma,
+                           foldid=foldid,
+                           nfolds=nfolds,
+                           standardize=standardize,
+                           verbose=verbose,
+                           weights=weights,
+                           penalty.factor=penalty.factor,
+                           fitoverall=fitoverall,
+                           fitind=fitind,
+                           en.alpha = en.alpha,
+                           ...
+                           ))
+    }
+    
     original.groups = groups
     legend = group.legend(original.groups)
     groups = transform.groups(groups, legend = legend)

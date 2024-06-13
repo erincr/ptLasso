@@ -28,13 +28,13 @@ Here, we suppose that we wish to predict multiple __Gaussian responses__. (If th
 
 Pretraining is a natural choice for multitask learning -- it allows us to pass information between models for the different responses. The overview for our approach is to:
 
-1. fit a multi-response Gaussian model,
+1. fit a multi-response Gaussian model using a group lasso penalty (more below),
 2. extract the support (shared across responses) and offsets (one for each response), and
 3. fit a model for each response, using the shared support and appropriate offset.
 
-Importantly, in Step 1, we use regularization so that the multi-response Gaussian model is forced to choose the same support for all responses $y_1, \dots, y_j$. This encourages learning _across_ all responses in the first stage; in the second stage, then, we find features that are specific to each individual response $y_k$.
+Importantly, the group lasso penalty behaves like the lasso, but on the whole group of coefficients for each response: they are either all zero, or else none are zero (see the `glmnet` documentation about `family = "mgaussian"` for more detail). As a result, the multi-response Gaussian model is forced to choose the same support for all responses $y_1, \dots, y_j$. This encourages learning _across_ all responses in the first stage; in the second stage, then, we find features that are specific to each individual response $y_k$.
 
-This is all done with the function `ptLassoMult` ("Mult" stands for multi-response ptLasso).
+This is all done with the function `ptLasso`, using the argument `use.case = "multiresponse"`.
 
 We will illustrate this with simulated data with two Gaussian responses; the two responses share the first 5 features, and they each have 5 features of their own. The two responses are quite related, with Pearson correlation around 0.5. 
 ```{r}
@@ -62,19 +62,16 @@ ytest = y[-(1:ntrain), ]
 x = x[1:ntrain, ]
 y = y[1:ntrain, ]
 ```
-```{r}
 
-```
-
-Now, we are ready to call `ptLassoMult` with our covariates `x` and response matrix `y`. (The syntax is nearly identical to that of `ptLasso`, and as in `ptLasso`, the default value of $\alpha = 0.5$.) A call to `plot` shows the CV curves over the lasso parameter $\lambda$ for each model.
-```{r}
-fit = ptLassoMult(x, y)
+Now, we are ready to call `ptLasso` with our covariates `x` and response matrix `y`, and we specify the argument `use.case = "multiresponse"`. A call to `plot` shows the CV curves over the lasso parameter $\lambda$ for each model.
+```{r, fig.width=7, fig.height=7, dpi=100}
+fit = ptLasso(x, y, use.case = "multiresponse")
 plot(fit)
 ```
 
-To choose the pretraining parameter $\alpha$, we can use `cv.ptLassoMult`. The syntax is as in `cv.ptLasso`; and just like `cv.ptLasso`, we can view the CV curve for pretraining together with the overall model (multi-response Gaussian model) and the individual model (a separate Gaussian model for each response) using `plot`.
+To choose the pretraining parameter $\alpha$, we can use `cv.ptLasso`. Using `plot`, we can view the CV curve for pretraining together with the overall model (multi-response Gaussian model) and the individual model (a separate Gaussian model for each response).
 ```{r}
-fit = cv.ptLassoMult(x, y)
+fit = cv.ptLasso(x, y, use.case = "multiresponse")
 plot(fit)
 ```
 

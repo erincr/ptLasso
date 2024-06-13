@@ -17,8 +17,8 @@ subset.y <- function(y, ix, family) {
 #' This function runs \code{ptLasso} once for each requested choice of alpha, and returns the cross validated performance.
 #'
 #' @param x \code{x} matrix as in \code{ptLasso}.
-#' @param y \code{y} vector as in \code{ptLasso}.
-#' @param groups A vector of length nobs indicating to which group each observation belongs. For data with k groups, groups should be coded as integers 1 through k. 
+#' @param y \code{y} vector or matrix as in \code{ptLasso}.
+#' @param groups A vector of length nobs indicating to which group each observation belongs. For data with k groups, groups should be coded as integers 1 through k. Only for 'use.case = "inputGroups"'.
 #' @param alphalist A vector of values of the pretraining hyperparameter alpha. Defaults to \code{seq(0, 1, length.out=11)}. This function will do pretraining for each choice of alpha in alphalist and return the CV performance for each alpha.
 #' @param family Response type as in \code{ptLasso}.
 #' @param type.measure Measure computed in \code{cv.glmnet}, as in \code{ptLasso}.
@@ -27,7 +27,7 @@ subset.y <- function(y, ix, family) {
 #' @param s The choice of lambda to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "lambda.min". May be "lambda.1se", or a numeric value. (Use caution when supplying a numeric value: the same lambda will be used for all models.)
 #' @param gamma For use only when \code{relax = TRUE}. The choice of gamma to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "gamma.min". May also be "gamma.1se".
 #' @param alphahat.choice When choosing alphahat, we may prefer the best performance using all data (\code{alphahat.choice = "overall"}) or the best average performance across groups (\code{alphahat.choice = "mean"}). This is particularly useful when \code{type.measure} is "auc" or "C", because the average performance across groups is different than the performance with the full dataset. The default is "overall".
-#' @param use.case The type of grouping observed in the data. Can be one of "inputGroups" or "targetGroups".
+#' @param use.case The type of grouping observed in the data. Can be one of "inputGroups", "targetGroups" or "multiresponse".
 #' @param verbose If \code{verbose=1}, print a statement showing which model is currently being fit.
 #' @param fitoverall An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argument keep = TRUE.
 #' @param fitind An optional list of cv.glmnet objects specifying the individual models. These should have been trained on the training data, with the argumnet keep = TRUE.
@@ -163,9 +163,48 @@ subset.y <- function(y, ix, family) {
 #'                    type.measure = "auc", parallel=TRUE)
 #' }
 #' 
+#' # Multiresponse pretraining
+#' set.seed(1234)
+#' n = 1000; ntrain = 500;
+#' p = 500
+#' sigma = 2
+#'      
+#' x = matrix(rnorm(n*p), n, p)
+#' beta1 = c(rep(1, 5), rep(0.5, 5), rep(0, p - 10))
+#' beta2 = c(rep(1, 5), rep(0, 5), rep(0.5, 5), rep(0, p - 15))
+#' 
+#' mu = cbind(x %*% beta1, x %*% beta2)
+#' y  = cbind(mu[, 1] + sigma * rnorm(n), 
+#'            mu[, 2] + sigma * rnorm(n))
+#' cat("SNR for the two tasks:", round(diag(var(mu)/var(y-mu)), 2), fill=TRUE)
+#' cat("Correlation between two tasks:", cor(y[, 1], y[, 2]), fill=TRUE)
+#' 
+#' xtest = x[-(1:ntrain), ]
+#' ytest = y[-(1:ntrain), ]
+#' 
+#' x = x[1:ntrain, ]
+#' y = y[1:ntrain, ]
+#'
+#' # Now, we can fit a ptLasso model:
+#' fit = cv.ptLasso(x, y, type.measure = "mse", use.case = "multiresponse")
+#' # plot(fit) # to see the cv curve.
+#' predict(fit, xtest) # to predict on new data
+#' predict(fit, xtest, ytest=ytest) # if ytest is included, we also measure performance
+#' # By default, we used s = "lambda.min" to compute CV performance.
+#' # We could instead use s = "lambda.1se":
+#' cvfit = cv.ptLasso(x, y, type.measure = "mse", s = "lambda.1se", use.case = "multiresponse")
+#'
+#' # We could also use the glmnet option relax = TRUE:
+#' cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, use.case = "multiresponse")
+#' # And, as we did with lambda, we may want to specify the choice of gamma to compute CV performance:
+#' cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, gamma = "gamma.1se",
+#'                    use.case = "multiresponse")
+#'
+#' 
 #' @export
 cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
-                       family = c("gaussian", "multinomial", "binomial","cox"),  use.case=c("inputGroups","targetGroups"),
+                       family = c("gaussian", "multinomial", "binomial","cox"),
+                       use.case=c("inputGroups","targetGroups", "multiresponse"),
                        type.measure = c("default", "mse", "mae", "auc","deviance","class", "C"),
                        nfolds = 10, foldid = NULL,
                        verbose=FALSE,
@@ -176,11 +215,27 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                        group.intercepts = TRUE,
                        ...) { 
      
-    use.case = match.arg(use.case, c("inputGroups","targetGroups"), several.ok=FALSE)
+    use.case = match.arg(use.case, c("inputGroups","targetGroups", "multiresponse"), several.ok=FALSE)
     family = match.arg(family)
     type.measure = match.arg(type.measure)
         
     this.call <- match.call()
+
+    if(use.case == "multiresponse"){
+        return(
+            cv.ptLassoMult(x, y,
+                           alphalist = alphalist,
+                           type.measure = type.measure,
+                           nfolds = nfolds,
+                           foldid = foldid,
+                           verbose=verbose,
+                           fitoverall=fitoverall,
+                           fitind=fitind,
+                           s = s,
+                           gamma = gamma,
+                           ...)
+        )
+    }
 
     if(!(family %in% names(this.call))) this.call$family = family
     if(!(type.measure %in% names(this.call))) this.call$type.measure = type.measure

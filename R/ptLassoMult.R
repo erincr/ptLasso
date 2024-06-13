@@ -8,7 +8,7 @@
 #' @param type.measure loss to use for cross-validation within each individual, overall, or pretrained lasso model. Choices are 'type.measure="mse"' (mean squared error), 'type.measure="mae"' (mean absolute error) and 'type.measure="deviance"'.
 #' @param overall.lambda The choice of lambda to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", could alternatively be "lambda.min". This choice of lambda will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another lambda must be specified for the individual models, the second stage of pretraining and the overall model.
 #' @param overall.gamma For use only when the option \code{relax = TRUE} is specified. The choice of gamma to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "gamma.1se", but "gamma.min" is also a good option. This choice of gamma will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another gamma must be specified for the individual models, the second stage of pretraining and the overall model.
-#' @param fitoverall An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argumnet keep = TRUE.
+#' @param fitoverall An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argument keep = TRUE.
 #' @param fitind An optional list of cv.glmnet objects specifying the individual models. 
 #' @param nfolds Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.
 #' @param foldid An optional vector of values between 1 and \code{nfolds} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.
@@ -30,6 +30,7 @@
 #' \item{fitoverall.lambda}{Lambda used with fitoverall, to compute the offset for pretraining.}
 #' 
 #' @examples
+#' \dontrun{
 #' # Getting started. First, we simulate data: we need covariates x and multiresponse y.
 #' set.seed(1234)
 #' n = 1000; ntrain = 500;
@@ -57,13 +58,13 @@
 #' # plot(fit) # to see all of the cv.glmnet models trained
 #' predict(fit, xtest) # to predict on new data
 #' predict(fit, xtest, ytest=ytest) # if ytest is included, we also measure performance
+#' }
 #' 
 #' @import glmnet Matrix
-#' @export
 #' @seealso \code{\link{glmnet}}
 #' @references Friedman, J., Hastie, T., & Tibshirani, R. (2010). Regularization paths for generalized linear models via coordinate descent. Journal of Statistical Software, 33(1), 1-22.
 #'
-#' 
+#' @noRd
 ptLassoMult=function(x,y,alpha=0.5,
                  type.measure=c("default", "mse", "mae", "deviance"),
                  overall.lambda = c("lambda.1se", "lambda.min"),
@@ -283,6 +284,8 @@ ptLassoMult=function(x,y,alpha=0.5,
 #'
 #' @seealso \code{\link{ptLassoMult}} and \code{\link{plot.cv.ptLasso}}.
 #' @examples
+#' \dontrun{
+#' # Not run - these examples are in the cv.ptLasso documentation.
 #' # Getting started. First, we simulate data: we need covariates x and multiresponse y.
 #' set.seed(1234)
 #' n = 1000; ntrain = 500;
@@ -322,9 +325,9 @@ ptLassoMult=function(x,y,alpha=0.5,
 #' # Note that the first stage of pretraining uses "lambda.1se" and "gamma.1se" by default.
 #' # This behavior can be modified by specifying overall.lambda and overall.gamma;
 #' # see the documentation for ptLasso for more information.
+#' }
 #' 
-#' 
-#' @export
+#' @noRd
 cv.ptLassoMult <- function(x, y, alphalist=seq(0,1,length=11),
                        type.measure = c("default", "mse", "mae", "deviance"),
                        nfolds = 10, foldid = NULL,
