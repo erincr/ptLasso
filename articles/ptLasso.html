@@ -1948,8 +1948,8 @@ only)<a class="anchor" aria-label="anchor" href="#multi-response-data-with-mixed
 </h3>
 <p>Muti-response data consists of datasets with covariates <span class="math inline">\(X\)</span> and multiple outcomes <span class="math inline">\(y_1, y_2, y_3, \dots\)</span>. If these outcomes
 are all continuous, then it may be natural to treat this as a multitask
-learning problem (see the section “Multitask Learning or Coaching”). If
-the outcomes have mixed types however – e.g. <span class="math inline">\(y_1\)</span> is continuous, <span class="math inline">\(y_2\)</span> binary and <span class="math inline">\(y_3\)</span> survival – then the problem is
+learning problem (see the section “Multi-response data with Gaussian
+responses”). If the outcomes have mixed types however – e.g. <span class="math inline">\(y_1\)</span> is continuous, <span class="math inline">\(y_2\)</span> binary and <span class="math inline">\(y_3\)</span> survival – then the problem is
 slightly more challenging, because there are fewer methods developed for
 this setting.</p>
 <p>Pretraining is a natural fit for this task: we often believe that
@@ -2260,10 +2260,10 @@ each response).</p>
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <p><img src="ptLasso_files/figure-html/unnamed-chunk-198-1.png" width="672"></p>
-<p>The <code>predict</code> function works the same as in
-<code>ptLasso</code>; if <code>ytest</code> is supplied, it will print
+<p>As in previous examples, we can predict using the
+<code>predict</code>; if <code>ytest</code> is supplied, this will print
 the mean squared error as well as the support size for the pretrained,
-overall and individual models, using the single <span class="math inline">\(\alpha\)</span> that minimizes the the average CV
+overall and individual models using the single <span class="math inline">\(\alpha\)</span> that minimizes the the average CV
 MSE across both responses.</p>
 <div class="sourceCode" id="cb103"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">preds</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
@@ -2288,9 +2288,8 @@ MSE across both responses.</p>
 <span><span class="co">#&gt; Overall    57                           </span></span>
 <span><span class="co">#&gt; Pretrain   23 (19 common + 4 individual)</span></span>
 <span><span class="co">#&gt; Individual 80</span></span></code></pre></div>
-<p>However, as in <code>predict</code> with <code>ptLasso</code>, we can
-choose to use the value of <span class="math inline">\(\alpha\)</span>
-that minimizes the CV MSE for <em>each</em> response.</p>
+<p>Also as before, we can choose to use the value of <span class="math inline">\(\alpha\)</span> that minimizes the CV MSE for
+<em>each</em> response.</p>
 <div class="sourceCode" id="cb104"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">preds</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, ytest <span class="op">=</span> <span class="va">ytest</span>, alphatype <span class="op">=</span> <span class="st">"varying"</span><span class="op">)</span></span>
 <span><span class="va">preds</span></span>
