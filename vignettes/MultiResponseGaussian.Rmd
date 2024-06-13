@@ -5,7 +5,7 @@ output:
   toc: false
 bibliography: ptLasso.bib
 vignette: >
-  %\VignetteIndexEntry{Multitask learning or coaching}
+  %\VignetteIndexEntry{Multi-response data with Gaussian responses}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{rpart, xgboost, survival, sparsepca, MASS}

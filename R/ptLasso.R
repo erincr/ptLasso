@@ -27,13 +27,14 @@
 #'
 #' @return An object of class \code{"ptLasso"}, which is a list with the ingredients of the fitted models.
 #' \item{call}{The call that produced this object.}
-#' \item{k}{The number of groups.}
+#' \item{k}{The number of groups (for 'use.case = "inputGroups"').}
+#' \item{nresps}{The number of responses (for 'use.case = "multiresponse"' and 'use.case = "timeseries"').}
 #' \item{alpha}{The value of alpha used for pretraining.}
-#' \item{group.levels}{IDs for all of the groups used in training.}
-#' \item{group.legend}{Mapping from user-supplied group ids to numeric group ids. For internal use (e.g. with predict).}
-#' \item{fitoverall}{A fitted \code{cv.glmnet} object trained using the full data.}
-#' \item{fitpre}{A list of fitted (pretrained) \code{cv.glmnet} objects, one trained with each data group.}
-#' \item{fitind}{A list of fitted \code{cv.glmnet} objects, one trained with each group.}
+#' \item{group.levels}{IDs for all of the groups used in training (for 'use.case = "inputGroups"').}
+#' \item{group.legend}{Mapping from user-supplied group ids to numeric group ids. For internal use (e.g. with predict). (For 'use.case = "inputGroups"')}
+#' \item{fitoverall}{A fitted \code{cv.glmnet} object trained using the full data. Not available for 'use.case = "timeseries"'. }
+#' \item{fitpre}{A list of fitted (pretrained) \code{cv.glmnet} objects, one trained with each data group or response.}
+#' \item{fitind}{A list of fitted \code{cv.glmnet} objects, one trained with each group or response.}
 #' \item{fitoverall.lambda}{Lambda used with fitoverall, to compute the offset for pretraining.}
 #' \item{fitoverall.gamma}{Gamma used with fitoverall when 'relax = TRUE', to compute the offset for pretraining.}
 #' 
