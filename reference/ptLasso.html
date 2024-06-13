@@ -173,25 +173,28 @@
 <dd><p>The call that produced this object.</p></dd>
 
 <dt>k</dt>
-<dd><p>The number of groups.</p></dd>
+<dd><p>The number of groups (for 'use.case = "inputGroups"').</p></dd>
+
+<dt>nresps</dt>
+<dd><p>The number of responses (for 'use.case = "multiresponse"' and 'use.case = "timeseries"').</p></dd>
 
 <dt>alpha</dt>
 <dd><p>The value of alpha used for pretraining.</p></dd>
 
 <dt>group.levels</dt>
-<dd><p>IDs for all of the groups used in training.</p></dd>
+<dd><p>IDs for all of the groups used in training (for 'use.case = "inputGroups"').</p></dd>
 
 <dt>group.legend</dt>
-<dd><p>Mapping from user-supplied group ids to numeric group ids. For internal use (e.g. with predict).</p></dd>
+<dd><p>Mapping from user-supplied group ids to numeric group ids. For internal use (e.g. with predict). (For 'use.case = "inputGroups"')</p></dd>
 
 <dt>fitoverall</dt>
-<dd><p>A fitted <code>cv.glmnet</code> object trained using the full data.</p></dd>
+<dd><p>A fitted <code>cv.glmnet</code> object trained using the full data. Not available for 'use.case = "timeseries"'.</p></dd>
 
 <dt>fitpre</dt>
-<dd><p>A list of fitted (pretrained) <code>cv.glmnet</code> objects, one trained with each data group.</p></dd>
+<dd><p>A list of fitted (pretrained) <code>cv.glmnet</code> objects, one trained with each data group or response.</p></dd>
 
 <dt>fitind</dt>
-<dd><p>A list of fitted <code>cv.glmnet</code> objects, one trained with each group.</p></dd>
+<dd><p>A list of fitted <code>cv.glmnet</code> objects, one trained with each group or response.</p></dd>
 
 <dt>fitoverall.lambda</dt>
 <dd><p>Lambda used with fitoverall, to compute the offset for pretraining.</p></dd>
