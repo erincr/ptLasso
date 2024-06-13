@@ -23,7 +23,7 @@ require(glmnet)
 require(survival)
 ```
 
-Muti-response data consists of datasets with covariates $X$ and multiple outcomes $y_1, y_2, y_3, \dots$. If these outcomes are all continuous, then it may be natural to treat this as a multitask learning problem (see the section "Multitask Learning or Coaching"). If the outcomes have mixed types however -- e.g. $y_1$ is continuous, $y_2$ binary and $y_3$ survival -- then the problem is slightly more challenging, because there are fewer methods developed for this setting.
+Muti-response data consists of datasets with covariates $X$ and multiple outcomes $y_1, y_2, y_3, \dots$. If these outcomes are all continuous, then it may be natural to treat this as a multitask learning problem (see the section "Multi-response data with Gaussian responses"). If the outcomes have mixed types however -- e.g. $y_1$ is continuous, $y_2$ binary and $y_3$ survival -- then the problem is slightly more challenging, because there are fewer methods developed for this setting.
 
 Pretraining is a natural fit for this task: we often believe that there is shared information between $y_1$, $y_2$ and $y_3$. If we fit 3 separate models, we never get to take advantage of any shared information; further, because the outcomes have different types, there are very few methods to fit _one_ model for all outcomes (an "overall model").
 

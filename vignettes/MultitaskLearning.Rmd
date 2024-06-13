@@ -1,5 +1,5 @@
 ---
-title: "Multitask learning or coaching (Gaussian responses)"
+title: "Multi-response data with Gaussian responses"
 output: 
   pdf_document:
   toc: false
@@ -75,13 +75,13 @@ fit = cv.ptLasso(x, y, use.case = "multiresponse")
 plot(fit)
 ```
 
-The `predict` function works the same as in `ptLasso`; if `ytest` is supplied, it will print the mean squared error as well as the support size for the pretrained, overall and individual models, using the single $\alpha$ that minimizes the the average CV MSE across both responses.
+As in previous examples, we can predict using the `predict`; if `ytest` is supplied, this will print the mean squared error as well as the support size for the pretrained, overall and individual models using the single $\alpha$ that minimizes the the average CV MSE across both responses.
 ```{r}
 preds = predict(fit, xtest, ytest = ytest)
 preds
 ```
 
-However, as in `predict` with `ptLasso`, we can choose to use the value of $\alpha$ that minimizes the CV MSE for _each_ response.
+Also as before, we can choose to use the value of $\alpha$ that minimizes the CV MSE for _each_ response.
 ```{r}
 preds = predict(fit, xtest, ytest = ytest, alphatype = "varying")
 preds
