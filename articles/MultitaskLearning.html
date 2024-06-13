@@ -97,20 +97,24 @@ types”.)</p>
 to pass information between models for the different responses. The
 overview for our approach is to:</p>
 <ol style="list-style-type: decimal">
-<li>fit a multi-response Gaussian model,</li>
+<li>fit a multi-response Gaussian model using a group lasso penalty
+(more below),</li>
 <li>extract the support (shared across responses) and offsets (one for
 each response), and</li>
 <li>fit a model for each response, using the shared support and
 appropriate offset.</li>
 </ol>
-<p>Importantly, in Step 1, we use regularization so that the
-multi-response Gaussian model is forced to choose the same support for
-all responses <span class="math inline">\(y_1, \dots, y_j\)</span>. This
-encourages learning <em>across</em> all responses in the first stage; in
-the second stage, then, we find features that are specific to each
-individual response <span class="math inline">\(y_k\)</span>.</p>
-<p>This is all done with the function <code>ptLassoMult</code> (“Mult”
-stands for multi-response ptLasso).</p>
+<p>Importantly, the group lasso penalty behaves like the lasso, but on
+the whole group of coefficients for each response: they are either all
+zero, or else none are zero (see the <code>glmnet</code> documentation
+about <code>family = "mgaussian"</code> for more detail). As a result,
+the multi-response Gaussian model is forced to choose the same support
+for all responses <span class="math inline">\(y_1, \dots, y_j\)</span>.
+This encourages learning <em>across</em> all responses in the first
+stage; in the second stage, then, we find features that are specific to
+each individual response <span class="math inline">\(y_k\)</span>.</p>
+<p>This is all done with the function <code>ptLasso</code>, using the
+argument <code>use.case = "multiresponse"</code>.</p>
 <p>We will illustrate this with simulated data with two Gaussian
 responses; the two responses share the first 5 features, and they each
 have 5 features of their own. The two responses are quite related, with
@@ -143,25 +147,23 @@ Pearson correlation around 0.5.</p>
 <span></span>
 <span><span class="va">x</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span>, <span class="op">]</span></span>
 <span><span class="va">y</span> <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span>, <span class="op">]</span></span></code></pre></div>
-<p>Now, we are ready to call <code>ptLassoMult</code> with our
-covariates <code>x</code> and response matrix <code>y</code>. (The
-syntax is nearly identical to that of <code>ptLasso</code>, and as in
-<code>ptLasso</code>, the default value of <span class="math inline">\(\alpha = 0.5\)</span>.) A call to
+<p>Now, we are ready to call <code>ptLasso</code> with our covariates
+<code>x</code> and response matrix <code>y</code>, and we specify the
+argument <code>use.case = "multiresponse"</code>. A call to
 <code>plot</code> shows the CV curves over the lasso parameter <span class="math inline">\(\lambda\)</span> for each model.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/ptLassoMult.html">ptLassoMult</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/ptLasso.html">ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
+<p><img src="MultitaskLearning_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<p>To choose the pretraining parameter <span class="math inline">\(\alpha\)</span>, we can use
+<code>cv.ptLasso</code>. Using <code>plot</code>, we can view the CV
+curve for pretraining together with the overall model (multi-response
+Gaussian model) and the individual model (a separate Gaussian model for
+each response).</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <p><img src="MultitaskLearning_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
-<p>To choose the pretraining parameter <span class="math inline">\(\alpha\)</span>, we can use
-<code>cv.ptLassoMult</code>. The syntax is as in
-<code>cv.ptLasso</code>; and just like <code>cv.ptLasso</code>, we can
-view the CV curve for pretraining together with the overall model
-(multi-response Gaussian model) and the individual model (a separate
-Gaussian model for each response) using <code>plot</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLassoMult.html">cv.ptLassoMult</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MultitaskLearning_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 <p>The <code>predict</code> function works the same as in
 <code>ptLasso</code>; if <code>ytest</code> is supplied, it will print
 the mean squared error as well as the support size for the pretrained,
