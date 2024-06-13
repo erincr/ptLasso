@@ -192,6 +192,13 @@ fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.meas
 # plot(fit) to see all of the cv.glmnet models trained
 predict(fit, xtest, groupstest, ytest=ytest)
 
+\dontrun{
+### Model fitting with parallel = TRUE
+require(doMC)
+registerDoMC(cores = 4)
+fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse", parallel=TRUE)
+}
+
 # Now let's consider the case of a multiresponse outcome. We'll start by simulating data:
 set.seed(1234)
 n = 1000; ntrain = 500;
@@ -228,12 +235,6 @@ cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, use.case = "multire
 # And, as we did with lambda, we may want to specify the choice of gamma to compute CV performance:
 cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, gamma = "gamma.1se", use.case = "multiresponse")
 
-\dontrun{
-### Model fitting with parallel = TRUE
-require(doMC)
-registerDoMC(cores = 4)
-fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse", parallel=TRUE)
-}
 
 
 }

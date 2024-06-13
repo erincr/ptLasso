@@ -186,6 +186,14 @@ cvfit
 # plot(cvfit) # to see CV performance as a function of alpha 
 predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.1se")
 
+\dontrun{
+### Model fitting with parallel = TRUE
+require(doMC)
+registerDoMC(cores = 4)
+cvfit = cv.ptLasso(x, y, groups = groups, family = "binomial",
+                   type.measure = "auc", parallel=TRUE)
+}
+
 # Multiresponse pretraining
 set.seed(1234)
 n = 1000; ntrain = 500;
@@ -220,15 +228,9 @@ cvfit = cv.ptLasso(x, y, type.measure = "mse", s = "lambda.1se", use.case = "mul
 # We could also use the glmnet option relax = TRUE:
 cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, use.case = "multiresponse")
 # And, as we did with lambda, we may want to specify the choice of gamma to compute CV performance:
-cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, gamma = "gamma.1se", use.case = "multiresponse")
+cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, gamma = "gamma.1se",
+                   use.case = "multiresponse")
 
-\dontrun{
-### Model fitting with parallel = TRUE
-require(doMC)
-registerDoMC(cores = 4)
-cvfit = cv.ptLasso(x, y, groups = groups, family = "binomial",
-                   type.measure = "auc", parallel=TRUE)
-}
 
 }
 \seealso{
