@@ -540,6 +540,14 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   23 (3 common + 20 individual)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Individual 7                            </span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co">### Model fitting with parallel = TRUE</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">doMC</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">registerDoMC</span><span class="op">(</span>cores <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu">cv.ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, family <span class="op">=</span> <span class="st">"binomial"</span>,</span></span>
+<span class="r-in"><span>                   type.measure <span class="op">=</span> <span class="st">"auc"</span>, parallel<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiresponse pretraining</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">n</span> <span class="op">=</span> <span class="fl">1000</span>; <span class="va">ntrain</span> <span class="op">=</span> <span class="fl">500</span>;</span></span>
@@ -609,15 +617,9 @@
 <span class="r-in"><span><span class="co"># We could also use the glmnet option relax = TRUE:</span></span></span>
 <span class="r-in"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu">cv.ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, relax <span class="op">=</span> <span class="cn">TRUE</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># And, as we did with lambda, we may want to specify the choice of gamma to compute CV performance:</span></span></span>
-<span class="r-in"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu">cv.ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, relax <span class="op">=</span> <span class="cn">TRUE</span>, gamma <span class="op">=</span> <span class="st">"gamma.1se"</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu">cv.ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, relax <span class="op">=</span> <span class="cn">TRUE</span>, gamma <span class="op">=</span> <span class="st">"gamma.1se"</span>,</span></span>
+<span class="r-in"><span>                   use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co">### Model fitting with parallel = TRUE</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">doMC</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">registerDoMC</span><span class="op">(</span>cores <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu">cv.ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, family <span class="op">=</span> <span class="st">"binomial"</span>,</span></span>
-<span class="r-in"><span>                   type.measure <span class="op">=</span> <span class="st">"auc"</span>, parallel<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
