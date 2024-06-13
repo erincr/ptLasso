@@ -756,18 +756,17 @@ predict(cvfit, xtest, ytest = ytest)
 predict(cvfit, xtest, ytest = ytest, alphatype = "varying")
 ```
 
-## Time series data (`glmnet` only)
-```{r child = 'TimeSeriesData.Rmd'}
+# Multi-response data with Gaussian responses
+```{r child = 'MultiResponseGaussian.Rmd'}
 ```
 
 ## Multi-response data with mixed response types (`glmnet` only)
-```{r child = 'MultiResponseData.Rmd'}
+```{r child = 'MultiResponseMixed.Rmd'}
 ```
 
-## Multi-task learning or coaching (`glmnet` only)
-```{r child = 'MultitaskLearning.Rmd'}
+# Time series data (`glmnet` only)
+```{r child = 'TimeSeriesData.Rmd'}
 ```
-
 
 # Conditional average treatment effect estimation (`glmnet` only)
 ```{r child = 'ConditionalAverageTreatmentEffect.Rmd'}
