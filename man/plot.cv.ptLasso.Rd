@@ -4,7 +4,7 @@
 \alias{plot.cv.ptLasso}
 \title{Plot the cross-validation curve produced by cv.ptLasso, as a function of the \code{alpha} values used.}
 \usage{
-\method{plot}{cv.ptLasso}(x, plot.alphahat = TRUE, ...)
+\method{plot}{cv.ptLasso}(x, plot.alphahat = FALSE, ...)
 }
 \arguments{
 \item{x}{Fitted \code{"cv.ptLasso"} object.}

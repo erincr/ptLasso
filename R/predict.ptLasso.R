@@ -108,8 +108,8 @@ predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=N
         }
         
         # TODO future: what if they have only e.g. one group at prediction time?
-                                        # They shouldn't have to supply alphas for every group.
-        if(object$call$use.case == "multiresponse"){
+        # They shouldn't have to supply alphas for every group.
+        if(object$call$use.case %in% c("multiresponse", "timeSeries")){
             if(length(alpha) != object$fit[[1]]$nresps) stop("Must have one alpha for each response.")
         } else {
             if(length(alpha) != object$fit[[1]]$k) stop("Must have one alpha for each group.")
@@ -118,7 +118,7 @@ predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=N
         model.ix = sapply(alpha, function(a) which(abs(a - object$errpre[, "alpha"]) < close.enough))
         model.ix = unname(model.ix)
 
-
+       
         ########################################################################################################
         # Target groups
         ########################################################################################################
@@ -145,6 +145,71 @@ predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=N
 
                    )
         }
+        
+        ########################################################################################################
+        # Time series
+        ########################################################################################################
+        if(object$call$use.case == "timeSeries") {
+            k = object$fit[[1]]$nresps
+            results = lapply(1:k,
+                             function(ix) {predict.ptLassoTS(object$fit[[model.ix[ix]]],
+                                                           xtest, 
+                                                           type = type,
+                                                           call = this.call,
+                                                           s = s, gamma = gamma)}
+                             )
+            
+            phatpre = do.call(cbind, lapply(1:k, function(i) results[[i]]$yhatpre[, i]))
+            phatind = do.call(cbind, lapply(1:k, function(i) results[[i]]$yhatind[, i]))
+            all.coef.cts = table(unlist(lapply(results, function(x) x$suppre.individual)))
+            suppre.common = as.numeric(names(all.coef.cts)[all.coef.cts > k/2])
+            suppre.individual = setdiff(as.numeric(names(all.coef.cts)), suppre.common)
+
+            if(!is.null(ytest)){
+                family = object$call$family
+                type.measure = object$call$type.measure
+                
+                errpre = errind = erroverall.classes = rep(NA, object$fit[[1]]$nresps)
+                for(kk in 1:k){
+                    errpre[kk] = as.numeric(assess.glmnet(phatpre[, kk, drop=FALSE], newy=ytest[, kk, drop=FALSE], family=family)[type.measure])
+                    errind[kk] = as.numeric(assess.glmnet(phatind[, kk, drop=FALSE], newy=ytest[, kk, drop=FALSE], family=family)[type.measure])
+                }
+                
+                errind = c(mean(errind, na.rm=TRUE),
+                           errind[!is.na(errind)])
+                errpre = c(mean(errpre, na.rm=TRUE),
+                           errpre[!is.na(errpre)])
+                names(errpre) = names(errind) = c("mean", paste0("response_", 1:k))
+                
+            }
+            
+            out = enlist(            
+                yhatind = phatind, 
+                yhatpre = phatpre,
+
+                suppre.common = results[[1]]$suppre.common,
+                suppre.individual,
+                supoverall = results[[1]]$supoverall,
+                supind = results[[1]]$supind,
+
+                use.case = object$fit[[1]]$call$use.case,
+
+                type.measure = object$fit[[1]]$call$type.measure,
+
+                alpha,
+                call = this.call
+            )
+
+            if(return.link){
+                out$linkind = phatind
+                out$linkpre = phatpre
+            }
+            
+            if(!is.null(ytest)){
+                out$errpre = errpre
+                out$errind = errind
+            }
+        }
 
         ########################################################################################################
         # Multiresponse
@@ -153,7 +218,7 @@ predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=N
 
             k = object$fit[[1]]$nresps
             results = lapply(1:k,
-                             function(ix) {predict.ptLasso.multiresponse(object$fit[[model.ix[ix]]],
+                             function(ix) {predict.ptLassoMult(object$fit[[model.ix[ix]]],
                                                            xtest, 
                                                            type = type,
                                                            call = this.call,
@@ -411,15 +476,99 @@ predict.ptLasso=function(object, xtest, groupstest=NULL, ytest=NULL,
 
     
     if(object$call$use.case=="inputGroups") out=predict.ptLasso.inputGroups(object, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s, gamma=gamma, return.link=return.link, group.intercepts=group.intercepts)
-    if(object$call$use.case=="multiresponse") out=predict.ptLasso.multiresponse(object, xtest, ytest=ytest, type=type, call=this.call, type.measure=type.measure, s=s, gamma=gamma)
+    if(object$call$use.case=="multiresponse") out=predict.ptLassoMult(object, xtest, ytest=ytest, type=type, call=this.call, type.measure=type.measure, s=s, gamma=gamma)
+    if(object$call$use.case=="timeSeries") out=predict.ptLassoTS(object, xtest, ytest=ytest, family=family, type=type, call=this.call, type.measure=type.measure, s=s, gamma=gamma)
     if(object$call$use.case=="targetGroups") out=predict.ptLasso.targetGroups(object, xtest, ytest=ytest, type=type, call=this.call, family=family, type.measure=type.measure, s=s, gamma=gamma, return.link=return.link)
     class(out)="predict.ptLasso"
     return(out)
 }
 
+#' Predict function for time series data
+#' @noRd
+predict.ptLassoTS = function(fit, xtest, type, family, call, type.measure = fit$call$type.measure, s="lambda.min", gamma="gamma.min", ytest=NULL, return.link = FALSE, ...){
+    
+    k=fit$nresps
+    n = if(is.list(xtest)) { nrow(xtest[[1]]) } else { nrow(xtest) }
+
+    if(is.list(xtest)){
+        isok = check.list.dims(xtest, k)
+        if(!isok[[1]]) stop(isok[[2]])
+        np = dim(xtest[[1]])
+    } else {
+        np=dim(xtest)
+        if(is.null(np)|(np[2]<=1)) stop("xtest should be a matrix with 2 or more columns")
+    }
+    n = np[1]
+
+    if(!is.null(ytest)) {
+        if(ncol(ytest) != k) stop("ytest should have the same number of columns as y in the training data.")
+        if(is.list(xtest)) {
+            if(length(xtest) != k) stop("The length of xtest should be the same as the number of columns of y.")
+       }
+    }
+    
+    errpre=errind=rep(NA, k)
+    phatpre=yhatpre=array(NA, c(n, k))
+    phatind=yhatind=array(NA, c(n, k))
+    
+    offset = rep(0, n)
+    for(kk in 1:k){
+        this.xtest = if(is.list(xtest)) { xtest[[kk]] } else { xtest }
+        
+        # Pretraining predictions
+        phatpre[, kk] = predict(fit$fitpre[[kk]], this.xtest, newoffset=offset, type="link", s=s, gamma=gamma)
+        yhatpre[, kk] = predict(fit$fitpre[[kk]], this.xtest, newoffset=offset, type=type, s=s, gamma=gamma)
+        offset = phatpre[, kk]
+        
+        # Individual model predictions
+        phatind[, kk] = predict(fit$fitind[[kk]], this.xtest, type="link", s=s, gamma=gamma)
+        yhatind[, kk] = predict(fit$fitind[[kk]], this.xtest, type=type, s=s, gamma=gamma)  
+        
+        if(!is.null(ytest)){
+            errpre[kk] = as.numeric(assess.glmnet(phatpre[, kk], newy=ytest[, kk, drop=FALSE], family=family)[type.measure])
+            errind[kk] = as.numeric(assess.glmnet(phatind[, kk], newy=ytest[, kk], family=family)[type.measure])
+        }
+    }
+    
+    if(!is.null(ytest)){
+        errind = c(mean(errind, na.rm=TRUE),
+                   errind[!is.na(errind)])
+        errpre = c(mean(errpre, na.rm=TRUE),
+                   errpre[!is.na(errpre)])
+        names(errpre) = names(errind) = c("mean", paste0("response_", 1:k))
+    }
+    
+    suppre.common     = get.pretrain.support(fit, s=s, gamma=gamma, commonOnly=TRUE)
+    suppre.individual = setdiff(get.pretrain.support(fit, s=s, gamma=gamma), suppre.common)
+    
+    out = enlist(
+        yhatind = yhatind,
+        yhatpre = yhatpre,
+        suppre.common,
+        suppre.individual,
+        supind  = get.individual.support(fit, s=s, gamma=gamma),
+        alpha = fit$alpha,
+        gamma = fit$gamma,
+        type.measure = type.measure,
+        call)
+    
+    if(!is.null(ytest)) {
+        out$errind = errind
+        out$errpre = errpre
+    }
+
+    if(return.link){
+        out$linkind = phatind
+        out$linkpre = phatpre 
+    }
+
+    return(out)
+}
+
+
 #' Predict function for multiresponse data
 #' @noRd
-predict.ptLasso.multiresponse = function(fit, xtest, type, call, type.measure = fit$call$type.measure, s="lambda.min", gamma="gamma.min", ytest=NULL, return.link = FALSE, ...){
+predict.ptLassoMult = function(fit, xtest, type, call, type.measure = fit$call$type.measure, s="lambda.min", gamma="gamma.min", ytest=NULL, return.link = FALSE, ...){
     
     k=fit$nresps
 
@@ -444,7 +593,7 @@ predict.ptLasso.multiresponse = function(fit, xtest, type, call, type.measure = 
     
     # preTraining predictions
     offsetTest = (1-fit$alpha) * predict(fit$fitoverall, xtest, s=fit$fitoverall.lambda, gamma=fit$fitoverall.gamma, type="link")[, , 1]
-    
+
     for(kk in 1:k){
         # Pretraining predictions
         phatpre[, kk, 1] = predict(fit$fitpre[[kk]], xtest, newoffset=offsetTest[, kk], type="link", s=s, gamma=gamma) 

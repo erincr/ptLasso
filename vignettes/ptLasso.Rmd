@@ -1,18 +1,18 @@
 ---
 title: "ptLasso Vignette and Manual"
 output:
-  html_document:
-    toc: true
   pdf_document:
+    toc: true
+  html_document:
     toc: true
 pkgdown:
   as_is: true
 bibliography: ptLasso.bib
 vignette: >
   %\VignetteIndexEntry{ptLasso}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{rpart, xgboost, survival, sparsepca, MASS}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 ```{r, include = FALSE}
@@ -582,6 +582,8 @@ predict(fit, xtest, groupstest, ytest = ytest, alphatype = "varying")
 ```
 
 # Target grouped data
+
+## Intuition
 Now we turn to the __target grouped__ setting. Suppose we have a dataset with a multinomial outcome, and no other grouping on the observations. For example, our data might look like the following:
 
 ```{r}
@@ -673,11 +675,11 @@ ovrpreds = cbind(
 ovrpreds.class = apply(ovrpreds, 1, which.max)
 ```
 
-This is all done automatically within `ptLasso`; we show a more detailed example in the next section. The example above is intended only to show how pretraining works for multinomial outcomes, and some technical details have been omitted. (For example, `ptLasso` takes care of crossfitting between the first and second steps.)
+This is all done automatically within `ptLasso`; we will now show a more detailed example using the `ptLasso` functions. The example above is intended only to show how pretraining works for multinomial outcomes, and some technical details have been omitted. (For example, `ptLasso` takes care of crossfitting between the first and second steps.)
 
-## Base case: data with a multinomial outcome
+## Example
 
-We will use `ptLasso` for data with a multinomial outcome. First, let's simulate multinomial data with 5 classes. We start by drawing $X$ from a normal distribution (uncorrelated features), and then we shift the columns differently for each group.
+First, let's simulate multinomial data with 5 classes. We start by drawing $X$ from a normal distribution (uncorrelated features), and then we shift the columns differently for each group.
 
 ```{r multicoefs, echo = FALSE, eval = FALSE}
 coef.table = cbind(cbind(

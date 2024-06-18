@@ -40,11 +40,17 @@ We will illustrate this with simulated data with two Gaussian responses; the two
 ```{r}
 set.seed(1234)
 
-n = 1000; ntrain = 500;
-p = 500
-sigma = 2
+# Define constants
+n = 1000         # Total number of samples
+ntrain = 650     # Number of training samples
+p = 500          # Number of features
+sigma = 2        # Standard deviation of noise
      
-x = matrix(rnorm(n*p), n, p)
+
+# Generate covariate matrix
+x = matrix(rnorm(n * p), n, p)
+
+# Define coefficients for responses 1 and 2
 beta1 = c(rep(1, 5), rep(0.5, 5), rep(0, p - 10))
 beta2 = c(rep(1, 5), rep(0, 5), rep(0.5, 5), rep(0, p - 15))
 

@@ -10,7 +10,7 @@ cv.ptLasso(
   groups = NULL,
   alphalist = seq(0, 1, length = 11),
   family = c("gaussian", "multinomial", "binomial", "cox"),
-  use.case = c("inputGroups", "targetGroups", "multiresponse"),
+  use.case = c("inputGroups", "targetGroups", "multiresponse", "timeSeries"),
   type.measure = c("default", "mse", "mae", "auc", "deviance", "class", "C"),
   nfolds = 10,
   foldid = NULL,
@@ -35,7 +35,7 @@ cv.ptLasso(
 
 \item{family}{Response type as in \code{ptLasso}.}
 
-\item{use.case}{The type of grouping observed in the data. Can be one of "inputGroups", "targetGroups" or "multiresponse".}
+\item{use.case}{The type of grouping observed in the data. Can be one of "inputGroups", "targetGroups", "multiresponse" or "timeSeries".}
 
 \item{type.measure}{Measure computed in \code{cv.glmnet}, as in \code{ptLasso}.}
 
@@ -96,7 +96,7 @@ groupstest = sort(rep(1:5, 200))
 # Model fitting
 cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
 cvfit
-# plot(cvfit) # to see CV performance as a function of alpha 
+plot(cvfit) # to see CV performance as a function of alpha 
 predict(cvfit, xtest, groupstest, s="lambda.min") # to predict with held out data
 predict(cvfit, xtest, groupstest, s="lambda.min", ytest=ytest) # to also measure performance
 
@@ -105,7 +105,7 @@ predict(cvfit, xtest, groupstest, s="lambda.min", ytest=ytest) # to also measure
 cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
                    s = "lambda.1se")
 
-# We could also use the glmnet option relax = TRUE:
+# We could have used the glmnet option relax = TRUE:
 cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
                    relax = TRUE)
 # And, as we did with lambda, we may want to specify the choice of gamma to compute CV performance:
@@ -195,6 +195,7 @@ cvfit = cv.ptLasso(x, y, groups = groups, family = "binomial",
 }
 
 # Multiresponse pretraining
+# Now let's consider the case of a multiresponse outcome. We'll start by simulating data:
 set.seed(1234)
 n = 1000; ntrain = 500;
 p = 500
@@ -218,8 +219,8 @@ y = y[1:ntrain, ]
 
 # Now, we can fit a ptLasso model:
 fit = cv.ptLasso(x, y, type.measure = "mse", use.case = "multiresponse")
-# plot(fit) # to see the cv curve.
-predict(fit, xtest) # to predict on new data
+plot(fit) # to see the cv curve.
+predict(fit, xtest) # to predict with new data
 predict(fit, xtest, ytest=ytest) # if ytest is included, we also measure performance
 # By default, we used s = "lambda.min" to compute CV performance.
 # We could instead use s = "lambda.1se":
@@ -231,6 +232,36 @@ cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, use.case = "multire
 cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, gamma = "gamma.1se",
                    use.case = "multiresponse")
 
+# Time series pretraining
+# Now suppose we have time series data with a binomial outcome measured at 3 different time points.
+set.seed(1234)
+n = 600; ntrain = 300; p = 50
+x = matrix(rnorm(n*p), n, p)
+
+beta1 = c(rep(0.25, 10), rep(0, p-10))
+beta2 = beta1 + c(rep(0.1, 10), runif(5, min = -0.25, max = 0), rep(0, p-15))
+beta3 = beta1 + c(rep(0.2, 10), runif(5, min = -0.25, max = 0),
+                  runif(5, min = 0, max = 0.1), rep(0, p-20))
+
+y1 = rbinom(n, 1, prob = 1/(1 + exp(-x \%*\% beta1)))
+y2 = rbinom(n, 1, prob = 1/(1 + exp(-x \%*\% beta2)))
+y3 = rbinom(n, 1, prob = 1/(1 + exp(-x \%*\% beta3)))
+y = cbind(y1, y2, y3)
+
+xtest = x[-(1:ntrain), ]
+ytest = y[-(1:ntrain), ]
+
+x = x[1:ntrain, ]
+y = y[1:ntrain, ]
+
+cvfit =  cv.ptLasso(x, y, use.case="timeSeries", family="binomial",
+                    type.measure="auc")
+plot(cvfit, plot.alphahat = TRUE)
+predict(cvfit, xtest, ytest=ytest)
+
+# The glmnet option relax = TRUE:
+cvfit = cv.ptLasso(x, y, type.measure = "auc", family = "binomial", relax = TRUE,
+                   use.case = "timeSeries")
 
 }
 \seealso{

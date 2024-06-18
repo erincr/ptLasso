@@ -33,8 +33,8 @@ yaxis.name = function(x){
 #' @export
 #'
 #'
-plot.cv.ptLasso = function(x, plot.alphahat = TRUE, ...){
-    if(x$call$use.case %in% c("inputGroups", "multiresponse"))  ggplot.ptLasso.inputGroups(x,  plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
+plot.cv.ptLasso = function(x, plot.alphahat = FALSE, ...){
+    if(x$call$use.case %in% c("inputGroups", "multiresponse", "timeSeries"))  ggplot.ptLasso.inputGroups(x,  plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
     if(x$call$use.case == "targetGroups") ggplot.ptLasso.targetGroups(x, plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
 }
 
@@ -129,74 +129,126 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
 #' @noRd
 ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 
+    is.ts = (x$call$use.case == "timeSeries")
+    
     nm = "group"
-    if(x$call$use.case == "multiresponse") nm = "response"
+    if(x$call$use.case %in% c("multiresponse", "timeSeries")) nm = "response"
     
     k = length(x$fit[[1]]$fitind)
     err.pre = x$errpre
     err.pan = x$erroverall
     err.ind = x$errind
-    
+   
     suppre = sapply(x$fit, function(ff) length(get.pretrain.support(ff, commonOnly = FALSE)))
     supind = length(get.individual.support(x, commonOnly = FALSE))
-    suppan = length(get.overall.support(x))
+    if(!is.ts) suppan = length(get.overall.support(x))
     
     n.alpha = nrow(err.pre)
 
-    forplot = data.frame(
-        "alpha"   = c(err.pre[,"alpha"], err.pre[,"alpha"], err.pre[,"alpha"]),
-        "overall" = c(err.pre[, "overall"], rep(err.ind["overall"], n.alpha), rep(err.pan["overall"], n.alpha)),
-        "model"   = c(rep("Pretrain", n.alpha), rep("Individual", n.alpha), rep("Overall", n.alpha))
-    )
-    ylims = range(forplot$overall)
+    if(is.ts){
+        forplot = data.frame(
+            "alpha"   = c(err.pre[,"alpha"], err.pre[,"alpha"]),
+            "mean" = c(err.pre[, "mean"], rep(err.ind["mean"], n.alpha)),
+            "model"   = c(rep("Pretrain", n.alpha), rep("Individual", n.alpha))
+        )
+        cname = "mean"
+    } else {
+        forplot = data.frame(
+            "alpha"   = c(err.pre[,"alpha"], err.pre[,"alpha"], err.pre[,"alpha"]),
+            "overall" = c(err.pre[, "overall"], rep(err.ind["overall"], n.alpha), rep(err.pan["overall"], n.alpha)),
+            "model"   = c(rep("Pretrain", n.alpha), rep("Individual", n.alpha), rep("Overall", n.alpha))
+        )
+        cname = "overall"
+    }
+    ylims = range(forplot[cname])
     nudge = .1 * (ylims[2] - ylims[1])
     ylims[2] = ylims[2] + nudge
     ylims[1] = ylims[1] - nudge
 
+    title = if(is.ts) {paste0("Average performance over ", as.character(k), " ",  nm, "s")} else {paste0(as.character(k), " ", nm, " problem")}
+
     plot1 <- ggplot() +
-        geom_line(aes(x=forplot$alpha, y=forplot$overall,
+        geom_line(aes(x=forplot$alpha, y=unlist(forplot[cname]),
                       group = forplot$model, color = forplot$model)) +
-        geom_text(aes(x=.2, y=err.pan["overall"], label=as.character(suppan), vjust=-1), size=3, color="#666666") +
-        geom_text(aes(x=.2, y=err.ind["overall"], label=as.character(supind), vjust=-1), size=3, color="#666666") +
+        geom_text(aes(x=.2, y=err.ind[cname], label=as.character(supind), vjust=-1), size=3, color="#666666") +
         scale_x_continuous(sec.axis = dup_axis(breaks = err.pre[, "alpha"][c(TRUE, FALSE)], labels = as.character(suppre)[c(TRUE, FALSE)], name = "")) + 
-        labs(x = expression(alpha), y = y.label, color = "", title=paste0(as.character(k), " ", nm, " problem")) +
+        labs(x = expression(alpha), y = y.label, color = "", title = title) +
         ylim(ylims[1], ylims[2]) +
         theme_minimal(base_size = 12) +
         scale_color_manual(values = c(overall.color, pretrain.color, individual.color), breaks = c("Overall", "Pretrain", "Individual"))
     
-    if(y.label == "Mean squared error") {
-        # Average of group-specific problems is the same as the overall model
+    if(!is.ts) plot1 <- plot1 + geom_text(aes(x=.2, y=err.pan[cname], label=as.character(suppan), vjust=-1), size=3, color="#666666") 
+
+    if(plot.alphahat){
+        plot1 <- plot1 + geom_vline(aes(xintercept = x$alphahat, lty = "alphahat"), color = '#666666')
+        plot1 <- plot1 + scale_linetype_manual(breaks = c("alphahat"), values = c("dotdash"), labels = c(expression(hat(alpha))))
+        plot1 <- plot1 + labs(linetype = "")
+    }
+    
+    if( (y.label == "Mean squared error") & !is.ts) {
         print(plot1)
         return()
     }
-    plot1 = plot1 + guides(color="none")
     
-    forplot2 = data.frame(
-        "alpha"   = c(err.pre[,"alpha"], err.pre[,"alpha"], err.pre[,"alpha"]),
-        "overall" = c(err.pre[, "mean"], rep(err.ind["mean"], n.alpha), rep(err.pan["mean"], n.alpha)),
-        "model"   = c(rep("Pretrain", n.alpha), rep("Individual", n.alpha), rep("Overall", n.alpha))
-    )
-    
-    ylims2 = range(forplot2$overall)
-    nudge = .1 * (ylims2[2] - ylims2[1])
-    ylims[2] = ylims2[2] + nudge
-    plot2 <- ggplot() +
-        geom_line(aes(x=forplot2$alpha, y=forplot2$overall,
-                      group = forplot2$model, color = forplot2$model)) +
-         geom_text(aes(x=.2, y=err.pan["mean"], label=as.character(suppan), vjust=-1), size=3, color="#666666") +
-         geom_text(aes(x=.2, y=err.ind["mean"], label=as.character(supind), vjust=-1), size=3, color="#666666") +
-         scale_x_continuous(sec.axis = dup_axis(breaks = err.pre[, "alpha"][c(TRUE, FALSE)], labels = as.character(suppre)[c(TRUE, FALSE)], name = "")) + 
-         labs(x = expression(alpha), y = y.label, color = "", title=paste0("Average of ", as.character(k)," individual problems")) +
-         ylim(ylims2[1], ylims2[2]) +
-         theme_minimal(base_size = 12) +
-        scale_color_manual(values = c(overall.color, pretrain.color, individual.color), breaks = c("Overall", "Pretrain", "Individual")) 
-    
-    if(plot.alphahat){
-        plot1 <- plot1 + geom_vline(aes(xintercept = x$alphahat), color = '#666666', lty=2)
-        plot2 <- plot2 + geom_vline(aes(xintercept = x$alphahat), color = '#666666', lty=2)
-    }
+    if(is.ts){
+        forplot2 = data.frame(
+            "alpha" = rep(err.pre[,"alpha"], ncol(err.pre) - 2),
+            "err"   = c(err.pre[, 3:ncol(err.pre)]),
+            "response" = paste0("Response ", sort(rep(1:(ncol(err.pre) - 2), nrow(err.pre))))
+        )
 
-    gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.8, 1))
+        plot2 <- ggplot() +
+            geom_line(aes(x=forplot2$alpha, y=forplot2$err,
+                          group = forplot2$response, color = forplot2$response,
+                          linetype = "Pretrain")) +
+            geom_hline(aes(yintercept = err.ind[2:length(err.ind)],
+                           color = paste0("Response ", 1:(ncol(err.pre) - 2)),
+                           linetype = "Individual")) +
+            scale_x_continuous(sec.axis = dup_axis(breaks = err.pre[, "alpha"][c(TRUE, FALSE)], labels = as.character(suppre)[c(TRUE, FALSE)], name = "")) + 
+            labs(x = expression(alpha), y = y.label, color = "", linetype = "", title=paste0(as.character(k), " ", nm, " problem")) +
+            theme_minimal(base_size = 12)
+
+        if(plot.alphahat){
+            plot2 <- plot2 + geom_vline(aes(xintercept = x$alphahat, lty = "alphahat"), color = '#666666')
+            plot2 <- plot2 + scale_linetype_manual(breaks = c("Pretrain", "Individual", "alphahat"),
+                                                   labels = c("Pretrain", "Individual", expression(hat(alpha))),
+                                                   values = c("solid", "dashed", "dotdash")) 
+        } else {
+            plot2 <- plot2 + scale_linetype_manual(breaks = c("Pretrain", "Individual"), values = c("solid", "dashed")) 
+        }
+
+        gridExtra::grid.arrange(plot1, plot2, ncol=1)
+
+    } else {
+        plot1 = plot1 + guides(color="none")
+        forplot2 = data.frame(
+            "alpha"   = c(err.pre[,"alpha"], err.pre[,"alpha"], err.pre[,"alpha"]),
+            "overall" = c(err.pre[, "mean"], rep(err.ind["mean"], n.alpha), rep(err.pan["mean"], n.alpha)),
+            "model"   = c(rep("Pretrain", n.alpha), rep("Individual", n.alpha), rep("Overall", n.alpha))
+        )
+        
+        ylims2 = range(forplot2$overall)
+        nudge = .1 * (ylims2[2] - ylims2[1])
+        ylims[2] = ylims2[2] + nudge
+        plot2 <- ggplot() +
+            geom_line(aes(x=forplot2$alpha, y=forplot2$overall,
+                          group = forplot2$model, color = forplot2$model)) +
+            geom_text(aes(x=.2, y=err.pan["mean"], label=as.character(suppan), vjust=-1), size=3, color="#666666") +
+            geom_text(aes(x=.2, y=err.ind["mean"], label=as.character(supind), vjust=-1), size=3, color="#666666") +
+            scale_x_continuous(sec.axis = dup_axis(breaks = err.pre[, "alpha"][c(TRUE, FALSE)], labels = as.character(suppre)[c(TRUE, FALSE)], name = "")) + 
+            labs(x = expression(alpha), y = y.label, color = "", title=paste0("Average of ", as.character(k)," individual problems")) +
+            ylim(ylims2[1], ylims2[2]) +
+            theme_minimal(base_size = 12) +
+            scale_color_manual(values = c(overall.color, pretrain.color, individual.color), breaks = c("Overall", "Pretrain", "Individual")) 
+        
+        if(plot.alphahat){
+            plot2 <- plot2 + geom_vline(aes(xintercept = x$alphahat, lty = "alphahat"), color = '#666666')
+            plot2 <- plot2 + scale_linetype_manual(breaks = c("alphahat"), values = c("dotdash"), labels = c(expression(hat(alpha))))
+            plot2 <- plot2 + labs(linetype = "")
+        }
+
+        gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.8, 1))
+    }
 }
 
 
@@ -221,24 +273,35 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 #' @method plot ptLasso
 #' @export
 plot.ptLasso = function(x, ...){
-    if("nresps" %in% names(x)) x$k = x$nresps
+
     nm = "Group"
-    if("nresps" %in% names(x)) nm = "Response"
-    lo = matrix(
-        c(1:x$k,                  # Overall model
-          (1 + x$k) : (2*x$k),    # Pretrained models
-          (1 + 2*x$k) : (3*x$k)), # Individual models
-        nrow = 3,
-        byrow = TRUE)
-    
+    if(x$call$use.case %in% c("multiresponse", "timeSeries")) nm = "Response"
+    k = if(x$call$use.case %in% c("multiresponse", "timeSeries")) { x$nresps } else { x$k }
+
     graphics::par()
-    graphics::layout(lo, heights=rep(1, 3))
-    plot(x$fitoverall); graphics::title("Overall model", line = 2)
-    for(kk in 1:(x$k - 1)) graphics::plot.new()
+    if(x$call$use.case != "timeSeries"){
+        lo = matrix(
+            c(1:k,              # Overall model
+            (1 + k) : (2*k),    # Pretrained models
+            (1 + 2*k) : (3*k)), # Individual models
+            nrow = 3,
+            byrow = TRUE)
+            
+        graphics::layout(lo, heights=rep(1, 3))
+        plot(x$fitoverall); graphics::title("Overall model", line = 2)
+        for(kk in 1:(k - 1)) graphics::plot.new()
+    } else {
+        lo = matrix(
+            c(1:k,              # Pretrained models
+            (1 + k) : (2*k)),   # Individual models
+            nrow = 2,
+            byrow = TRUE)
+        graphics::layout(lo, heights=rep(1, 2))
+    }
 
     line.nudge = 2
     
-    for(kk in 1:x$k){
+    for(kk in 1:k){
         plot(x$fitpre[[kk]]);
         if(kk == 1) {
            graphics::title(paste0("Pretrained\n", nm, " ", kk), line=line.nudge)
@@ -248,7 +311,7 @@ plot.ptLasso = function(x, ...){
         
     }
 
-    for(kk in 1:x$k){
+    for(kk in 1:k){
         plot(x$fitind[[kk]]);
         if(kk == 1) {
             graphics::title(paste0("Individual\n", nm, " ", kk), line=line.nudge)

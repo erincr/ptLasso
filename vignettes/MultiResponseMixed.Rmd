@@ -39,9 +39,12 @@ Here, we walk through an example with simulated data with three outcomes $y_1, y
 ```{r}
 set.seed(1234)
 
-n = 600; ntrain = 300
-p = 50
-     
+# Define constants
+n = 600          # Total number of samples
+ntrain = 300     # Number of training samples
+p = 50           # Number of features
+
+# Define covariates     
 x = matrix(rnorm(n*p), n, p)
 
 # y1: continuous response

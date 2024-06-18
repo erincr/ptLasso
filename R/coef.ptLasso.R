@@ -5,9 +5,9 @@
 #' @param fit fitted \code{"ptLasso"} or \code{"cv.ptLasso"} object.
 #' @param s the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".
 #' @param gamma for use only when 'relax = TRUE' was specified during training. The choice of 'gamma' to use. May be "gamma.min" or "gamma.1se". Default is "gamma.min".
-#' @param commonOnly whether to return the features that are chosen by all group-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.
-#' @param includeOverall whether to return the features that are chosen by the overall model and not the group-specific models (TRUE) or the features that are chosen by the overall model or the group-specific models (FALSE). Default is TRUE.
-#' @param groups which groups to include when computing the support. Default is to include all groups.
+#' @param includeOverall whether to return the features that are chosen by the overall model and not the group-specific models (TRUE) or the features that are chosen by the overall model or the group-specific models (FALSE). Default is TRUE. Not used when 'use.case = "timeSeries"'.
+#' @param commonOnly whether to return the features that are chosen by more than half of the group- or response-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.
+#' @param groups which groups or responses to include when computing the support. Default is to include all groups/responses. 
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso}.
 #' @keywords models regression classification
@@ -51,8 +51,8 @@ get.pretrain.support <- function(fit, s="lambda.min", gamma="gamma.min", commonO
 #' @param fit fitted \code{"ptLasso"} or \code{"cv.ptLasso"} object.
 #' @param s the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".
 #' @param gamma for use only when 'relax = TRUE' was specified during training. The choice of 'gamma' to use. May be "gamma.min" or "gamma.1se". Default is "gamma.min".
-#' @param commonOnly whether to return the features that are chosen by all group-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.
-#' @param groups which groups to include when computing the support. Default is to include all groups.
+#' @param commonOnly whether to return the features that are chosen by more than half of the group- or response-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.
+#' @param groups which groups or responses to include when computing the support. Default is to include all groups/responses. 
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso}.
 #' @keywords models regression classification
@@ -94,7 +94,7 @@ get.individual.support <- function(fit, s="lambda.min", gamma="gamma.min", commo
 get.pretrain.or.individual.support <- function(fit, s="lambda.min", gamma="gamma.min", model="pretrain", groups = groups, includeOverall=TRUE, commonOnly = FALSE){
     
     include.these = c()
-    if((model == "pretrain") && (includeOverall == TRUE)){
+    if((model == "pretrain") && (includeOverall == TRUE) & (fit$call$use.case != "timeSeries")){
         if(fit$alpha < 1) {
             if("fitoverall.gamma" %in% names(fit)){
                 include.these = get.overall.support(fit, s=fit$fitoverall.lambda, gamma=fit$fitoverall.gamma)
@@ -108,6 +108,7 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", gamma="gamma
     
     suppre=vector("list",length(groups))
     bhatpre=vector("list",length(groups))
+    
     ix = 1
     for(kk in groups){
         if(fit$call$use.case == "inputGroups"){
@@ -129,11 +130,11 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", gamma="gamma
             # This should always be a binomial (one vs. rest) model:
             bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=F)[-1])
             suppre[[ix]] = sort(unique(c(which(bhatpre[[ix]]!=0), include.these)))
-        } else if(fit$call$use.case == "multiresponse"){
-            # This should always be a gaussian:
+        } else if(fit$call$use.case %in% c("multiresponse", "timeSeries")){
+            # This should always be gaussian (or logistic for timeSeries):
             bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=F)[-1])
             suppre[[ix]] = sort(unique(c(which(bhatpre[[ix]]!=0), include.these)))
-        }
+        } 
       
       ix = ix + 1
     }
@@ -178,6 +179,8 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", gamma="gamma
 #'
 get.overall.support <- function(fit, s="lambda.min", gamma="gamma.min"){
 
+    if(fit$call$use.case == "timeSeries") stop("Overall support is not available for the time series use case. There is no overall model.")
+    
     if(inherits(fit, "cv.ptLasso")) {
         if(is.null(s)) s = fit$fitoverall.lambda
         if("fitoverall.gamma" %in% names(fit)){
@@ -204,17 +207,6 @@ get.overall.support <- function(fit, s="lambda.min", gamma="gamma.min"){
             return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-1] != 0)))))) # no group indicators, only an intercept
         }
     }
-    #if(is.list(coefs)){
-    #    if(fit$call$use.case == "inputGroups"){
-    #        if(fit$call$family == "cox"){
-    #            return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-(1:k)] != 0)))))) # first k are group indicators
-    #         } else {
-    #             return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-(1:k)] != 0)))))) # first is intercept, next k-1 are indicators
-    #         }
-    #    } else if(fit$call$use.case == "targetGroups") {
-    #        return(sort(unique(unlist(lapply(coefs, function(cc) which(cc[-1] != 0)))))) # no group indicators, only an intercept
-    #    }
-    #}
 
     # other
     if(fit$call$use.case == "inputGroups"){
@@ -259,16 +251,25 @@ get.overall.support <- function(fit, s="lambda.min", gamma="gamma.min"){
 #'
 coef.ptLasso=function(object, model = c("all", "individual", "overall", "pretrain"), ...){
     model = match.arg(model)
+    is.ts = object$call$use.case == "timeSeries"
+    
+    if( (model == "overall") && (is.ts) ) stop("There is no overall model for time series data")
 
     if((model == "all") | (model == "individual")) individual = lapply(object$fitind, function(x) coef(x, ...))
     if((model == "all") | (model == "pretrain"))   pretrain   = lapply(object$fitpre, function(x) coef(x, ...))
-    if((model == "all") | (model == "overall"))    overall    = coef(object$fitoverall, ...)
+    if(!is.ts) {
+        if((model == "all") | (model == "overall"))    overall    = coef(object$fitoverall, ...)
+    }
 
-    if(model == "all")        return(list( individual = individual,  pretrain = pretrain, overall = overall))
+    if(model == "all")  {
+        res = list( individual = individual,  pretrain = pretrain )
+        if(is.ts) return(res)
+        res$overall = overall
+        return(res)
+    }
     if(model == "individual") return(individual)
     if(model == "pretrain")   return(pretrain)
     if(model == "overall")    return(overall)
-
 }
 
 

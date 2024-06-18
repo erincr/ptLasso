@@ -11,7 +11,7 @@ ptLasso(
   alpha = 0.5,
   family = c("gaussian", "multinomial", "binomial", "cox"),
   type.measure = c("default", "mse", "mae", "auc", "deviance", "class", "C"),
-  use.case = c("inputGroups", "targetGroups", "multiresponse"),
+  use.case = c("inputGroups", "targetGroups", "multiresponse", "timeSeries"),
   overall.lambda = c("lambda.1se", "lambda.min"),
   overall.gamma = "gamma.1se",
   foldid = NULL,
@@ -19,7 +19,7 @@ ptLasso(
   standardize = TRUE,
   verbose = FALSE,
   weights = NULL,
-  penalty.factor = rep(1, nvars),
+  penalty.factor = rep(1, p),
   fitoverall = NULL,
   fitind = NULL,
   en.alpha = 1,
@@ -28,19 +28,19 @@ ptLasso(
 )
 }
 \arguments{
-\item{x}{input matrix, of dimension nobs x nvars; each row is an observation vector. Can be in sparse matrix format (inherit from class '"sparseMatrix"' as in package 'Matrix'). Requirement: 'nvars >1'; in other words, 'x' should have 2 or more columns.}
+\item{x}{input matrix, of dimension nobs x nvars; each row is an observation vector. Can be in sparse matrix format (inherit from class '"sparseMatrix"' as in package 'Matrix'). Requirement: 'nvars >1'; in other words, 'x' should have 2 or more columns. If 'use.case = "timeSeries"', then x may be a list of matrices with identical dimensions, one for each point in time.}
 
-\item{y}{response variable. Quantitative for 'family="gaussian"'. For 'family="binomial"' should be either a factor with two levels, or a two-column matrix of counts or proportions (the second column is treated as the target class; for a factor, the last level in alphabetical order is the target class). For 'family="multinomial"', can be a 'nc>=2' level factor, or a matrix with 'nc' columns of counts or proportions. For either '"binomial"' or '"multinomial"', if 'y' is presented as a vector, it will be coerced into a factor. For 'family="cox"', preferably a 'Surv' object from the survival package: see Detail section for more information. For 'use.case = "multiresponse", 'y' is a matrix of quantitative responses.}
+\item{y}{response variable. Quantitative for 'family="gaussian"'. For 'family="binomial"' should be either a factor with two levels, or a two-column matrix of counts or proportions (the second column is treated as the target class; for a factor, the last level in alphabetical order is the target class). For 'family="multinomial"', can be a 'nc>=2' level factor, or a matrix with 'nc' columns of counts or proportions. For either '"binomial"' or '"multinomial"', if 'y' is presented as a vector, it will be coerced into a factor. For 'family="cox"', preferably a 'Surv' object from the survival package: see Detail section for more information. For 'use.case = "multiresponse"' or 'use.case = "timeSeries"', 'y' is a matrix of responses.}
 
 \item{groups}{A vector of length nobs indicating to which group each observation belongs. Only for 'use.case = "inputGroups"'.}
 
 \item{alpha}{The pretrained lasso hyperparameter, with \eqn{0\le\alpha\le 1}. The range of alpha is from 0 (which fits the overall model with fine tuning) to 1 (the individual models). The default value is 0.5, chosen mostly at random. To choose the appropriate value for your data, please either run \code{ptLasso} with a few choices of alpha and evaluate with a validation set, or use cv.ptLasso, which recommends a value of alpha using cross validation.}
 
-\item{family}{Either a character string representing one of the built-in families, or else a 'glm()' family object. For more information, see Details section below or the documentation for response type (above).}
+\item{family}{Either a character string representing one of the built-in families, or else a 'glm()' family object. For more information, see Details section below or the documentation for response type (see above).}
 
 \item{type.measure}{loss to use for cross-validation within each individual, overall, or pretrained lasso model. Currently five options, not all available for all models. The default is 'type.measure="deviance"', which uses squared-error for gaussian models (a.k.a 'type.measure="mse"' there), deviance for logistic and poisson regression, and partial-likelihood for the Cox model. 'type.measure="class"' applies to binomial and multinomial logistic regression only, and gives misclassification error. 'type.measure="auc"' is for two-class logistic regression only, and gives area under the ROC curve. 'type.measure="mse"' or 'type.measure="mae"' (mean absolute error) can be used by all models except the '"cox"'; they measure the deviation from the fitted mean to the response. 'type.measure="C"' is Harrel's concordance measure, only available for 'cox' models.}
 
-\item{use.case}{The type of grouping observed in the data. Can be one of "inputGroups", "targetGroups" or "multiresponse".}
+\item{use.case}{The type of grouping observed in the data. Can be one of "inputGroups", "targetGroups", "multiresponse" or "timeSeries".}
 
 \item{overall.lambda}{The choice of lambda to be used by the overall model to define the offset and penalty factor for pretrained lasso. Defaults to "lambda.1se", could alternatively be "lambda.min". This choice of lambda will be used to compute the offset and penalty factor (1) during model training and (2) during prediction. In the predict function, another lambda must be specified for the individual models, the second stage of pretraining and the overall model.}
 
@@ -48,15 +48,15 @@ ptLasso(
 
 \item{foldid}{An optional vector of values between 1 and \code{nfolds} identifying what fold each observation is in. If supplied, \code{nfold} can be missing.}
 
-\item{nfolds}{Number of folds for CV (default is 10). Although \code{nfolds}can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.}
+\item{nfolds}{Number of folds for CV (default is 10). Although \code{nfolds} can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is \code{nfolds = 3}.}
 
 \item{standardize}{Should the predictors be standardized before fitting (default is TRUE).}
 
-\item{verbose}{If \code{verbose=1}, print a statement showing which model is currently being fit with \code{cv.glmnet}.}
+\item{verbose}{If \code{verbose=TRUE}, print a statement showing which model is currently being fit with \code{cv.glmnet}.}
 
 \item{weights}{observation weights. Default is 1 for each observation.}
 
-\item{penalty.factor}{Separate penalty factors can be applied to each coefficient. This is a number that multiplies 'lambda' to allow differential shrinkage. Can be 0 for some variables,  which implies no shrinkage, and that variable is always included in the model. Default is 1 for all variables (and implicitly infinity for variables listed in 'exclude'). For more information, see \code{?glmnet}. For pretraining, the user-supplied penalty.factor will be multiplied by the penalty.factor computed by the overall model.}
+\item{penalty.factor}{Separate penalty factors can be applied to each coefficient. This is a number that multiplies 'lambda' to allow differential shrinkage. Can be 0 for some variables,  which implies no shrinkage, and that variable is always included in the model. Default is 1 for all variables (and implicitly infinity for variables listed in 'exclude'). For more information, see \code{?glmnet}. For pretraining, the user-supplied penalty.factor will be multiplied by that computed by the overall model.}
 
 \item{fitoverall}{An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argument 'keep = TRUE'.}
 
@@ -98,7 +98,7 @@ groupstest = sort(rep(1:5, 200))
 
 # Now, we can fit a ptLasso model:
 fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
-# plot(fit) # to see all of the cv.glmnet models trained
+plot(fit) # to see all of the cv.glmnet models trained
 predict(fit, xtest, groupstest) # to predict on new data
 predict(fit, xtest, groupstest, ytest=ytest) # if ytest is included, we also measure performance
 
@@ -159,7 +159,7 @@ outtest = gaussian.example.data(k=k, class.sizes=class.sizes,
 xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 
 fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
-# plot(fit) to see all of the cv.glmnet models trained
+plot(fit) # to see all of the cv.glmnet models trained
 predict(fit, xtest, groupstest, ytest=ytest)
 
 # Now, we repeat with a binomial outcome.
@@ -189,8 +189,8 @@ outtest = binomial.example.data(k=k, class.sizes=class.sizes,
                                 beta.common=beta.common, beta.indiv=beta.indiv)
 xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 
-fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
-# plot(fit) to see all of the cv.glmnet models trained
+fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "binomial", type.measure = "auc")
+plot(fit) # to see all of the cv.glmnet models trained
 predict(fit, xtest, groupstest, ytest=ytest)
 
 \dontrun{
@@ -200,6 +200,7 @@ registerDoMC(cores = 4)
 fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse", parallel=TRUE)
 }
 
+# Multiresponse pretraining:
 # Now let's consider the case of a multiresponse outcome. We'll start by simulating data:
 set.seed(1234)
 n = 1000; ntrain = 500;
@@ -222,21 +223,47 @@ ytest = y[-(1:ntrain), ]
 x = x[1:ntrain, ]
 y = y[1:ntrain, ]
 
-# Now, we can fit a ptLasso multiresponse model:
-fit = cv.ptLasso(x, y, type.measure = "mse", use.case = "multiresponse")
-# plot(fit) # to see the cv curve.
-predict(fit, xtest) # to predict on new data
+fit = ptLasso(x, y, type.measure = "mse", use.case = "multiresponse")
+plot(fit)  # to see all of the cv.glmnet models trained
+predict(fit, xtest) # to predict with new data
 predict(fit, xtest, ytest=ytest) # if ytest is included, we also measure performance
-# By default, we used s = "lambda.min" to compute CV performance.
-# We could instead use s = "lambda.1se":
-cvfit = cv.ptLasso(x, y, type.measure = "mse", s = "lambda.1se", use.case = "multiresponse")
+# By default, we used lambda = "lambda.min" to measure performance.
+# We could instead use lambda = "lambda.1se":
+predict(fit, xtest, ytest=ytest, s="lambda.1se")
 
 # We could also use the glmnet option relax = TRUE:
-cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, use.case = "multiresponse")
-# And, as we did with lambda, we may want to specify the choice of gamma to compute CV performance:
-cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, gamma = "gamma.1se", use.case = "multiresponse")
+fit = ptLasso(x, y, type.measure = "mse", relax = TRUE, use.case = "multiresponse")
 
+# Time series pretraining
+# Now suppose we have time series data with a binomial outcome measured at 3 different time points.
+set.seed(1234)
+n = 600; ntrain = 300; p = 50
+x = matrix(rnorm(n*p), n, p)
 
+beta1 = c(rep(0.5, 10), rep(0, p-10))
+beta2 = beta1 + c(rep(0, 10), runif(5, min = 0, max = 0.5), rep(0, p-15))
+beta3 = beta1 + c(rep(0, 10), runif(5, min = 0, max = 0.5), rep(.5, 5), rep(0, p-20))
+
+y1 = rbinom(n, 1, prob = 1/(1 + exp(-x \%*\% beta1)))
+y2 = rbinom(n, 1, prob = 1/(1 + exp(-x \%*\% beta2)))
+y3 = rbinom(n, 1, prob = 1/(1 + exp(-x \%*\% beta3)))
+y = cbind(y1, y2, y3)
+
+xtest = x[-(1:ntrain), ]
+ytest = y[-(1:ntrain), ]
+
+x = x[1:ntrain, ]
+y = y[1:ntrain, ]
+
+fit =  ptLasso(x, y, use.case="timeSeries", family="binomial", type.measure = "auc")
+plot(fit)
+predict(fit, xtest, ytest=ytest)
+
+# The glmnet option relax = TRUE:
+fit = ptLasso(x, y, type.measure = "auc", family = "binomial", relax = TRUE,
+              use.case = "timeSeries")
+plot(fit)
+predict(fit, xtest, ytest=ytest)
 
 }
 \references{

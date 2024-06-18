@@ -77,9 +77,11 @@ ptLassoMult=function(x,y,alpha=0.5,
                  penalty.factor = rep(1, nvars),
                  fitoverall=NULL, fitind=NULL,
                  en.alpha = 1,
+                 call = NULL,
                  ...
                  ) {
-    this.call = match.call()
+    if(is.null(call)){ this.call = match.call() } else { this.call = call }
+    
     this.call$use.case = "multiresponse"
     this.call$group.intercepts = FALSE
     
@@ -335,6 +337,7 @@ cv.ptLassoMult <- function(x, y, alphalist=seq(0,1,length=11),
                        fitoverall=NULL, fitind=NULL, 
                        s = "lambda.min",
                        gamma = "gamma.min",
+                       call = NULL,
                        ...) { 
      
     type.measure = match.arg(type.measure, c("default", "mse", "mae", "deviance"))

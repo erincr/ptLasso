@@ -27,7 +27,7 @@ subset.y <- function(y, ix, family) {
 #' @param s The choice of lambda to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "lambda.min". May be "lambda.1se", or a numeric value. (Use caution when supplying a numeric value: the same lambda will be used for all models.)
 #' @param gamma For use only when \code{relax = TRUE}. The choice of gamma to be used by all models when estimating the CV performance for each choice of alpha. Defaults to "gamma.min". May also be "gamma.1se".
 #' @param alphahat.choice When choosing alphahat, we may prefer the best performance using all data (\code{alphahat.choice = "overall"}) or the best average performance across groups (\code{alphahat.choice = "mean"}). This is particularly useful when \code{type.measure} is "auc" or "C", because the average performance across groups is different than the performance with the full dataset. The default is "overall".
-#' @param use.case The type of grouping observed in the data. Can be one of "inputGroups", "targetGroups" or "multiresponse".
+#' @param use.case The type of grouping observed in the data. Can be one of "inputGroups", "targetGroups", "multiresponse" or "timeSeries".
 #' @param verbose If \code{verbose=1}, print a statement showing which model is currently being fit.
 #' @param fitoverall An optional cv.glmnet object specifying the overall model. This should have been trained on the full training data, with the argument keep = TRUE.
 #' @param fitind An optional list of cv.glmnet objects specifying the individual models. These should have been trained on the training data, with the argumnet keep = TRUE.
@@ -65,7 +65,7 @@ subset.y <- function(y, ix, family) {
 #' # Model fitting
 #' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
 #' cvfit
-#' # plot(cvfit) # to see CV performance as a function of alpha 
+#' plot(cvfit) # to see CV performance as a function of alpha 
 #' predict(cvfit, xtest, groupstest, s="lambda.min") # to predict with held out data
 #' predict(cvfit, xtest, groupstest, s="lambda.min", ytest=ytest) # to also measure performance
 #'
@@ -74,7 +74,7 @@ subset.y <- function(y, ix, family) {
 #' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
 #'                    s = "lambda.1se")
 #'
-#' # We could also use the glmnet option relax = TRUE:
+#' # We could have used the glmnet option relax = TRUE:
 #' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
 #'                    relax = TRUE)
 #' # And, as we did with lambda, we may want to specify the choice of gamma to compute CV performance:
@@ -164,6 +164,7 @@ subset.y <- function(y, ix, family) {
 #' }
 #' 
 #' # Multiresponse pretraining
+#' # Now let's consider the case of a multiresponse outcome. We'll start by simulating data:
 #' set.seed(1234)
 #' n = 1000; ntrain = 500;
 #' p = 500
@@ -187,8 +188,8 @@ subset.y <- function(y, ix, family) {
 #'
 #' # Now, we can fit a ptLasso model:
 #' fit = cv.ptLasso(x, y, type.measure = "mse", use.case = "multiresponse")
-#' # plot(fit) # to see the cv curve.
-#' predict(fit, xtest) # to predict on new data
+#' plot(fit) # to see the cv curve.
+#' predict(fit, xtest) # to predict with new data
 #' predict(fit, xtest, ytest=ytest) # if ytest is included, we also measure performance
 #' # By default, we used s = "lambda.min" to compute CV performance.
 #' # We could instead use s = "lambda.1se":
@@ -200,11 +201,41 @@ subset.y <- function(y, ix, family) {
 #' cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, gamma = "gamma.1se",
 #'                    use.case = "multiresponse")
 #'
+#' # Time series pretraining
+#' # Now suppose we have time series data with a binomial outcome measured at 3 different time points.
+#' set.seed(1234)
+#' n = 600; ntrain = 300; p = 50
+#' x = matrix(rnorm(n*p), n, p)
+#'
+#' beta1 = c(rep(0.25, 10), rep(0, p-10))
+#' beta2 = beta1 + c(rep(0.1, 10), runif(5, min = -0.25, max = 0), rep(0, p-15))
+#' beta3 = beta1 + c(rep(0.2, 10), runif(5, min = -0.25, max = 0),
+#'                   runif(5, min = 0, max = 0.1), rep(0, p-20))
+#'
+#' y1 = rbinom(n, 1, prob = 1/(1 + exp(-x %*% beta1)))
+#' y2 = rbinom(n, 1, prob = 1/(1 + exp(-x %*% beta2)))
+#' y3 = rbinom(n, 1, prob = 1/(1 + exp(-x %*% beta3)))
+#' y = cbind(y1, y2, y3)
+#' 
+#' xtest = x[-(1:ntrain), ]
+#' ytest = y[-(1:ntrain), ]
+#'
+#' x = x[1:ntrain, ]
+#' y = y[1:ntrain, ]
+#'
+#' cvfit =  cv.ptLasso(x, y, use.case="timeSeries", family="binomial",
+#'                     type.measure="auc")
+#' plot(cvfit, plot.alphahat = TRUE)
+#' predict(cvfit, xtest, ytest=ytest)
+#'
+#' # The glmnet option relax = TRUE:
+#' cvfit = cv.ptLasso(x, y, type.measure = "auc", family = "binomial", relax = TRUE,
+#'                    use.case = "timeSeries")
 #' 
 #' @export
 cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                        family = c("gaussian", "multinomial", "binomial","cox"),
-                       use.case=c("inputGroups","targetGroups", "multiresponse"),
+                       use.case=c("inputGroups","targetGroups", "multiresponse", "timeSeries"),
                        type.measure = c("default", "mse", "mae", "auc","deviance","class", "C"),
                        nfolds = 10, foldid = NULL,
                        verbose=FALSE,
@@ -215,7 +246,7 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                        group.intercepts = TRUE,
                        ...) { 
      
-    use.case = match.arg(use.case, c("inputGroups","targetGroups", "multiresponse"), several.ok=FALSE)
+    use.case = match.arg(use.case, c("inputGroups","targetGroups", "multiresponse", "timeSeries"), several.ok=FALSE)
     family = match.arg(family)
     type.measure = match.arg(type.measure)
         
@@ -233,7 +264,26 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                            fitind=fitind,
                            s = s,
                            gamma = gamma,
+                           call = this.call,
                            ...)
+        )
+    }
+
+    if(use.case == "timeSeries"){
+        return(
+            cv.ptLassoTS(x, y,
+                         family = family,
+                         alphalist = alphalist,
+                         type.measure = type.measure,
+                         nfolds = nfolds,
+                         foldid = foldid,
+                         verbose=verbose,
+                         fitoverall=fitoverall,
+                         fitind=fitind,
+                         s = s,
+                         gamma = gamma,
+                         call = this.call,
+                         ...)
         )
     }
 

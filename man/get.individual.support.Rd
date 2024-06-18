@@ -19,9 +19,9 @@ get.individual.support(
 
 \item{gamma}{for use only when 'relax = TRUE' was specified during training. The choice of 'gamma' to use. May be "gamma.min" or "gamma.1se". Default is "gamma.min".}
 
-\item{commonOnly}{whether to return the features that are chosen by all group-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.}
+\item{commonOnly}{whether to return the features that are chosen by more than half of the group- or response-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.}
 
-\item{groups}{which groups to include when computing the support. Default is to include all groups.}
+\item{groups}{which groups or responses to include when computing the support. Default is to include all groups/responses.}
 }
 \value{
 This returns a vector containing the indices of nonzero coefficients (excluding the intercept).

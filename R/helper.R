@@ -113,9 +113,12 @@ print.predict.ptLasso=function (x, ...)
     cat(c("alpha = ", x$alpha, "\n"), fill=TRUE)
 
     if("errpre" %in% names(x)){
-        #cat("type.measure: ", x$type.measure, "\n\n")
-        disp = rbind(x$erroverall, rbind(x$errpre,x$errind))
-        rownames(disp) = c("Overall", "Pretrain", "Individual")
+        disp = rbind(x$errpre,x$errind)
+        rownames(disp) = c("Pretrain", "Individual")
+        if("supoverall" %in% names(x)){
+            disp = rbind(x$erroverall, disp)
+            rownames(disp) = c("Overall", "Pretrain", "Individual")
+        }
 
         cat("Performance (",  yaxis.name(x$type.measure), "):", "\n", sep="")
         cat("", fill=TRUE)
@@ -124,12 +127,20 @@ print.predict.ptLasso=function (x, ...)
      }
 
     cat("Support size:\n")
-    disp.support = matrix(c(length(x$supoverall),
-                            paste0(length(x$suppre.common) + length(x$suppre.individual),
-                                   " (", length(x$suppre.common), " common + ",
-                                   length(x$suppre.individual), " individual)"),
-                            length(x$supind)), ncol=1)
-    rownames(disp.support) = c("Overall", "Pretrain", "Individual")
+    if("supoverall" %in% names(x)){
+        disp.support = matrix(c(length(x$supoverall),
+                                paste0(length(x$suppre.common) + length(x$suppre.individual),
+                                       " (", length(x$suppre.common), " common + ",
+                                       length(x$suppre.individual), " individual)"),
+                                length(x$supind)), ncol=1)
+        rownames(disp.support) = c("Overall", "Pretrain", "Individual")
+    } else {
+        disp.support = matrix(c(paste0(length(x$suppre.common) + length(x$suppre.individual),
+                                       " (", length(x$suppre.common), " common + ",
+                                       length(x$suppre.individual), " individual)"),
+                                length(x$supind)), ncol=1)
+        rownames(disp.support) = c("Pretrain", "Individual")
+    }
     colnames(disp.support) = ""
     print(noquote(disp.support))
     
@@ -181,24 +192,37 @@ print.predict.cv.ptLasso=function (x, ...)
     cat("\n",fill=TRUE)
     
     if("errpre" %in% names(x)){
-        disp = rbind(x$erroverall, rbind(x$errpre,x$errind))
-        rownames(disp) = c("Overall", "Pretrain", "Individual")
+        if("erroverall" %in% names(x)){
+            disp = rbind(x$erroverall, rbind(x$errpre,x$errind))
+            rownames(disp) = c("Overall", "Pretrain", "Individual")
 
-        cat("Performance (", yaxis.name(x$type.measure), "):", "\n", sep="")
-        print(disp, digits = digits)  
-        cat("\n",fill=TRUE)
-
-     }
-    
-    cat("Support size:\n")
-    disp.support = matrix(c(length(x$supoverall),
-                          #paste0(length(x$suppre.common), " + ", length(x$suppre.individual), " (common + individual)"),
+            disp.support = matrix(c(length(x$supoverall),
                           paste0(length(x$suppre.common) + length(x$suppre.individual),
                                  " (", length(x$suppre.common), " common + ",
                                  length(x$suppre.individual), " individual)"),
                           length(x$supind)), ncol=1)
-    rownames(disp.support) = c("Overall", "Pretrain", "Individual")
+            rownames(disp.support) = c("Overall", "Pretrain", "Individual")
+            
+        } else {
+            disp = rbind(x$errpre,x$errind)
+            rownames(disp) = c("Pretrain", "Individual")
+
+            disp.support = matrix(
+                          c(paste0(length(x$suppre.common) + length(x$suppre.individual),
+                                 " (", length(x$suppre.common), " common + ",
+                                 length(x$suppre.individual), " individual)"),
+                            length(x$supind)), ncol=1)
+            rownames(disp.support) = c("Pretrain", "Individual")
+        }
+    }
     colnames(disp.support) = ""
+
+    
+    cat("Performance (", yaxis.name(x$type.measure), "):", "\n", sep="")
+    print(disp, digits = digits)  
+    cat("\n",fill=TRUE)
+
+    cat("Support size:\n")
     print(noquote(disp.support))
 }
 
