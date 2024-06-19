@@ -51,7 +51,7 @@ fit = ptLasso(x, y, groups, alpha = 0.5, family = "binomial",
 predict(fit, xtest, groupstest, ytest = ytest)
 ```
 
-To fit the overall and individual models, we can use elasticnet instead of lasso by defining the parameter `en.alpha`. (as in `glmnet` and described in the section "Fitting elasticnet or ridge models").
+To fit the overall and individual models, we can use elasticnet instead of lasso by defining the parameter `en.alpha` (as in `glmnet` and described in the section "Fitting elasticnet or ridge models").
 ```{r}
 fit = ptLasso(x, y, groups, alpha = 0.5, family = "binomial", 
               type.measure = "auc", 
