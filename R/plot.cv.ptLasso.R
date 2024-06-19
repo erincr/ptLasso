@@ -244,53 +244,49 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 #' @export
 plot.ptLasso = function(x, ...){
 
+    
     nm = "Group"
     if(x$call$use.case %in% c("multiresponse", "timeSeries")) nm = "Response"
     k = if(x$call$use.case %in% c("multiresponse", "timeSeries")) { x$nresps } else { x$k }
 
-    graphics::par(oma = c(0, 0, 2, 0))
+    graphics::par(oma = c(0, 0, 1, 0), mgp = c(2.2, 1, 0))
     if(x$call$use.case != "timeSeries"){
         lo = matrix(
-            c(1:k,              # Overall model
-            (1 + k) : (2*k),    # Pretrained models
-            (1 + 2*k) : (3*k)), # Individual models
+            c(1, rep(0, k-1),              # Overall model
+            2 : (2 + k - 1),    # Pretrained models
+            (2 + k) : (1 + 2*k)), # Individual models
             nrow = 3,
             byrow = TRUE)
-            
-        graphics::layout(lo, heights=rep(1, 3))
+        graphics::layout(lo)#, heights=rep(1, 3))
         
-        graphics::par(mar = c(7, 4, 4, 2) + 0.1)
-        plot(x$fitoverall); #graphics::title("Overall", line = 2)
+        plot(x$fitoverall); 
         mtext("Overall", side = 3, outer = FALSE, line = 3.2,
-                          at = par("usr")[1]+0.5*diff(par("usr")[1:2]),
-                          cex = 1.3)
-        for(kk in 1:(k - 1)) graphics::plot.new()
+              at = par("usr")[1],
+              cex = 1.3)
     } else {
         lo = matrix(
             c(1:k,              # Pretrained models
             (1 + k) : (2*k)),   # Individual models
             nrow = 2,
             byrow = TRUE)
-        graphics::layout(lo, heights=rep(1, 2))
+        graphics::layout(lo)
     }
 
-    line.nudge = 3
+    line.nudge = 2.5
 
-    graphics::par(mar = c(7, 4, 4, 2) + 0.1)
     for(kk in 1:k){
         plot(x$fitpre[[kk]]);
         graphics::title(paste0(nm, " ", kk), line=line.nudge)
         if(kk == 1) mtext("Pretrained", side = 3, outer = FALSE, line = 4.2,
-                          at = par("usr")[1]+0.5*diff(par("usr")[1:2]),
+                          at = par("usr")[1],
                           cex = 1.3)
     }
 
-    graphics::par(mar = c(5, 4, 4, 2) + 0.1)
     for(kk in 1:k){
         plot(x$fitind[[kk]]);
         graphics::title(paste0(nm, " ", kk), line=line.nudge)
         if(kk == 1) mtext("Individual", side = 3, outer = FALSE, line = 4.2,
-                          at = par("usr")[1]+0.5*diff(par("usr")[1:2]),
+                          at = par("usr")[1],
                           cex = 1.3) 
     }
    
