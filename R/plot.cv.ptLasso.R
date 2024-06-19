@@ -257,7 +257,7 @@ plot.ptLasso = function(x, ...){
             (2 + k) : (1 + 2*k)), # Individual models
             nrow = 3,
             byrow = TRUE)
-        graphics::layout(lo)#, heights=rep(1, 3))
+        graphics::layout(lo)
         
         plot(x$fitoverall); 
         mtext("Overall", side = 3, outer = FALSE, line = 3.2,
@@ -277,7 +277,7 @@ plot.ptLasso = function(x, ...){
     for(kk in 1:k){
         plot(x$fitpre[[kk]]);
         graphics::title(paste0(nm, " ", kk), line=line.nudge)
-        if(kk == 1) mtext("Pretrained", side = 3, outer = FALSE, line = 4.2,
+        if(kk == 1) mtext("Pretrained", side = 3, outer = FALSE, line = 3.2,
                           at = par("usr")[1],
                           cex = 1.3)
     }
@@ -285,7 +285,7 @@ plot.ptLasso = function(x, ...){
     for(kk in 1:k){
         plot(x$fitind[[kk]]);
         graphics::title(paste0(nm, " ", kk), line=line.nudge)
-        if(kk == 1) mtext("Individual", side = 3, outer = FALSE, line = 4.2,
+        if(kk == 1) mtext("Individual", side = 3, outer = FALSE, line = 3.2,
                           at = par("usr")[1],
                           cex = 1.3) 
     }
