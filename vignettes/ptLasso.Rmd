@@ -30,7 +30,7 @@ Pretraining (@craig2024pretraining) is a method that bridges these two options; 
 
 Our example dataset consisting of ten different cancers is called __input grouped__. There is a grouping on the rows of $X$ and each row belongs to one of the cancer classes. Alternatively, data can be __target grouped__, where there is no grouping on the rows of $X$, but we have (for example) a multinomial outcome. We could fit one multinomial model, or we could fit a set of one-vs-rest models. Pretraining again bridges the two approaches, and this is described in detail in the section "Target grouped data". The remainder of this introduction describes the input grouped setting. 
 
-Importantly, pretraining is a general method to pass information from one model to another -- it has many uses beyond what has already been discussed here, including time series data, multi-response data with mixed response types, and multitask learning. Some of these modeling tasks are not supported by the `ptLasso` package, and this vignette shows how to do pretraining for them using the `glmnet` package. These sections are marked by the expression *"`glmnet` only"* in their title. 
+Importantly, pretraining is a general method to pass information from one model to another -- it has many uses beyond what has already been discussed here, including time series data, multi-response data and conditional average treatment effect estimation. Some of these modeling tasks are not supported by the `ptLasso` package, and the final section in this vignette shows how to do pretraining for them using the `glmnet` package. 
 
 Before we describe pretraining in more detail, we will first give a quick review of the lasso.
 
@@ -404,22 +404,22 @@ fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
 ```{r child = 'TimeSeriesData.Rmd'}
 ```
 
-# More examples of pretraining, using `glmnet`
+# More examples of pretraining using `glmnet`
 
-## Multi-response data with mixed response types (`glmnet` only)
+## Multi-response data with mixed response types 
 ```{r child = 'MultiResponseMixed.Rmd'}
 ```
 
 
-## Conditional average treatment effect estimation (`glmnet` only)
+## Conditional average treatment effect estimation 
 ```{r child = 'ConditionalAverageTreatmentEffect.Rmd'}
 ```
 
-## Using non-linear bases (`glmnet` only)
+## Using non-linear bases 
 ```{r child = 'UsingNonlinearBases.Rmd'}
 ```
 
-## Unsupervised pretraining (`glmnet` only)
+## Unsupervised pretraining 
 ```{r child = 'UnsupervisedPretraining.Rmd'}
 ```
 
