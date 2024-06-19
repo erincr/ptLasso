@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r echo = FALSE}
+```{r echo = TRUE}
 require(glmnet)
 ```
 
@@ -29,7 +29,7 @@ Suppose we have a dataset with features $X$ and response $y$. Suppose we also ha
 
 In step 1, we may choose to use the nonzero features from the first $k$ PCs instead of just the first PC; in the examples that follow, we use only the first PC for simplicity.
 
-To demonstrate unsupervised pretraining, we'll use simulated data. The covariates $X$ and $X^*$ are drawn from a multivariate normal distribution where the first 10 features describe most of the variance, and $y$ is defined as $X \beta + \epsilon$, where only the first 10 coefficients in $\beta$ are nonzero and $\epsilon$ is noise. In this example, we have 10 times as much unlabeled data as labeled data; this generally happens when labels are difficult to obtain.
+We will demonstrate unsupervised pretraining using simulated data. The covariates $X$ and $X^*$ are drawn from a multivariate normal distribution where the first 10 features describe most of the variance, and $y$ is defined as $X \beta + \epsilon$, where only the first 10 coefficients in $\beta$ are nonzero and $\epsilon$ is noise. In this example, we have 10 times as much unlabeled data as labeled data; this generally happens when labels are difficult to obtain.
 ```{r}
 require(MASS) # for mvrnorm
 

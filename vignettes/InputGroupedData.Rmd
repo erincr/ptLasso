@@ -1,0 +1,159 @@
+---
+title: "Input grouped data"
+output: 
+  pdf_document:
+    toc: false
+bibliography: ptLasso.bib
+vignette: >
+  %\VignetteIndexEntry{Input grouped data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r, echo=TRUE}
+require(ptLasso)
+```
+
+## Base case: input grouped data with a binomial outcome
+
+In the Quick Start, we applied `ptLasso` to data with a continuous response. Here, we'll use data with a binary outcome. This creates a dataset with $k = 3$ groups (each with $100$ observations), 5 shared coefficients, and 5 coefficients specific to each group. 
+
+```{r}
+set.seed(1234)
+
+out = binomial.example.data()
+x = out$x; y = out$y; groups = out$groups
+
+outtest = binomial.example.data()
+xtest = outtest$x; ytest = outtest$y; groupstest = outtest$groups
+```
+
+We can fit and predict as before. By default, `predict.ptLasso` will compute and return the _deviance_ on the test set.
+```{r}
+fit = ptLasso(x, y, groups, alpha = 0.5, family = "binomial")
+
+predict(fit, xtest, groupstest, ytest = ytest)
+
+```
+
+We could instead compute the AUC by specifying the `type.measure` in the call to `ptLasso`. Note: `type.measure` is specified during model fitting and not prediction because it is used in each call to `cv.glmnet`.
+```{r}
+fit = ptLasso(x, y, groups, alpha = 0.5, family = "binomial", 
+              type.measure = "auc")
+
+predict(fit, xtest, groupstest, ytest = ytest)
+```
+
+To fit the overall and individual models, we can use elasticnet instead of lasso by defining the parameter `en.alpha`. (as in `glmnet` and described in the section "Fitting elasticnet or ridge models").
+```{r}
+fit = ptLasso(x, y, groups, alpha = 0.5, family = "binomial", 
+              type.measure = "auc", 
+              en.alpha = .5)
+predict(fit, xtest, groupstest, ytest = ytest)
+```
+
+Using cross validation is the same as in the Gaussian case:
+```{r}
+##################################################
+# Fit:
+##################################################
+fit = cv.ptLasso(x, y, groups, family = "binomial", type.measure = "auc")
+
+##################################################
+# Predict with a common alpha for all groups:
+##################################################
+predict(fit, xtest, groupstest, ytest = ytest)
+
+##################################################
+# Predict with a different alpha for each group:
+##################################################
+predict(fit, xtest, groupstest, ytest = ytest, alphatype = "varying")
+```
+
+## Base case: input grouped survival data
+```{r}
+require(survival)
+```
+
+Now, we will simulate survival times with 3 groups; the three groups have overlapping support, with 5 shared features and each has 5 individual features. To compute survival time, we start by computing $\text{survival} = X \beta + \epsilon$, where $\beta$ is specific to each group and $\epsilon$ is noise. Because survival times must be positive, we modify this to be $\text{survival} = \text{survival} + 1.1 * \text{abs}(\text{min}(\text{survival}))$.
+```{r}
+set.seed(1234)
+
+n = 600; ntrain = 300
+p = 50
+     
+x = matrix(rnorm(n*p), n, p)
+beta1 = c(rnorm(5), rep(0, p-5))
+
+beta2 = runif(p) * beta1 # Shared support
+beta2 = beta2 + c(rep(0, 5), rnorm(5), rep(0, p-10)) # Individual features
+
+beta3 = runif(p) * beta1 # Shared support
+beta3 = beta3 + c(rep(0, 10), rnorm(5), rep(0, p-15)) # Individual features
+
+# Randomly split into groups
+groups = sample(1:3, n, replace = TRUE)
+
+# Compute survival times:
+survival = x %*% beta1
+survival[groups == 2] = x[groups == 2, ] %*% beta2
+survival[groups == 3] = x[groups == 3, ] %*% beta3
+survival = survival + rnorm(n)
+survival = survival + 1.1 * abs(min(survival))
+
+# Censoring times from a random uniform distribution:
+censoring = runif(n, min = 1, max = 10)
+
+# Did we observe surivival or censoring?
+y = Surv(pmin(survival, censoring), survival <= censoring)
+
+# Split into train and test:
+xtest = x[-(1:300), ]
+ytest = y[-(1:300), ]
+groupstest = groups[-(1:300)]
+
+x = x[1:300, ]
+y = y[1:300, ]
+groups = groups[1:300]
+```
+
+
+Training with `ptLasso` is much the same as it was for the continuous and binomial cases; the only difference is that we specify `family = "cox"`. By default, `ptLasso` uses the partial likelihood for model selection. We could instead use the C index.
+```{r}
+############################################################
+# Default -- use partial likelihood as the type.measure:
+############################################################
+fit = ptLasso(x, y, groups, alpha = 0.5, family = "cox")
+predict(fit, xtest, groupstest, ytest = ytest)
+
+############################################################
+# Alternatively -- use the C index:
+############################################################
+fit = ptLasso(x, y, groups, alpha = 0.5, family = "cox", type.measure = "C")
+predict(fit, xtest, groupstest, ytest = ytest)
+```
+
+The call to `cv.ptLasso` is again much the same; we only need to specify `family` ("cox") and `type.measure` (if we want to use the C index instead of the partial likelihood).
+```{r}
+##################################################
+# Fit:
+##################################################
+fit = cv.ptLasso(x, y, groups, family = "cox", type.measure = "C")
+
+##################################################
+# Predict with a common alpha for all groups:
+##################################################
+predict(fit, xtest, groupstest, ytest = ytest)
+
+##################################################
+# Predict with a different alpha for each group:
+##################################################
+predict(fit, xtest, groupstest, ytest = ytest, alphatype = "varying")
+```

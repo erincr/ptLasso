@@ -8,7 +8,6 @@ vignette: >
   %\VignetteIndexEntry{Multi-response data with mixed response types}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  % \VignetteDepends{rpart}
 ---
 
 ```{r, include = FALSE}
@@ -18,7 +17,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r, echo=FALSE}
+```{r, echo=TRUE}
 require(glmnet)
 require(survival)
 ```
@@ -35,7 +34,7 @@ So, we will use pretraining to pass information between models. Our plan is simi
 
 There is one small detail here: we must choose the primary outcome $y_1$. This is an important choice because it will form the support and offset for the other two outcomes. We recommend making this selection using domain knowledge, but cross-validation (or a validation set) can of course be used. 
 
-Here, we walk through an example with simulated data with three outcomes $y_1, y_2$ and $y_3$. The 3 outcomes have an overlapping support; the first 10 features are shared. Outcomes 2 and 3 additionally have 5 features unique to them. We'll define $y_1$ to be continuous, $y_2$ to be binomial and $y_3$ to be survival.
+Here, we walk through an example with simulated data with three outcomes $y_1, y_2$ and $y_3$. The three outcomes have overlapping support; the first 10 features are predictive . Outcomes 2 and 3 additionally have 5 features unique to each of them. We'll define $y_1$ to be continuous, $y_2$ to be binomial and $y_3$ to be survival.
 ```{r}
 set.seed(1234)
 
@@ -66,10 +65,7 @@ beta3 = beta3 + c(rep(0, 10),
 y3.true = - log(runif(n)) / exp(x %*% beta3)
 y3.cens = runif(n)
 y3 = Surv(pmin(y3.true, y3.cens), y3.true <= y3.cens)
-```
 
-We split into train and test sets, and define training folds:
-```{r}
 # Split into train and test
 xtest = x[-(1:ntrain), ]
 y1test = y1[-(1:ntrain)]
@@ -138,14 +134,12 @@ plot(alphalist, cv.error.y3, type = "b",
 abline(v = alphalist[which.max(cv.error.y3)])
 ```
 
-Fit the final models for $y_2$ and $y_3$:
+Now that we have selected our values of $\alpha$, we can fit the final models for $y_2$ and $y_3$:
 ```{r}
 ############################################################
 # Model for y2:
 ############################################################
 best.alpha.y2 = alphalist[which.max(cv.error.y2)]
-cat("Chosen alpha (y_2):", best.alpha.y2)
-
 pf = rep(1/best.alpha.y2, p); pf[support] = 1
 
 y2_fit = cv.glmnet(x, y2, 
@@ -159,8 +153,6 @@ y2_fit = cv.glmnet(x, y2,
 # Repeat for y3:
 ############################################################
 best.alpha.y3 = alphalist[which.max(cv.error.y3)]
-cat("Chosen alpha (y_3):", best.alpha.y3)
-
 pf = rep(1/best.alpha.y3, p); pf[support] = 1
 
 y3_fit = cv.glmnet(x, y3, 

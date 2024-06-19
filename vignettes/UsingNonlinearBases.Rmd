@@ -19,14 +19,14 @@ knitr::opts_chunk$set(
 ```
 
 
-```{r, echo=FALSE}
+```{r, echo=TRUE}
 require(glmnet)
 require(ptLasso)
 ```
 
 Suppose we have a dataset with features $X$ and response $y$, where the relationship between $X$ and $y$ is a nonlinear function of the columns of $X$. Can we still use the lasso? Yes! We can *pretrain* our linear model using `xgboost` to obtain basis functions (features). Let's walk through an example.
 
-## Example 1: xgboost pretraining 
+### Example 1: xgboost pretraining 
 
 ```{r}
 require(xgboost)
@@ -77,7 +77,7 @@ cat("xgboost alone PSE: ",
 ```
 
 
-## Example 2: xgboost pretraining with input groups
+### Example 2: xgboost pretraining with input groups
 
 Now, let's repeat the above supposing our data have input groups. The only difference here is that we will use `cv.ptLasso` for our model instead of `cv.glmnet`, and we will use the group indicators as a feature when fitting `xgboost`.
 

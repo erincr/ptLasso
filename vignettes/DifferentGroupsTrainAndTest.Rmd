@@ -23,7 +23,7 @@ Suppose we observe groups at test time that were unobserved at train time. For e
 Now however, we also fit an extra model to predict the similarity of test observations to the observations from each of the *training people*. To train this model, we use the (training) observation matrix $X$ and the response $y_{\text{sim}}$, where $y_{\text{sim}} = k$ for all observations from the $k^\text{th}$ person. When used for prediction, this model gives us a similarity (or probability) vector of length $K$ that sums to 1, describing how similar an observation is to each training person. 
 
 At test time, we make predictions from (1) each pretrained person-specific model and (2) the person-similarity model, and we compute the weighted average of the pretrained predictions with respect to the similarity vector. Here is an example using simulated data.
-```{r, echo=FALSE}
+```{r, echo=TRUE}
 require(glmnet)
 require(ptLasso)
 ```

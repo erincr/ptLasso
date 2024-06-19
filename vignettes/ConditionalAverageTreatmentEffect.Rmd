@@ -18,11 +18,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r, echo = FALSE}
+```{r, echo = TRUE}
 require(glmnet)
 ```
 
-## Background: CATE estimation and pretraining
+### Background: CATE estimation and pretraining
 In causal inference, we are often interested in predicting the treatment effect for individual observations; this is called the conditional average treatment effect (CATE). For example, before prescribing a drug to a patient, we want to know whether the drug is likely to work well _for that patient_ - not just whether it works well on average. One tool to model the CATE is the R-learner (@nie2021quasi), which minimizes the R loss:
 
 $$
@@ -36,7 +36,7 @@ When $\tau$ is a linear function, then the second stage of fitting is straightfo
 
 How can pretraining be useful here? Well, we are separately fitting models for $m^*$ (the conditional mean) and $\tau$ (the heterogeneous treatment effect), and these two functions are likely to share support: it is sensible to assume that the features that modulate the mean treatment effect also modulate the heterogeneous treatment effect. We can use pretraining by (1) training a model for $m^*$ and (2) using the support from this model to guide the fitting of $\tau$. Note that the offset is not used in this case; $m^*$ and $\tau$ are designed to predict different outcomes.
 
-## A simulated example
+### A simulated example
 Here is an example. We will simplify the problem by assuming treatment has been randomized -- the true $e^*(x_i) = 0.5$ for all $i$.
 
 ```{r}
@@ -169,7 +169,7 @@ cat("Pretrained R-learner PSE: ",
 
 ```
 
-## What if the pretraining assumption is wrong?
+### What if the pretraining assumption is wrong?
 Here, we repeat everything from above, only now there is no overlap in the support of $m^*$ and $\tau$. 
 ```{r}
 ######################################################

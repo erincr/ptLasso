@@ -12,20 +12,25 @@ navbar:
     articles:
       text: Articles
       menu:
-      - text: Different groups in train and test data
-        href: articles/DifferentGroupsTrainAndTest.html
+      - text: Input grouped data
+        href: articles/InputGroupedData.html
       - text: Learning the input groups
         href: articles/LearningTheInputGroups.html
-      - text: Multitask learning or coaching
-        href: articles/MultitaskLearning.html
-      - text: Multi-response data with mixed response types
-        href: articles/MultiResponseData.html
-      - text: Time series
+      - text: Different groups in train and test data
+        href: articles/DifferentGroupsTrainAndTest.html
+      - text: Target grouped (multinomial response) data
+        href: articles/TargetGroupedData.html
+      - text: Multi-response data with Gaussian responses
+        href: articles/MultiResponseGaussian.html
+      - text: Time series data
         href: articles/TimeSeriesData.html
+      - text: Multi-response data with mixed response types
+        href: articles/MultiResponseMixed.html
+      - text: Conditional average treatment effects
+        href: articles/ConditionalAverageTreatmentEffect.html
       - text: Pretraining with nonlinear bases
         href: articles/UsingNonlinearBases.html
       - text: Unsupervised pretraining
         href: articles/UnsupervisedPretraining.html
-      - text: Conditional average treatment effects
-        href: articles/ConditionalAverageTreatmentEffect.html
+
 
