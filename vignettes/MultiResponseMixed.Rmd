@@ -1,5 +1,5 @@
 ---
-title: "Multi-response data with mixed response types (glmnet only)"
+title: "Multi-response data with mixed response types"
 output: 
   pdf_document:
     toc: false
@@ -26,7 +26,7 @@ Muti-response data consists of datasets with covariates $X$ and multiple outcome
 
 Pretraining is a natural fit for this task: we often believe that there is shared information between $y_1$, $y_2$ and $y_3$. If we fit 3 separate models, we never get to take advantage of any shared information; further, because the outcomes have different types, there are very few methods to fit _one_ model for all outcomes (an "overall model").
 
-So, we will use pretraining to pass information between models. Our plan is similar to the time series example; we will:
+So, we will use pretraining to pass information between models. We will:
 
 1. fit a model for $y_1$,
 2. extract the offset and support from this model,

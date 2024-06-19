@@ -110,7 +110,6 @@ Finally we can make predictions: we have everything we need. For each test obser
 ```{r}
 alphahat  = cvfit$alphahat
 bestmodel = cvfit$fit[[which(cvfit$alphalist == alphahat)]]
-cat("Chosen alpha is", alphahat, ".\n")
 
 offset = (1-alphahat) * predict(bestmodel$fitoverall, xtest, s = "lambda.1se")
 
@@ -171,19 +170,16 @@ pred.data.test = cbind(pretrained.preds,
 assess.glmnet(predict(final.model, pred.data.test), newy = ytest)$mse
 ```
 
-Comparing performance of all models side-by-side shows that (1) using input groups improved performance -- including for the individual models and (2) including the final model did not help performance (but we still recommend trying this with real data).
+Comparing performance of all models side-by-side shows that (1) using input groups improved performance -- including for the individual models and (2) including the final model did not help performance dramatically (but we still recommend trying this with real data).
 ```{r}
 rd = function(x) round(x, 2)
 
 cat("Overall model PSE: ", 
     rd(assess.glmnet(overall.predictions, newy = ytest)$mse))
-
 cat("Individual model PSE: ", 
     rd(assess.glmnet(rowSums(individual.preds*class.preds), newy = ytest)$mse))
-
 cat("Pretraining model PSE: ", 
     rd(assess.glmnet(rowSums(pretrained.preds*class.preds), newy = ytest)$mse))
-
 cat("Pretraining model + final prediction model PSE: ", 
     rd(assess.glmnet(predict(final.model, 
                           cbind(pretrained.preds, 

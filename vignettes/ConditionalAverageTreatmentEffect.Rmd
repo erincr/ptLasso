@@ -1,5 +1,5 @@
 ---
-title: "Conditional average treatment effect estimation (glmnet only)"
+title: "Conditional average treatment effect estimation"
 output: 
   pdf_document:
    toc: false

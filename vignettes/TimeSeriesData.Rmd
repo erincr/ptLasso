@@ -26,10 +26,12 @@ We may have repeated measurements of $X$ and $y$ across time; for example, we ma
 
 `ptLasso` supports this setting, and below is an example. We first assume that $X$ is constant across time, and $y$ changes. Later, we will show an example where $X$ changes across time.
 
-To do pretraining, we:
+To do pretraining with time series data, we:
 
 1. fit a model for time 1 and extract its offset and support,
-3. use the offset and support (the usual pretraining) to train a model for time 2.
+2. use the offset and support (the usual pretraining) to train a model for time 2.
+
+We could continue this for $k$ time points: after fitting a model for time 2, we would extract the offset and support. Now, the offset will include the offset from time 1 and the prediction from time 2; the support will be the _union_ of supports from the first two models.
 
 ## Example 1: covariates are constant over time
 
@@ -82,7 +84,8 @@ cvfit = cv.ptLasso(x, y, use.case = "timeSeries")
 plot(cvfit, plot.alphahat = TRUE)
 predict(cvfit, xtest, ytest = ytest)
 ```
-A minor detail: we could also have treated this as a _multireponse_ problem, and ignored the time-ordering of the responses. See more in the section called "Multi-response data with Gaussian responses".
+
+A minor detail: we could also have treated this as a _multireponse_ problem, and ignored the time-ordering of the responses. See more in the section called "Multi-response data with Gaussian responses". (However, we recommend using the time ordering!)
 ```{r}
 fit = ptLasso(x, y, use.case = "multiresponse")
 ```

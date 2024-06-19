@@ -1,5 +1,5 @@
 ---
-title: "Using nonlinear bases (glmnet only)"
+title: "Using nonlinear bases"
 output: 
   pdf_document:
     toc: false

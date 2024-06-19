@@ -31,7 +31,7 @@ Pretraining is a natural choice for multitask learning -- it allows us to pass i
 2. extract the support (shared across responses) and offsets (one for each response), and
 3. fit a model for each response, using the shared support and appropriate offset.
 
-Importantly, the group lasso penalty behaves like the lasso, but on the whole group of coefficients for each response: they are either all zero, or else none are zero (see the `glmnet` documentation about `family = "mgaussian"` for more detail). As a result, the multi-response Gaussian model is forced to choose the same support for all responses $y_1, \dots, y_j$. This encourages learning _across_ all responses in the first stage; in the second stage, then, we find features that are specific to each individual response $y_k$.
+Importantly, the group lasso penalty behaves like the lasso, but on the whole group of coefficients for each response: they are either all zero, or else none are zero (see the `glmnet` documentation about `family = "mgaussian"` for more detail). As a result, the multi-response Gaussian model is forced to choose the same support for all responses $y_1, \dots, y_j$. This encourages learning _across_ all responses in the first stage; in the second stage, we find features that are specific to each individual response $y_k$.
 
 This is all done with the function `ptLasso`, using the argument `use.case = "multiresponse"`.
 

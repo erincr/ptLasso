@@ -1,5 +1,5 @@
 ---
-title: "Unsupervised pretraining (glmnet only)"
+title: "Unsupervised pretraining"
 output: 
   pdf_document:
    toc: false
