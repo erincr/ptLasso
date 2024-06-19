@@ -182,13 +182,17 @@ print.predict.cv.ptLasso=function (x, ...)
     cat("\nCall: ", deparse(x$call), "\n\n", fill = 50)
 
     if(length(x$alpha) > 1){
-          alpha.disp = x$alpha
-          names(alpha.disp) = paste0("group_", 1:length(x$alpha))
-          cat("alpha:\n")
-          print(alpha.disp)
+        alpha.disp = x$alpha
+        if("nresps" %in% names(x$fit[[1]])){
+            names(alpha.disp) = colnames(x$errpre)[grepl("response", colnames(x$errpre))]
         } else {
-          cat(c("alpha =",x$alpha), fill=TRUE)
+            names(alpha.disp) = colnames(x$errpre)[grepl("group", colnames(x$errpre))]
         }
+        cat("alpha:\n")
+        print(alpha.disp)
+    } else {
+        cat(c("alpha =",x$alpha), fill=TRUE)
+    }
     cat("\n",fill=TRUE)
     
     if("errpre" %in% names(x)){

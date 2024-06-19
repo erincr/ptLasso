@@ -78,14 +78,14 @@ And as before, we can `predict` with `xtest`. In this example, pretraining helps
 preds = predict(fit, xtest, ytest = ytest)
 preds
 ```
-We specified `alpha = 0` in this example, but cross validation would advise us to choose $\alpha = 0.2$. Plotting shows us the average performance across the two time points as well as the performance for each time point. Note that, at time 1, the the individual model and the pretrained model are the same; we do not see the advantage of pretraining until time 2 (when we use information from time 1).
+We specified `alpha = 0` in this example, but cross validation would advise us to choose $\alpha = 0.2$. Plotting shows us the average performance across the two time points. Importantly, at time 1, the individual model and the pretrained model are the same; we do not see the advantage of pretraining until time 2 (when we use information from time 1).
 ```{r}
 cvfit = cv.ptLasso(x, y, use.case = "timeSeries")
-plot(cvfit, plot.alphahat = TRUE)
+plot(cvfit)
 predict(cvfit, xtest, ytest = ytest)
 ```
 
-A minor detail: we could also have treated this as a _multireponse_ problem, and ignored the time-ordering of the responses. See more in the section called "Multi-response data with Gaussian responses". (However, we recommend using the time ordering!)
+Note that we could also have treated this as a _multireponse_ problem, and ignored the time-ordering of the responses. See more in the section called "Multi-response data with Gaussian responses". (However, time ordering can be informative, and the multi-response approach does not make use of this.)
 ```{r}
 fit = ptLasso(x, y, use.case = "multiresponse")
 ```

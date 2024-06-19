@@ -96,7 +96,7 @@ ptLassoMult=function(x,y,alpha=0.5,
     ############################################################################################################
     ##check dims
     np=dim(x) 
-    if(is.null(np)|(np[2]<=1))stop("x should be a matrix with 2 or more columns")
+    if(is.null(np)|(np[2]<=1)) stop("x should be a matrix with 2 or more columns")
     nobs=as.integer(np[1])
     nvars=as.integer(np[2])
 
@@ -106,7 +106,7 @@ ptLassoMult=function(x,y,alpha=0.5,
     nresps=as.integer(npy[2])
 
     for(argument in c("fit", "check.args", "offset", "intercept", "standardize.response", "family")){
-        if(argument %in% names(list(...))) stop(paste0("ptLassoMult does not support the argument '", argument, "'."))
+        if(argument %in% names(list(...))) stop(paste0("ptLasso does not support the argument '", argument, "'."))
     }
     
     if((alpha > 1) | (alpha < 0)) stop("alpha must be between 0 and 1")
@@ -116,19 +116,18 @@ ptLassoMult=function(x,y,alpha=0.5,
     if(!is.null(fitoverall)){
         if(!("cv.glmnet" %in% class(fitoverall))) stop("fitoverall must be a cv.glmnet object.")
         if(!("fit.preval" %in% names(fitoverall))) stop("fitoverall must have fit.preval defined (fitted with the argument keep = TRUE).")
-        if(nrow(get.preval(fitoverall, gamma = overall.gamma)) != nrow(x)) stop("fitoverall must have been trained using the same training data passed to ptLassoMult.")
+        if(nrow(get.preval(fitoverall, gamma = overall.gamma)) != nrow(x)) stop("fitoverall must have been trained using the same training data passed to ptLasso.")
     }
     if(!is.null(fitind)){
         if(length(fitind) != nresps) stop("Some of the individual models are missing: need one model trained for each response.")
         if(!(all(sapply(fitind, function(mm) "cv.glmnet" %in% class(mm))))) stop("fitind must be a list of cv.glmnet objects.")
         if(!all(sapply(fitind, function(mm) "fit.preval" %in% names(mm)))) stop("Individual models must have fit.preval defined (fitted with the argument keep = TRUE).")
-        if(!all(sapply(fitind, function(mm) nrow(get.preval(mm, gamma = overall.gamma))) == nrow(x))) stop("Individual models must have been trained using the same training data passed to ptLassoMult.")
+        if(!all(sapply(fitind, function(mm) nrow(get.preval(mm, gamma = overall.gamma))) == nrow(x))) stop("Individual models must have been trained using the same training data passed to ptLasso.")
     }
     
     ############################################################################################################
     # End error checking
     ############################################################################################################
-
     p = ncol(x)
     
     if(is.null(foldid)){ 
@@ -161,19 +160,19 @@ ptLassoMult=function(x,y,alpha=0.5,
     if(overall.lambda == "lambda.min") lamhat = fitoverall$lambda.min
     if(overall.lambda == "lambda.1se") lamhat = fitoverall$lambda.1se
     preval.offset = get.preval(fitoverall, gamma = overall.gamma)[, , fitoverall$lambda == lamhat]
-    #preval.offset = fitoverall$fit.preval[, , fitoverall$lambda == lamhat]
     bhatall = coef(fitoverall, s = lamhat)
     bhatall = do.call(cbind, bhatall)
     supall  = which((rowSums(bhatall) != 0)[-1])
 
     ############################################################################################################
     # Fit individual models
+    # TODO: Combine these into one loop?
     ############################################################################################################
 
     if(verbose & fitind.is.null) cat("Fitting individual models",fill=TRUE)
     
     if(fitind.is.null){
-        fitind=vector("list", nresps) #bhatInd
+        fitind=vector("list", nresps)
         
         for(kk in 1:nresps){
             
@@ -214,7 +213,6 @@ ptLassoMult=function(x,y,alpha=0.5,
             if((alpha == 0) & (length(supall) == 0)) {
                 almost.zero = 1e-9
                 fac = rep(1/almost.zero, p)
-                fac[supall] = 1
                 pf = penalty.factor * fac
             }
 

@@ -269,6 +269,16 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
         if (is.null(np) | (np[2] <= 1)) stop("x should be a matrix with 2 or more columns")
         nobs = as.integer(np[1])
         p = as.integer(np[2])
+    } else if(is.list(x) && (use.case == "timeSeries")){
+        np = dim(x[[1]])
+        if (is.null(np) | (np[2] <= 1)) stop("x should be a list of matrices with 2 or more columns")
+        nobs = as.integer(np[1])
+        p = as.integer(np[2])
+    } else {
+        np = dim(x)
+        if (is.null(np) | (np[2] <= 1)) stop("x should be a matrix with 2 or more columns")
+        nobs = as.integer(np[1])
+        p = as.integer(np[2])
     }
 
     # If multiresponse use.case, delegate to ptLassoMult

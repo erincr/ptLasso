@@ -991,12 +991,12 @@ test_that("multresponse_cv_errall", {
 # Time series
 ###########################################################################
 set.seed(1234)
-n = 600; ntrain = 300; p = 50
-x = matrix(rnorm(n*p), n, p)
+n = 600; ntrain = 300; ncol = 50
+x = matrix(rnorm(n*ncol), n, ncol)
 
-beta1 = c(rep(0.5, 10), rep(0, p-10))
-beta2 = beta1 + c(rep(0, 10), runif(5, min = 0, max = 0.5), rep(0, p-15))
-beta3 = beta1 + c(rep(0, 10), runif(5, min = 0, max = 0.5), rep(.5, 5), rep(0, p-20))
+beta1 = c(rep(0.5, 10), rep(0, ncol-10))
+beta2 = beta1 + c(rep(0, 10), runif(5, min = 0, max = 0.5), rep(0, ncol-15))
+beta3 = beta1 + c(rep(0, 10), runif(5, min = 0, max = 0.5), rep(.5, 5), rep(0, ncol-20))
 
 y1 = rbinom(n, 1, prob = 1/(1 + exp(-x %*% beta1)))
 y2 = rbinom(n, 1, prob = 1/(1 + exp(-x %*% beta2)))

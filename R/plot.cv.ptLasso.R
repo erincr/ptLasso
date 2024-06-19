@@ -185,52 +185,22 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
         plot1 <- plot1 + labs(linetype = "")
     }
     
-    if( (y.label == "Mean squared error") & !is.ts) {
+    if( (y.label == "Mean squared error") || is.ts) {
         print(plot1)
         return()
     }
     
-    if(is.ts){
-        forplot2 = data.frame(
-            "alpha" = rep(err.pre[,"alpha"], ncol(err.pre) - 2),
-            "err"   = c(err.pre[, 3:ncol(err.pre)]),
-            "response" = paste0("Response ", sort(rep(1:(ncol(err.pre) - 2), nrow(err.pre))))
-        )
-
-        plot2 <- ggplot() +
-            geom_line(aes(x=forplot2$alpha, y=forplot2$err,
-                          group = forplot2$response, color = forplot2$response,
-                          linetype = "Pretrain")) +
-            geom_hline(aes(yintercept = err.ind[2:length(err.ind)],
-                           color = paste0("Response ", 1:(ncol(err.pre) - 2)),
-                           linetype = "Individual")) +
-            scale_x_continuous(sec.axis = dup_axis(breaks = err.pre[, "alpha"][c(TRUE, FALSE)], labels = as.character(suppre)[c(TRUE, FALSE)], name = "")) + 
-            labs(x = expression(alpha), y = y.label, color = "", linetype = "", title=paste0(as.character(k), " ", nm, " problem")) +
-            theme_minimal(base_size = 12)
-
-        if(plot.alphahat){
-            plot2 <- plot2 + geom_vline(aes(xintercept = x$alphahat, lty = "alphahat"), color = '#666666')
-            plot2 <- plot2 + scale_linetype_manual(breaks = c("Pretrain", "Individual", "alphahat"),
-                                                   labels = c("Pretrain", "Individual", expression(hat(alpha))),
-                                                   values = c("solid", "dashed", "dotdash")) 
-        } else {
-            plot2 <- plot2 + scale_linetype_manual(breaks = c("Pretrain", "Individual"), values = c("solid", "dashed")) 
-        }
-
-        gridExtra::grid.arrange(plot1, plot2, ncol=1)
-
-    } else {
-        plot1 = plot1 + guides(color="none")
-        forplot2 = data.frame(
+    plot1 = plot1 + guides(color="none")
+    forplot2 = data.frame(
             "alpha"   = c(err.pre[,"alpha"], err.pre[,"alpha"], err.pre[,"alpha"]),
             "overall" = c(err.pre[, "mean"], rep(err.ind["mean"], n.alpha), rep(err.pan["mean"], n.alpha)),
             "model"   = c(rep("Pretrain", n.alpha), rep("Individual", n.alpha), rep("Overall", n.alpha))
         )
-        
-        ylims2 = range(forplot2$overall)
-        nudge = .1 * (ylims2[2] - ylims2[1])
-        ylims[2] = ylims2[2] + nudge
-        plot2 <- ggplot() +
+
+    ylims2 = range(forplot2$overall)
+    nudge = .1 * (ylims2[2] - ylims2[1])
+    ylims[2] = ylims2[2] + nudge
+    plot2 <- ggplot() +
             geom_line(aes(x=forplot2$alpha, y=forplot2$overall,
                           group = forplot2$model, color = forplot2$model)) +
             geom_text(aes(x=.2, y=err.pan["mean"], label=as.character(suppan), vjust=-1), size=3, color="#666666") +
@@ -239,16 +209,15 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
             labs(x = expression(alpha), y = y.label, color = "", title=paste0("Average of ", as.character(k)," individual problems")) +
             ylim(ylims2[1], ylims2[2]) +
             theme_minimal(base_size = 12) +
-            scale_color_manual(values = c(overall.color, pretrain.color, individual.color), breaks = c("Overall", "Pretrain", "Individual")) 
-        
-        if(plot.alphahat){
+        scale_color_manual(values = c(overall.color, pretrain.color, individual.color), breaks = c("Overall", "Pretrain", "Individual"))
+
+    if(plot.alphahat){
             plot2 <- plot2 + geom_vline(aes(xintercept = x$alphahat, lty = "alphahat"), color = '#666666')
             plot2 <- plot2 + scale_linetype_manual(breaks = c("alphahat"), values = c("dotdash"), labels = c(expression(hat(alpha))))
             plot2 <- plot2 + labs(linetype = "")
-        }
-
-        gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.8, 1))
     }
+
+    gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.8, 1))
 }
 
 
@@ -270,6 +239,7 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 #' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
 #' plot(fit) 
 #'
+#' @importFrom graphics mtext par
 #' @method plot ptLasso
 #' @export
 plot.ptLasso = function(x, ...){
@@ -278,7 +248,7 @@ plot.ptLasso = function(x, ...){
     if(x$call$use.case %in% c("multiresponse", "timeSeries")) nm = "Response"
     k = if(x$call$use.case %in% c("multiresponse", "timeSeries")) { x$nresps } else { x$k }
 
-    graphics::par()
+    graphics::par(oma = c(0, 0, 2, 0))
     if(x$call$use.case != "timeSeries"){
         lo = matrix(
             c(1:k,              # Overall model
@@ -288,7 +258,12 @@ plot.ptLasso = function(x, ...){
             byrow = TRUE)
             
         graphics::layout(lo, heights=rep(1, 3))
-        plot(x$fitoverall); graphics::title("Overall model", line = 2)
+        
+        graphics::par(mar = c(7, 4, 4, 2) + 0.1)
+        plot(x$fitoverall); #graphics::title("Overall", line = 2)
+        mtext("Overall", side = 3, outer = FALSE, line = 3.2,
+                          at = par("usr")[1]+0.5*diff(par("usr")[1:2]),
+                          cex = 1.3)
         for(kk in 1:(k - 1)) graphics::plot.new()
     } else {
         lo = matrix(
@@ -299,24 +274,25 @@ plot.ptLasso = function(x, ...){
         graphics::layout(lo, heights=rep(1, 2))
     }
 
-    line.nudge = 2
-    
+    line.nudge = 3
+
+    graphics::par(mar = c(7, 4, 4, 2) + 0.1)
     for(kk in 1:k){
         plot(x$fitpre[[kk]]);
-        if(kk == 1) {
-           graphics::title(paste0("Pretrained\n", nm, " ", kk), line=line.nudge)
-        } else {
-           graphics::title(paste0(nm, " ", kk), line=line.nudge)
-        }
-        
+        graphics::title(paste0(nm, " ", kk), line=line.nudge)
+        if(kk == 1) mtext("Pretrained", side = 3, outer = FALSE, line = 4.2,
+                          at = par("usr")[1]+0.5*diff(par("usr")[1:2]),
+                          cex = 1.3)
     }
 
+    graphics::par(mar = c(5, 4, 4, 2) + 0.1)
     for(kk in 1:k){
         plot(x$fitind[[kk]]);
-        if(kk == 1) {
-            graphics::title(paste0("Individual\n", nm, " ", kk), line=line.nudge)
-        } else {
-            graphics::title(paste0(nm, " ", kk), line=line.nudge)
-        }
+        graphics::title(paste0(nm, " ", kk), line=line.nudge)
+        if(kk == 1) mtext("Individual", side = 3, outer = FALSE, line = 4.2,
+                          at = par("usr")[1]+0.5*diff(par("usr")[1:2]),
+                          cex = 1.3) 
     }
+   
 }
+
