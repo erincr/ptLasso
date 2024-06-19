@@ -4,14 +4,16 @@ pkgdown_sha: ~
 articles:
   ConditionalAverageTreatmentEffect: ConditionalAverageTreatmentEffect.html
   DifferentGroupsTrainAndTest: DifferentGroupsTrainAndTest.html
+  InputGroupedData: InputGroupedData.html
   LearningTheInputGroups: LearningTheInputGroups.html
   MultiResponseGaussian: MultiResponseGaussian.html
   MultiResponseMixed: MultiResponseMixed.html
   ptLasso: ptLasso.html
+  TargetGroupedData: TargetGroupedData.html
   TimeSeriesData: TimeSeriesData.html
   UnsupervisedPretraining: UnsupervisedPretraining.html
   UsingNonlinearBases: UsingNonlinearBases.html
-last_built: 2024-06-19T00:11Z
+last_built: 2024-06-19T02:13Z
 urls:
   reference: https://erincr.github.io/ptLasso/reference
   article: https://erincr.github.io/ptLasso/articles

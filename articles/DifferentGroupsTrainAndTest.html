@@ -44,14 +44,16 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/DifferentGroupsTrainAndTest.html">Different groups in train and test data</a>
+    <a class="dropdown-item" href="../articles/InputGroupedData.html">Input grouped data</a>
     <a class="dropdown-item" href="../articles/LearningTheInputGroups.html">Learning the input groups</a>
-    <a class="dropdown-item" href="../articles/MultitaskLearning.html">Multitask learning or coaching</a>
-    <a class="dropdown-item" href="../articles/MultiResponseData.html">Multi-response data with mixed response types</a>
-    <a class="dropdown-item" href="../articles/TimeSeriesData.html">Time series</a>
+    <a class="dropdown-item" href="../articles/DifferentGroupsTrainAndTest.html">Different groups in train and test data</a>
+    <a class="dropdown-item" href="../articles/TargetGroupedData.html">Target grouped (multinomial response) data</a>
+    <a class="dropdown-item" href="../articles/MultiResponseGaussian.html">Multi-response data with Gaussian responses</a>
+    <a class="dropdown-item" href="../articles/TimeSeriesData.html">Time series data</a>
+    <a class="dropdown-item" href="../articles/MultiResponseMixed.html">Multi-response data with mixed response types</a>
+    <a class="dropdown-item" href="../articles/ConditionalAverageTreatmentEffect.html">Conditional average treatment effects</a>
     <a class="dropdown-item" href="../articles/UsingNonlinearBases.html">Pretraining with nonlinear bases</a>
     <a class="dropdown-item" href="../articles/UnsupervisedPretraining.html">Unsupervised pretraining</a>
-    <a class="dropdown-item" href="../articles/ConditionalAverageTreatmentEffect.html">Conditional average treatment effects</a>
   </div>
 </li>
       </ul>
@@ -98,13 +100,17 @@ describing how similar an observation is to each training person.</p>
 person-specific model and (2) the person-similarity model, and we
 compute the weighted average of the pretrained predictions with respect
 to the similarity vector. Here is an example using simulated data.</p>
-<pre><code><span><span class="co">#&gt; Loading required package: glmnet</span></span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://glmnet.stanford.edu" class="external-link">glmnet</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: glmnet</span></span>
 <span><span class="co">#&gt; Loading required package: Matrix</span></span>
-<span><span class="co">#&gt; Loaded glmnet 4.1-8</span></span>
+<span><span class="co">#&gt; Loaded glmnet 4.1-8</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://erincr.github.io/ptLasso/">ptLasso</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: ptLasso</span></span>
 <span><span class="co">#&gt; Loading required package: ggplot2</span></span>
-<span><span class="co">#&gt; Loading required package: gridExtra</span></span></code></pre>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt; Loading required package: gridExtra</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Start with 5 people, each with 300 observations and 200 features.</span></span>
@@ -143,7 +149,7 @@ to the similarity vector. Here is an example using simulated data.</p>
 <p>We’re ready to split into train, validation and test sets. We will
 use people 1, 2 and 3 for training and validation (two-thirds train,
 one-third validation), and people 4 and 5 for testing.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trn.index</span> <span class="op">=</span> <span class="va">groups</span> <span class="op">&lt;</span> <span class="fl">4</span></span>
 <span><span class="va">val.sample</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">trn.index</span><span class="op">)</span>, <span class="fl">1</span><span class="op">/</span><span class="fl">3</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">trn.index</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
@@ -160,7 +166,7 @@ one-third validation), and people 4 and 5 for testing.</p>
 <span><span class="va">gpstest</span> <span class="op">=</span> <span class="va">groups</span><span class="op">[</span><span class="op">!</span><span class="va">trn.index</span><span class="op">]</span></span></code></pre></div>
 <p>We start with pretraining, where the person ID is the grouping
 variable.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">xtrain</span>, <span class="va">ytrain</span>, <span class="va">gpstrain</span>, </span>
 <span>                   type.measure <span class="op">=</span> <span class="st">"mse"</span>, </span>
 <span>                   group.intercepts <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -169,8 +175,8 @@ variable.</p>
 Because this example is simulated, we can measure the performance of our
 model on test data (via the confusion matrix comparing predicted group
 labels to true labels). In real settings, this would be impossible.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">simmod</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">xtrain</span>, <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">gpstrain</span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"multinomial"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">simmod</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">xtrain</span>, <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">gpstrain</span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"multinomial"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Peek at performance on test data.</span></span>
 <span><span class="co"># Not possible with real data.</span></span>
@@ -187,12 +193,12 @@ test observation, we will get the pretrained prediction for all 3
 training classes. Our final predictions are the weighted combination of
 the predictions from <code>ptLasso</code> and the class predictions from
 <code>glmnet</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">alphahat</span>  <span class="op">=</span> <span class="va">cvfit</span><span class="op">$</span><span class="va">alphahat</span></span>
 <span><span class="va">bestmodel</span> <span class="op">=</span> <span class="va">cvfit</span><span class="op">$</span><span class="va">fit</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">cvfit</span><span class="op">$</span><span class="va">alphalist</span> <span class="op">==</span> <span class="va">alphahat</span><span class="op">)</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Chosen alpha is"</span>, <span class="va">alphahat</span>, <span class="st">".\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Chosen alpha is 0.5 .</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">offset</span> <span class="op">=</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">alphahat</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">bestmodel</span><span class="op">$</span><span class="va">fitoverall</span>, <span class="va">xtest</span>, s <span class="op">=</span> <span class="st">"lambda.1se"</span><span class="op">)</span></span>
 <span></span>
@@ -206,24 +212,24 @@ the predictions from <code>ptLasso</code> and the class predictions from
 <span>                      <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">assess.glmnet</span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">pretrained.preds</span> <span class="op">*</span> <span class="va">class.preds</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span></span>
+<span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">pretrained.preds</span> <span class="op">*</span> <span class="va">class.preds</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span></span>
 <span><span class="co">#&gt; [1] 28.17891</span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
 <span><span class="co">#&gt; [1] "Mean-Squared Error"</span></span></code></pre></div>
 <p>There are two reasonable baselines. The first is the overall model
 with no grouping at all, and the second is the set of individual models
 (one for each group).</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">########################################################</span></span>
 <span><span class="co"># Baseline 1: overall model</span></span>
 <span><span class="co">########################################################</span></span>
 <span><span class="va">overall.predictions</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span><span class="op">$</span><span class="va">fitoverall</span>, <span class="va">xtest</span><span class="op">)</span></span>
-<span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="va">overall.predictions</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span></span>
+<span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">overall.predictions</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span></span>
 <span><span class="co">#&gt; lambda.1se </span></span>
 <span><span class="co">#&gt;   29.64747 </span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
 <span><span class="co">#&gt; [1] "Mean-Squared Error"</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">########################################################</span></span>
 <span><span class="co"># Baseline 2: individual models</span></span>
@@ -235,7 +241,7 @@ with no grouping at all, and the second is the set of individual models
 <span>                                                      type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
 <span>                      <span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">individual.preds</span> <span class="op">*</span> <span class="va">class.preds</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span></span>
+<span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">individual.preds</span> <span class="op">*</span> <span class="va">class.preds</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span></span>
 <span><span class="co">#&gt; [1] 29.17333</span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
 <span><span class="co">#&gt; [1] "Mean-Squared Error"</span></span></code></pre></div>
@@ -245,7 +251,7 @@ However, we have found better empirical results if we instead train a
 supervised learning algorithm to make the final prediction <span class="math inline">\(\hat{y}\)</span> using the pretrained model
 predictions and the class similarity predictions as features. So, let’s
 do that here, using our so-far-untouched validation set.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">val.offset</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">bestmodel</span><span class="op">$</span><span class="va">fitoverall</span>, <span class="va">xval</span>, s <span class="op">=</span> <span class="st">"lambda.1se"</span><span class="op">)</span></span>
 <span><span class="va">val.offset</span> <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">alphahat</span><span class="op">)</span> <span class="op">*</span> <span class="va">val.offset</span></span>
 <span><span class="va">val.preds</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">cbind</span>, </span>
@@ -258,12 +264,12 @@ do that here, using our so-far-untouched validation set.</p>
 <span><span class="va">val.class.preds</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">simmod</span>, <span class="va">xval</span><span class="op">)</span><span class="op">[</span>, , <span class="fl">1</span><span class="op">]</span></span>
 <span></span>
 <span><span class="va">pred.data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">val.preds</span>, <span class="va">val.class.preds</span>, <span class="va">val.preds</span> <span class="op">*</span> <span class="va">val.class.preds</span><span class="op">)</span> </span>
-<span><span class="va">final.model</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">pred.data</span>, <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">val.preds</span> <span class="op">*</span> <span class="va">val.class.preds</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">final.model</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">pred.data</span>, <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">val.preds</span> <span class="op">*</span> <span class="va">val.class.preds</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">pred.data.test</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">pretrained.preds</span>, </span>
 <span>                       <span class="va">class.preds</span>, </span>
 <span>                       <span class="va">pretrained.preds</span> <span class="op">*</span> <span class="va">class.preds</span><span class="op">)</span></span>
-<span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">final.model</span>, <span class="va">pred.data.test</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span></span>
+<span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">final.model</span>, <span class="va">pred.data.test</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span></span>
 <span><span class="co">#&gt; lambda.1se </span></span>
 <span><span class="co">#&gt;   28.28504 </span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
@@ -272,26 +278,26 @@ do that here, using our so-far-untouched validation set.</p>
 input groups improved performance – including for the individual models
 and (2) including the final model did not help performance (but we still
 recommend trying this with real data).</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rd</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Overall model PSE: "</span>, </span>
-<span>    <span class="fu">rd</span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="va">overall.predictions</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu">rd</span><span class="op">(</span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">overall.predictions</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Overall model PSE:  29.65</span></span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Individual model PSE: "</span>, </span>
-<span>    <span class="fu">rd</span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">individual.preds</span><span class="op">*</span><span class="va">class.preds</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Individual model PSE:  29.17</span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Pretraining model PSE: "</span>, </span>
-<span>    <span class="fu">rd</span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">pretrained.preds</span><span class="op">*</span><span class="va">class.preds</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Pretraining model PSE:  28.18</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Individual model PSE: "</span>, </span>
+<span>    <span class="fu">rd</span><span class="op">(</span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">individual.preds</span><span class="op">*</span><span class="va">class.preds</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Individual model PSE:  29.17</span></span></code></pre></div>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Pretraining model PSE: "</span>, </span>
+<span>    <span class="fu">rd</span><span class="op">(</span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">pretrained.preds</span><span class="op">*</span><span class="va">class.preds</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Pretraining model PSE:  28.18</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Pretraining model + final prediction model PSE: "</span>, </span>
-<span>    <span class="fu">rd</span><span class="op">(</span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">final.model</span>, </span>
+<span>    <span class="fu">rd</span><span class="op">(</span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">final.model</span>, </span>
 <span>                          <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">pretrained.preds</span>, </span>
 <span>                                <span class="va">class.preds</span>, </span>
 <span>                                <span class="va">pretrained.preds</span> <span class="op">*</span> <span class="va">class.preds</span><span class="op">)</span></span>

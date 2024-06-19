@@ -10,6 +10,9 @@
     <loc>https://erincr.github.io/ptLasso/articles/DifferentGroupsTrainAndTest.html</loc>
   </url>
   <url>
+    <loc>https://erincr.github.io/ptLasso/articles/InputGroupedData.html</loc>
+  </url>
+  <url>
     <loc>https://erincr.github.io/ptLasso/articles/LearningTheInputGroups.html</loc>
   </url>
   <url>
@@ -17,6 +20,9 @@
   </url>
   <url>
     <loc>https://erincr.github.io/ptLasso/articles/MultiResponseMixed.html</loc>
+  </url>
+  <url>
+    <loc>https://erincr.github.io/ptLasso/articles/TargetGroupedData.html</loc>
   </url>
   <url>
     <loc>https://erincr.github.io/ptLasso/articles/TimeSeriesData.html</loc>

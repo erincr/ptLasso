@@ -44,14 +44,16 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/DifferentGroupsTrainAndTest.html">Different groups in train and test data</a>
+    <a class="dropdown-item" href="../articles/InputGroupedData.html">Input grouped data</a>
     <a class="dropdown-item" href="../articles/LearningTheInputGroups.html">Learning the input groups</a>
-    <a class="dropdown-item" href="../articles/MultitaskLearning.html">Multitask learning or coaching</a>
-    <a class="dropdown-item" href="../articles/MultiResponseData.html">Multi-response data with mixed response types</a>
-    <a class="dropdown-item" href="../articles/TimeSeriesData.html">Time series</a>
+    <a class="dropdown-item" href="../articles/DifferentGroupsTrainAndTest.html">Different groups in train and test data</a>
+    <a class="dropdown-item" href="../articles/TargetGroupedData.html">Target grouped (multinomial response) data</a>
+    <a class="dropdown-item" href="../articles/MultiResponseGaussian.html">Multi-response data with Gaussian responses</a>
+    <a class="dropdown-item" href="../articles/TimeSeriesData.html">Time series data</a>
+    <a class="dropdown-item" href="../articles/MultiResponseMixed.html">Multi-response data with mixed response types</a>
+    <a class="dropdown-item" href="../articles/ConditionalAverageTreatmentEffect.html">Conditional average treatment effects</a>
     <a class="dropdown-item" href="../articles/UsingNonlinearBases.html">Pretraining with nonlinear bases</a>
     <a class="dropdown-item" href="../articles/UnsupervisedPretraining.html">Unsupervised pretraining</a>
-    <a class="dropdown-item" href="../articles/ConditionalAverageTreatmentEffect.html">Conditional average treatment effects</a>
   </div>
 </li>
       </ul>
@@ -80,9 +82,11 @@
 
     
     
-<pre><code><span><span class="co">#&gt; Loading required package: glmnet</span></span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://glmnet.stanford.edu" class="external-link">glmnet</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: glmnet</span></span>
 <span><span class="co">#&gt; Loading required package: Matrix</span></span>
-<span><span class="co">#&gt; Loaded glmnet 4.1-8</span></span></code></pre>
+<span><span class="co">#&gt; Loaded glmnet 4.1-8</span></span></code></pre></div>
 <p>Suppose we have a dataset with features <span class="math inline">\(X\)</span> and response <span class="math inline">\(y\)</span>. Suppose we also have a large set of
 <em>unlabeled</em> data <span class="math inline">\(X^*\)</span>. Here,
 we show how to <em>pretrain</em> a model using <span class="math inline">\(X^*\)</span>. The steps are:</p>
@@ -99,7 +103,7 @@ no offset defined by sparse PCA.</li>
 <span class="math inline">\(k\)</span> PCs instead of just the first PC;
 in the examples that follow, we use only the first PC for
 simplicity.</p>
-<p>To demonstrate unsupervised pretraining, we’ll use simulated data.
+<p>We will demonstrate unsupervised pretraining using simulated data.
 The covariates <span class="math inline">\(X\)</span> and <span class="math inline">\(X^*\)</span> are drawn from a multivariate normal
 distribution where the first 10 features describe most of the variance,
 and <span class="math inline">\(y\)</span> is defined as <span class="math inline">\(X \beta + \epsilon\)</span>, where only the first

@@ -44,14 +44,16 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/DifferentGroupsTrainAndTest.html">Different groups in train and test data</a>
+    <a class="dropdown-item" href="../articles/InputGroupedData.html">Input grouped data</a>
     <a class="dropdown-item" href="../articles/LearningTheInputGroups.html">Learning the input groups</a>
-    <a class="dropdown-item" href="../articles/MultitaskLearning.html">Multitask learning or coaching</a>
-    <a class="dropdown-item" href="../articles/MultiResponseData.html">Multi-response data with mixed response types</a>
-    <a class="dropdown-item" href="../articles/TimeSeriesData.html">Time series</a>
+    <a class="dropdown-item" href="../articles/DifferentGroupsTrainAndTest.html">Different groups in train and test data</a>
+    <a class="dropdown-item" href="../articles/TargetGroupedData.html">Target grouped (multinomial response) data</a>
+    <a class="dropdown-item" href="../articles/MultiResponseGaussian.html">Multi-response data with Gaussian responses</a>
+    <a class="dropdown-item" href="../articles/TimeSeriesData.html">Time series data</a>
+    <a class="dropdown-item" href="../articles/MultiResponseMixed.html">Multi-response data with mixed response types</a>
+    <a class="dropdown-item" href="../articles/ConditionalAverageTreatmentEffect.html">Conditional average treatment effects</a>
     <a class="dropdown-item" href="../articles/UsingNonlinearBases.html">Pretraining with nonlinear bases</a>
     <a class="dropdown-item" href="../articles/UnsupervisedPretraining.html">Unsupervised pretraining</a>
-    <a class="dropdown-item" href="../articles/ConditionalAverageTreatmentEffect.html">Conditional average treatment effects</a>
   </div>
 </li>
       </ul>
@@ -155,10 +157,10 @@ unique intercept to adjust its baseline risk.</p>
 <p>By design, <span class="math inline">\(P(y = 1)\)</span> is different
 across groups:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">geom_boxplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">groups</span>, y<span class="op">=</span><span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">x.beta</span><span class="op">)</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">groups</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Group"</span>, y <span class="op">=</span> <span class="st">"P(y = 1)"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_boxplot.html" class="external-link">geom_boxplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">groups</span>, y<span class="op">=</span><span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">x.beta</span><span class="op">)</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">groups</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Group"</span>, y <span class="op">=</span> <span class="st">"P(y = 1)"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="LearningTheInputGroups_files/figure-html/unnamed-chunk-6-1.png" width="384"></p>
 <p>We cluster using <code>rpart</code>. Note that we use
 <code>maxdepth = 2</code>: an obvious choice because we simulated the
@@ -222,8 +224,8 @@ advantage of the clustering: it fits a unique intercept for each group.
 Performance would have been much worse if we hadn’t done any clustering
 at all:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">baseline.model</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">xtrain</span>, <span class="va">ytrain</span>, family <span class="op">=</span> <span class="st">"binomial"</span>, type.measure <span class="op">=</span> <span class="st">"auc"</span>, nfolds <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span><span class="fu">assess.glmnet</span><span class="op">(</span><span class="va">baseline.model</span>, newx<span class="op">=</span><span class="va">xtest</span>, newy<span class="op">=</span><span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">auc</span></span>
+<code class="sourceCode R"><span><span class="va">baseline.model</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">xtrain</span>, <span class="va">ytrain</span>, family <span class="op">=</span> <span class="st">"binomial"</span>, type.measure <span class="op">=</span> <span class="st">"auc"</span>, nfolds <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">baseline.model</span>, newx<span class="op">=</span><span class="va">xtest</span>, newy<span class="op">=</span><span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">auc</span></span>
 <span><span class="co">#&gt; [1] 0.6050242</span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
 <span><span class="co">#&gt; [1] "AUC"</span></span></code></pre></div>

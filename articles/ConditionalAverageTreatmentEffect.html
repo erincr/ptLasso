@@ -44,14 +44,16 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/DifferentGroupsTrainAndTest.html">Different groups in train and test data</a>
+    <a class="dropdown-item" href="../articles/InputGroupedData.html">Input grouped data</a>
     <a class="dropdown-item" href="../articles/LearningTheInputGroups.html">Learning the input groups</a>
-    <a class="dropdown-item" href="../articles/MultitaskLearning.html">Multitask learning or coaching</a>
-    <a class="dropdown-item" href="../articles/MultiResponseData.html">Multi-response data with mixed response types</a>
-    <a class="dropdown-item" href="../articles/TimeSeriesData.html">Time series</a>
+    <a class="dropdown-item" href="../articles/DifferentGroupsTrainAndTest.html">Different groups in train and test data</a>
+    <a class="dropdown-item" href="../articles/TargetGroupedData.html">Target grouped (multinomial response) data</a>
+    <a class="dropdown-item" href="../articles/MultiResponseGaussian.html">Multi-response data with Gaussian responses</a>
+    <a class="dropdown-item" href="../articles/TimeSeriesData.html">Time series data</a>
+    <a class="dropdown-item" href="../articles/MultiResponseMixed.html">Multi-response data with mixed response types</a>
+    <a class="dropdown-item" href="../articles/ConditionalAverageTreatmentEffect.html">Conditional average treatment effects</a>
     <a class="dropdown-item" href="../articles/UsingNonlinearBases.html">Pretraining with nonlinear bases</a>
     <a class="dropdown-item" href="../articles/UnsupervisedPretraining.html">Unsupervised pretraining</a>
-    <a class="dropdown-item" href="../articles/ConditionalAverageTreatmentEffect.html">Conditional average treatment effects</a>
   </div>
 </li>
       </ul>
@@ -80,12 +82,14 @@
 
     
     
-<pre><code><span><span class="co">#&gt; Loading required package: glmnet</span></span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://glmnet.stanford.edu" class="external-link">glmnet</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: glmnet</span></span>
 <span><span class="co">#&gt; Loading required package: Matrix</span></span>
-<span><span class="co">#&gt; Loaded glmnet 4.1-8</span></span></code></pre>
-<div class="section level2">
-<h2 id="background-cate-estimation-and-pretraining">Background: CATE estimation and pretraining<a class="anchor" aria-label="anchor" href="#background-cate-estimation-and-pretraining"></a>
-</h2>
+<span><span class="co">#&gt; Loaded glmnet 4.1-8</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="background-cate-estimation-and-pretraining">Background: CATE estimation and pretraining<a class="anchor" aria-label="anchor" href="#background-cate-estimation-and-pretraining"></a>
+</h3>
 <p>In causal inference, we are often interested in predicting the
 treatment effect for individual observations; this is called the
 conditional average treatment effect (CATE). For example, before
@@ -125,9 +129,9 @@ model to guide the fitting of <span class="math inline">\(\tau\)</span>.
 Note that the offset is not used in this case; <span class="math inline">\(m^*\)</span> and <span class="math inline">\(\tau\)</span> are designed to predict different
 outcomes.</p>
 </div>
-<div class="section level2">
-<h2 id="a-simulated-example">A simulated example<a class="anchor" aria-label="anchor" href="#a-simulated-example"></a>
-</h2>
+<div class="section level3">
+<h3 id="a-simulated-example">A simulated example<a class="anchor" aria-label="anchor" href="#a-simulated-example"></a>
+</h3>
 <p>Here is an example. We will simplify the problem by assuming
 treatment has been randomized – the true <span class="math inline">\(e^*(x_i) = 0.5\)</span> for all <span class="math inline">\(i\)</span>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -172,7 +176,7 @@ treatment). To fit <span class="math inline">\(\tau\)</span>, we will
 also need to record the cross-fitted <span class="math inline">\(\hat{e}^*(x)\)</span>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">e_fit</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x</span>, <span class="va">w</span>, foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
+<span><span class="va">e_fit</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">w</span>, foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
 <span>                  family<span class="op">=</span><span class="st">"binomial"</span>, type.measure<span class="op">=</span><span class="st">"deviance"</span>,</span>
 <span>                  keep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -182,7 +186,7 @@ also need to record the cross-fitted <span class="math inline">\(\hat{e}^*(x)\)<
 also record the cross-fitted <span class="math inline">\(\hat{m}^*(x)\)</span>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">m_fit</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, keep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">m_fit</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, keep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">m_hat</span> <span class="op">=</span> <span class="va">m_fit</span><span class="op">$</span><span class="va">fit.preval</span><span class="op">[</span>, <span class="va">m_fit</span><span class="op">$</span><span class="va">lambda</span> <span class="op">==</span> <span class="va">m_fit</span><span class="op">$</span><span class="va">lambda.1se</span><span class="op">]</span></span>
 <span></span>
@@ -210,7 +214,7 @@ each step so that we can choose the <span class="math inline">\(\alpha\)</span> 
 <span>  <span class="va">pf</span><span class="op">[</span><span class="va">support</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
 <span>  <span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pf</span><span class="op">)</span> <span class="co"># Don't penalize the intercept</span></span>
 <span>  </span>
-<span>  <span class="va">tau_fit</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x_tilde</span>, <span class="va">y_tilde</span>, </span>
+<span>  <span class="va">tau_fit</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x_tilde</span>, <span class="va">y_tilde</span>, </span>
 <span>                      foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
 <span>                      penalty.factor <span class="op">=</span> <span class="va">pf</span>,</span>
 <span>                      intercept <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co"># already include in x_tilde</span></span>
@@ -241,14 +245,14 @@ performing model:</p>
 <span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">best.alpha</span>, <span class="va">p</span><span class="op">)</span></span>
 <span><span class="va">pf</span><span class="op">[</span><span class="va">support</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pf</span><span class="op">)</span></span>
-<span><span class="va">tau_fit</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x_tilde</span>, <span class="va">y_tilde</span>, foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
+<span><span class="va">tau_fit</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x_tilde</span>, <span class="va">y_tilde</span>, foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
 <span>                    penalty.factor <span class="op">=</span> <span class="va">pf</span>,</span>
 <span>                    intercept <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                    standardize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>To concretely compare the pretrained R-learner with the usual
 R-learner, we’ll train the usual R-learner here:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tau_rlearner</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x_tilde</span>, <span class="va">y_tilde</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, </span>
+<code class="sourceCode R"><span><span class="va">tau_rlearner</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x_tilde</span>, <span class="va">y_tilde</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, </span>
 <span>                         penalty.factor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                         intercept <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                         standardize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
@@ -267,9 +271,9 @@ relative to the R learner – this is how we designed our simulation:</p>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">pretrained_preds</span> <span class="op">-</span> <span class="va">tautest</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Pretrained R-learner PSE:  37.63</span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="what-if-the-pretraining-assumption-is-wrong">What if the pretraining assumption is wrong?<a class="anchor" aria-label="anchor" href="#what-if-the-pretraining-assumption-is-wrong"></a>
-</h2>
+<div class="section level3">
+<h3 id="what-if-the-pretraining-assumption-is-wrong">What if the pretraining assumption is wrong?<a class="anchor" aria-label="anchor" href="#what-if-the-pretraining-assumption-is-wrong"></a>
+</h3>
 <p>Here, we repeat everything from above, only now there is no overlap
 in the support of <span class="math inline">\(m^*\)</span> and <span class="math inline">\(\tau\)</span>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
@@ -308,7 +312,7 @@ in the support of <span class="math inline">\(m^*\)</span> and <span class="math
 <span><span class="co">######################################################</span></span>
 <span><span class="co"># Model fitting: e^*</span></span>
 <span><span class="co">######################################################</span></span>
-<span><span class="va">e_fit</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x</span>, <span class="va">w</span>, foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
+<span><span class="va">e_fit</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">w</span>, foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
 <span>                  family<span class="op">=</span><span class="st">"binomial"</span>, type.measure<span class="op">=</span><span class="st">"deviance"</span>,</span>
 <span>                  keep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">e_hat</span> <span class="op">=</span> <span class="va">e_fit</span><span class="op">$</span><span class="va">fit.preval</span><span class="op">[</span>, <span class="va">e_fit</span><span class="op">$</span><span class="va">lambda</span> <span class="op">==</span> <span class="va">e_fit</span><span class="op">$</span><span class="va">lambda.1se</span><span class="op">]</span></span>
@@ -317,7 +321,7 @@ in the support of <span class="math inline">\(m^*\)</span> and <span class="math
 <span><span class="co">######################################################</span></span>
 <span><span class="co"># Model fitting: m^*</span></span>
 <span><span class="co">######################################################</span></span>
-<span><span class="va">m_fit</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, keep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">m_fit</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, keep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">m_hat</span> <span class="op">=</span> <span class="va">m_fit</span><span class="op">$</span><span class="va">fit.preval</span><span class="op">[</span>, <span class="va">m_fit</span><span class="op">$</span><span class="va">lambda</span> <span class="op">==</span> <span class="va">m_fit</span><span class="op">$</span><span class="va">lambda.1se</span><span class="op">]</span></span>
 <span></span>
@@ -338,7 +342,7 @@ in the support of <span class="math inline">\(m^*\)</span> and <span class="math
 <span>  <span class="va">pf</span><span class="op">[</span><span class="va">support</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
 <span>  <span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pf</span><span class="op">)</span> <span class="co"># Don't penalize the intercept</span></span>
 <span>  </span>
-<span>  <span class="va">tau_fit</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x_tilde</span>, <span class="va">y_tilde</span>, </span>
+<span>  <span class="va">tau_fit</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x_tilde</span>, <span class="va">y_tilde</span>, </span>
 <span>                      foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
 <span>                      penalty.factor <span class="op">=</span> <span class="va">pf</span>,</span>
 <span>                      intercept <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co"># already include in x_tilde</span></span>
@@ -355,7 +359,7 @@ in the support of <span class="math inline">\(m^*\)</span> and <span class="math
 <span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">best.alpha</span>, <span class="va">p</span><span class="op">)</span></span>
 <span><span class="va">pf</span><span class="op">[</span><span class="va">support</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">pf</span><span class="op">)</span></span>
-<span><span class="va">tau_fit</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x_tilde</span>, <span class="va">y_tilde</span>, foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
+<span><span class="va">tau_fit</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x_tilde</span>, <span class="va">y_tilde</span>, foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
 <span>                    penalty.factor <span class="op">=</span> <span class="va">pf</span>,</span>
 <span>                    intercept <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                    standardize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -363,7 +367,7 @@ in the support of <span class="math inline">\(m^*\)</span> and <span class="math
 <span><span class="co">######################################################</span></span>
 <span><span class="co"># Fit the usual R-learner:</span></span>
 <span><span class="co">######################################################</span></span>
-<span><span class="va">tau_rlearner</span> <span class="op">=</span> <span class="fu">cv.glmnet</span><span class="op">(</span><span class="va">x_tilde</span>, <span class="va">y_tilde</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, </span>
+<span><span class="va">tau_rlearner</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x_tilde</span>, <span class="va">y_tilde</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, </span>
 <span>                         penalty.factor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                         intercept <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                         standardize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
