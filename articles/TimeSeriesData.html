@@ -100,12 +100,17 @@ We first assume that <span class="math inline">\(X\)</span> is constant
 across time, and <span class="math inline">\(y\)</span> changes. Later,
 we will show an example where <span class="math inline">\(X\)</span>
 changes across time.</p>
-<p>To do pretraining, we:</p>
+<p>To do pretraining with time series data, we:</p>
 <ol style="list-style-type: decimal">
 <li>fit a model for time 1 and extract its offset and support,</li>
 <li>use the offset and support (the usual pretraining) to train a model
 for time 2.</li>
 </ol>
+<p>We could continue this for <span class="math inline">\(k\)</span>
+time points: after fitting a model for time 2, we would extract the
+offset and support. Now, the offset will include the offset from time 1
+and the prediction from time 2; the support will be the <em>union</em>
+of supports from the first two models.</p>
 <div class="section level2">
 <h2 id="example-1-covariates-are-constant-over-time">Example 1: covariates are constant over time<a class="anchor" aria-label="anchor" href="#example-1-covariates-are-constant-over-time"></a>
 </h2>
@@ -208,7 +213,8 @@ use information from time 1).</p>
 <p>A minor detail: we could also have treated this as a
 <em>multireponse</em> problem, and ignored the time-ordering of the
 responses. See more in the section called “Multi-response data with
-Gaussian responses”.</p>
+Gaussian responses”. (However, we recommend using the time
+ordering!)</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/ptLasso.html">ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span></code></pre></div>
 </div>

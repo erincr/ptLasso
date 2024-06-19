@@ -115,8 +115,8 @@ about <code>family = "mgaussian"</code> for more detail). As a result,
 the multi-response Gaussian model is forced to choose the same support
 for all responses <span class="math inline">\(y_1, \dots, y_j\)</span>.
 This encourages learning <em>across</em> all responses in the first
-stage; in the second stage, then, we find features that are specific to
-each individual response <span class="math inline">\(y_k\)</span>.</p>
+stage; in the second stage, we find features that are specific to each
+individual response <span class="math inline">\(y_k\)</span>.</p>
 <p>This is all done with the function <code>ptLasso</code>, using the
 argument <code>use.case = "multiresponse"</code>.</p>
 <p>We will illustrate this with simulated data with two Gaussian
