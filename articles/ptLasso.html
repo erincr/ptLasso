@@ -481,8 +481,7 @@ minimizes the CV MSE for each group:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; alpha:</span></span>
-<span><span class="co">#&gt; group_1 group_2 group_3 group_4 group_5 </span></span>
-<span><span class="co">#&gt;     0.7     0.4     0.0     0.8     0.8 </span></span>
+<span><span class="co">#&gt; [1] 0.7 0.4 0.0 0.8 0.8</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Performance (Mean squared error):</span></span>
@@ -616,8 +615,7 @@ same as the overall <span class="math inline">\(\alpha\)</span>.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; alpha:</span></span>
-<span><span class="co">#&gt; group_1 group_2 group_3 group_4 group_5 </span></span>
-<span><span class="co">#&gt;     0.5     0.5     0.0     1.0     0.5 </span></span>
+<span><span class="co">#&gt; [1] 0.5 0.5 0.0 1.0 0.5</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Performance (Mean squared error):</span></span>
@@ -1009,8 +1007,7 @@ ridge models”).</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; alpha:</span></span>
-<span><span class="co">#&gt; group_1 group_2 group_3 </span></span>
-<span><span class="co">#&gt;     0.2     0.5     0.2 </span></span>
+<span><span class="co">#&gt; [1] 0.2 0.5 0.2</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Performance (AUC):</span></span>
@@ -1188,8 +1185,7 @@ partial likelihood).</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; alpha:</span></span>
-<span><span class="co">#&gt; group_1 group_2 group_3 </span></span>
-<span><span class="co">#&gt;     0.3     0.4     0.4 </span></span>
+<span><span class="co">#&gt; [1] 0.3 0.4 0.4</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Performance (C-index):</span></span>
@@ -1934,8 +1930,7 @@ MSE across both responses.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; alpha:</span></span>
-<span><span class="co">#&gt; group_1 group_2 </span></span>
-<span><span class="co">#&gt;     0.3     0.3 </span></span>
+<span><span class="co">#&gt; [1] 0.3 0.3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Performance (Mean squared error):</span></span>
@@ -2048,13 +2043,12 @@ this.</p>
 <p>We specified <code>alpha = 0</code> in this example, but cross
 validation would advise us to choose <span class="math inline">\(\alpha
 = 0.2\)</span>. Plotting shows us the average performance across the two
-time points as well as the performance for each time point. Note that,
-at time 1, the the individual model and the pretrained model are the
-same; we do not see the advantage of pretraining until time 2 (when we
-use information from time 1).</p>
+time points. Importantly, at time 1, the individual model and the
+pretrained model are the same; we do not see the advantage of
+pretraining until time 2 (when we use information from time 1).</p>
 <div class="sourceCode" id="cb91"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"timeSeries"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvfit</span>, plot.alphahat <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvfit</span><span class="op">)</span></span></code></pre></div>
 <p><img src="ptLasso_files/figure-html/unnamed-chunk-182-1.png" width="700"></p>
 <div class="sourceCode" id="cb92"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
@@ -2076,11 +2070,11 @@ use information from time 1).</p>
 <span><span class="co">#&gt;                                          </span></span>
 <span><span class="co">#&gt; Pretrain   28 (10 common + 18 individual)</span></span>
 <span><span class="co">#&gt; Individual 40</span></span></code></pre></div>
-<p>A minor detail: we could also have treated this as a
-<em>multireponse</em> problem, and ignored the time-ordering of the
-responses. See more in the section called “Multi-response data with
-Gaussian responses”. (However, we recommend using the time
-ordering!)</p>
+<p>Note that we could also have treated this as a <em>multireponse</em>
+problem, and ignored the time-ordering of the responses. See more in the
+section called “Multi-response data with Gaussian responses”. (However,
+time ordering can be informative, and the multi-response approach does
+not make use of this.)</p>
 <div class="sourceCode" id="cb93"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/ptLasso.html">ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span></code></pre></div>
 </div>
