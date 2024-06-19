@@ -65,7 +65,7 @@
 <span>  alpha <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"multinomial"</span>, <span class="st">"binomial"</span>, <span class="st">"cox"</span><span class="op">)</span>,</span>
 <span>  type.measure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"default"</span>, <span class="st">"mse"</span>, <span class="st">"mae"</span>, <span class="st">"auc"</span>, <span class="st">"deviance"</span>, <span class="st">"class"</span>, <span class="st">"C"</span><span class="op">)</span>,</span>
-<span>  use.case <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"inputGroups"</span>, <span class="st">"targetGroups"</span>, <span class="st">"multiresponse"</span><span class="op">)</span>,</span>
+<span>  use.case <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"inputGroups"</span>, <span class="st">"targetGroups"</span>, <span class="st">"multiresponse"</span>, <span class="st">"timeSeries"</span><span class="op">)</span>,</span>
 <span>  overall.lambda <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lambda.1se"</span>, <span class="st">"lambda.min"</span><span class="op">)</span>,</span>
 <span>  overall.gamma <span class="op">=</span> <span class="st">"gamma.1se"</span>,</span>
 <span>  foldid <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -73,7 +73,7 @@
 <span>  standardize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  penalty.factor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">nvars</span><span class="op">)</span>,</span>
+<span>  penalty.factor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span>,</span>
 <span>  fitoverall <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  fitind <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  en.alpha <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -85,11 +85,11 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>x</dt>
-<dd><p>input matrix, of dimension nobs x nvars; each row is an observation vector. Can be in sparse matrix format (inherit from class '"sparseMatrix"' as in package 'Matrix'). Requirement: 'nvars &gt;1'; in other words, 'x' should have 2 or more columns.</p></dd>
+<dd><p>input matrix, of dimension nobs x nvars; each row is an observation vector. Can be in sparse matrix format (inherit from class '"sparseMatrix"' as in package 'Matrix'). Requirement: 'nvars &gt;1'; in other words, 'x' should have 2 or more columns. If 'use.case = "timeSeries"', then x may be a list of matrices with identical dimensions, one for each point in time.</p></dd>
 
 
 <dt>y</dt>
-<dd><p>response variable. Quantitative for 'family="gaussian"'. For 'family="binomial"' should be either a factor with two levels, or a two-column matrix of counts or proportions (the second column is treated as the target class; for a factor, the last level in alphabetical order is the target class). For 'family="multinomial"', can be a 'nc&gt;=2' level factor, or a matrix with 'nc' columns of counts or proportions. For either '"binomial"' or '"multinomial"', if 'y' is presented as a vector, it will be coerced into a factor. For 'family="cox"', preferably a 'Surv' object from the survival package: see Detail section for more information. For 'use.case = "multiresponse", 'y' is a matrix of quantitative responses.</p></dd>
+<dd><p>response variable. Quantitative for 'family="gaussian"'. For 'family="binomial"' should be either a factor with two levels, or a two-column matrix of counts or proportions (the second column is treated as the target class; for a factor, the last level in alphabetical order is the target class). For 'family="multinomial"', can be a 'nc&gt;=2' level factor, or a matrix with 'nc' columns of counts or proportions. For either '"binomial"' or '"multinomial"', if 'y' is presented as a vector, it will be coerced into a factor. For 'family="cox"', preferably a 'Surv' object from the survival package: see Detail section for more information. For 'use.case = "multiresponse"' or 'use.case = "timeSeries"', 'y' is a matrix of responses.</p></dd>
 
 
 <dt>groups</dt>
@@ -101,7 +101,7 @@
 
 
 <dt>family</dt>
-<dd><p>Either a character string representing one of the built-in families, or else a 'glm()' family object. For more information, see Details section below or the documentation for response type (above).</p></dd>
+<dd><p>Either a character string representing one of the built-in families, or else a 'glm()' family object. For more information, see Details section below or the documentation for response type (see above).</p></dd>
 
 
 <dt>type.measure</dt>
@@ -109,7 +109,7 @@
 
 
 <dt>use.case</dt>
-<dd><p>The type of grouping observed in the data. Can be one of "inputGroups", "targetGroups" or "multiresponse".</p></dd>
+<dd><p>The type of grouping observed in the data. Can be one of "inputGroups", "targetGroups", "multiresponse" or "timeSeries".</p></dd>
 
 
 <dt>overall.lambda</dt>
@@ -125,7 +125,7 @@
 
 
 <dt>nfolds</dt>
-<dd><p>Number of folds for CV (default is 10). Although <code>nfolds</code>can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is <code>nfolds = 3</code>.</p></dd>
+<dd><p>Number of folds for CV (default is 10). Although <code>nfolds</code> can be as large as the sample size (leave-one-out CV), it is not recommended for large datasets. Smallest value allowable is <code>nfolds = 3</code>.</p></dd>
 
 
 <dt>standardize</dt>
@@ -133,7 +133,7 @@
 
 
 <dt>verbose</dt>
-<dd><p>If <code>verbose=1</code>, print a statement showing which model is currently being fit with <code>cv.glmnet</code>.</p></dd>
+<dd><p>If <code>verbose=TRUE</code>, print a statement showing which model is currently being fit with <code>cv.glmnet</code>.</p></dd>
 
 
 <dt>weights</dt>
@@ -141,7 +141,7 @@
 
 
 <dt>penalty.factor</dt>
-<dd><p>Separate penalty factors can be applied to each coefficient. This is a number that multiplies 'lambda' to allow differential shrinkage. Can be 0 for some variables,  which implies no shrinkage, and that variable is always included in the model. Default is 1 for all variables (and implicitly infinity for variables listed in 'exclude'). For more information, see <code>?glmnet</code>. For pretraining, the user-supplied penalty.factor will be multiplied by the penalty.factor computed by the overall model.</p></dd>
+<dd><p>Separate penalty factors can be applied to each coefficient. This is a number that multiplies 'lambda' to allow differential shrinkage. Can be 0 for some variables,  which implies no shrinkage, and that variable is always included in the model. Default is 1 for all variables (and implicitly infinity for variables listed in 'exclude'). For more information, see <code>?glmnet</code>. For pretraining, the user-supplied penalty.factor will be multiplied by that computed by the overall model.</p></dd>
 
 
 <dt>fitoverall</dt>
@@ -226,7 +226,8 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Now, we can fit a ptLasso model:</span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># plot(fit) # to see all of the cv.glmnet models trained</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="co"># to see all of the cv.glmnet models trained</span></span></span>
+<span class="r-plt img"><img src="ptLasso-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span><span class="op">)</span> <span class="co"># to predict on new data</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
@@ -320,7 +321,8 @@
 <span class="r-in"><span><span class="va">xtest</span><span class="op">=</span><span class="va">outtest</span><span class="op">$</span><span class="va">x</span>; <span class="va">ytest</span><span class="op">=</span><span class="va">outtest</span><span class="op">$</span><span class="va">y</span>; <span class="va">groupstest</span><span class="op">=</span><span class="va">outtest</span><span class="op">$</span><span class="va">groups</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># plot(fit) to see all of the cv.glmnet models trained</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="co"># to see all of the cv.glmnet models trained</span></span></span>
+<span class="r-plt img"><img src="ptLasso-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest<span class="op">=</span><span class="va">ytest</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
@@ -370,8 +372,9 @@
 <span class="r-in"><span>                                beta.common<span class="op">=</span><span class="va">beta.common</span>, beta.indiv<span class="op">=</span><span class="va">beta.indiv</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">xtest</span><span class="op">=</span><span class="va">outtest</span><span class="op">$</span><span class="va">x</span>; <span class="va">ytest</span><span class="op">=</span><span class="va">outtest</span><span class="op">$</span><span class="va">y</span>; <span class="va">groupstest</span><span class="op">=</span><span class="va">outtest</span><span class="op">$</span><span class="va">groups</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># plot(fit) to see all of the cv.glmnet models trained</span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, family <span class="op">=</span> <span class="st">"binomial"</span>, type.measure <span class="op">=</span> <span class="st">"auc"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="co"># to see all of the cv.glmnet models trained</span></span></span>
+<span class="r-plt img"><img src="ptLasso-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest<span class="op">=</span><span class="va">ytest</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
@@ -381,18 +384,18 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.5 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Performance (Mean squared error):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Performance (AUC):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            allGroups   mean group_1 group_2 group_3     r^2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Overall       0.2432 0.2432  0.2371  0.2341  0.2584 0.02687</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain      0.2374 0.2374  0.2603  0.1991  0.2527 0.05022</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Individual    0.2414 0.2414  0.2681  0.2028  0.2532 0.03415</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            allGroups   mean wtdMean group_1 group_2 group_3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Overall       0.5990 0.5963  0.5963  0.6006  0.6772  0.5112</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain      0.6442 0.6631  0.6631  0.6965  0.7752  0.5177</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual    0.6429 0.6580  0.6580  0.6948  0.7607  0.5186</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Support size:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Overall    7                            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   29 (3 common + 26 individual)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 29                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Overall    8                            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   40 (3 common + 37 individual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 40                           </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="co">### Model fitting with parallel = TRUE</span></span></span>
@@ -401,6 +404,7 @@
 <span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, parallel<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Multiresponse pretraining:</span></span></span>
 <span class="r-in"><span><span class="co"># Now let's consider the case of a multiresponse outcome. We'll start by simulating data:</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">n</span> <span class="op">=</span> <span class="fl">1000</span>; <span class="va">ntrain</span> <span class="op">=</span> <span class="fl">500</span>;</span></span>
@@ -425,54 +429,138 @@
 <span class="r-in"><span><span class="va">x</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Now, we can fit a ptLasso multiresponse model:</span></span></span>
-<span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># plot(fit) # to see the cv curve.</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span><span class="op">)</span> <span class="co"># to predict on new data</span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>  <span class="co"># to see all of the cv.glmnet models trained</span></span></span>
+<span class="r-plt img"><img src="ptLasso-4.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span><span class="op">)</span> <span class="co"># to predict with new data</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> predict.cv.ptLasso(object = fit, xtest = xtest) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> predict.ptLasso(object = fit, xtest = xtest) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.5 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Support size:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Overall    57                           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   23 (19 common + 4 individual)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 80                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Overall    57                            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   29 (19 common + 10 individual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 80                            </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, ytest<span class="op">=</span><span class="va">ytest</span><span class="op">)</span> <span class="co"># if ytest is included, we also measure performance</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> predict.cv.ptLasso(object = fit, xtest = xtest, ytest = ytest) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> predict.ptLasso(object = fit, xtest = xtest, ytest = ytest) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.5 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Performance (Mean squared error):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            allGroups  mean response_1 response_2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Overall        9.394 4.697      4.227      5.168</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain       8.907 4.453      4.186      4.721</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain       9.022 4.511      4.144      4.878</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Individual     9.465 4.733      4.243      5.222</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Support size:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Overall    57                            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   29 (19 common + 10 individual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 80                            </span>
+<span class="r-in"><span><span class="co"># By default, we used lambda = "lambda.min" to measure performance.</span></span></span>
+<span class="r-in"><span><span class="co"># We could instead use lambda = "lambda.1se":</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, ytest<span class="op">=</span><span class="va">ytest</span>, s<span class="op">=</span><span class="st">"lambda.1se"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> predict.ptLasso(object = fit, xtest = xtest, ytest = ytest, s = "lambda.1se") </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Performance (Mean squared error):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            allGroups  mean response_1 response_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Overall        9.879 4.940      4.387      5.492</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain       9.481 4.740      4.210      5.271</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual     9.965 4.983      4.341      5.624</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Support size:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Overall    57                           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   23 (19 common + 4 individual)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 80                           </span>
-<span class="r-in"><span><span class="co"># By default, we used s = "lambda.min" to compute CV performance.</span></span></span>
-<span class="r-in"><span><span class="co"># We could instead use s = "lambda.1se":</span></span></span>
-<span class="r-in"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu"><a href="cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, s <span class="op">=</span> <span class="st">"lambda.1se"</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Overall    19                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   19 (19 common + 0 individual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 27                           </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># We could also use the glmnet option relax = TRUE:</span></span></span>
-<span class="r-in"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu"><a href="cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, relax <span class="op">=</span> <span class="cn">TRUE</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># And, as we did with lambda, we may want to specify the choice of gamma to compute CV performance:</span></span></span>
-<span class="r-in"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu"><a href="cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, relax <span class="op">=</span> <span class="cn">TRUE</span>, gamma <span class="op">=</span> <span class="st">"gamma.1se"</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, relax <span class="op">=</span> <span class="cn">TRUE</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Time series pretraining</span></span></span>
+<span class="r-in"><span><span class="co"># Now suppose we have time series data with a binomial outcome measured at 3 different time points.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">n</span> <span class="op">=</span> <span class="fl">600</span>; <span class="va">ntrain</span> <span class="op">=</span> <span class="fl">300</span>; <span class="va">p</span> <span class="op">=</span> <span class="fl">50</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">beta1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">-</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">beta2</span> <span class="op">=</span> <span class="va">beta1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">5</span>, min <span class="op">=</span> <span class="fl">0</span>, max <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">-</span><span class="fl">15</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">beta3</span> <span class="op">=</span> <span class="va">beta1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">5</span>, min <span class="op">=</span> <span class="fl">0</span>, max <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">.5</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">-</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">y1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">1</span>, prob <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">1</span>, prob <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y3</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">1</span>, prob <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">y1</span>, <span class="va">y2</span>, <span class="va">y3</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">xtest</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">ytest</span> <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">=</span>  <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case<span class="op">=</span><span class="st">"timeSeries"</span>, family<span class="op">=</span><span class="st">"binomial"</span>, type.measure <span class="op">=</span> <span class="st">"auc"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="ptLasso-5.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, ytest<span class="op">=</span><span class="va">ytest</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> predict.ptLasso(object = fit, xtest = xtest, ytest = ytest) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Performance (AUC):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              mean response_1 response_2 response_3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   0.8185     0.8194     0.8060     0.8301</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 0.7997     0.8194     0.7691     0.8106</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Support size:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   43 (26 common + 17 individual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 47                            </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># The glmnet option relax = TRUE:</span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type.measure <span class="op">=</span> <span class="st">"auc"</span>, family <span class="op">=</span> <span class="st">"binomial"</span>, relax <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>              use.case <span class="op">=</span> <span class="st">"timeSeries"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="ptLasso-6.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, ytest<span class="op">=</span><span class="va">ytest</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> predict.ptLasso(object = fit, xtest = xtest, ytest = ytest) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Performance (AUC):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              mean response_1 response_2 response_3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   0.8154     0.8298     0.7956     0.8207</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 0.8018     0.8298     0.7647     0.8110</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Support size:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   26 (12 common + 14 individual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 29                            </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

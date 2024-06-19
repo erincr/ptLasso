@@ -115,9 +115,12 @@ have 5 features unique to them. We’ll define <span class="math inline">\(y_1\)
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">n</span> <span class="op">=</span> <span class="fl">600</span>; <span class="va">ntrain</span> <span class="op">=</span> <span class="fl">300</span></span>
-<span><span class="va">p</span> <span class="op">=</span> <span class="fl">50</span></span>
-<span>     </span>
+<span><span class="co"># Define constants</span></span>
+<span><span class="va">n</span> <span class="op">=</span> <span class="fl">600</span>          <span class="co"># Total number of samples</span></span>
+<span><span class="va">ntrain</span> <span class="op">=</span> <span class="fl">300</span>     <span class="co"># Number of training samples</span></span>
+<span><span class="va">p</span> <span class="op">=</span> <span class="fl">50</span>           <span class="co"># Number of features</span></span>
+<span></span>
+<span><span class="co"># Define covariates     </span></span>
 <span><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># y1: continuous response</span></span>

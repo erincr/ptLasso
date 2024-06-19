@@ -67,6 +67,8 @@
 </nav><div class="container template-article">
 
 
+
+
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>ptLasso Vignette and Manual</h1>
@@ -1568,6 +1570,9 @@ at all:</p>
 <div class="section level2">
 <h2 id="target-grouped-data">Target grouped data<a class="anchor" aria-label="anchor" href="#target-grouped-data"></a>
 </h2>
+<div class="section level3">
+<h3 id="intuition">Intuition<a class="anchor" aria-label="anchor" href="#intuition"></a>
+</h3>
 <p>Now we turn to the <strong>target grouped</strong> setting. Suppose
 we have a dataset with a multinomial outcome, and no other grouping on
 the observations. For example, our data might look like the
@@ -1665,16 +1670,17 @@ to the class with the highest prediction:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">class3</span>, <span class="va">Xtest</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span>, newoffset <span class="op">=</span> <span class="va">newoffset</span><span class="op">[</span>, <span class="fl">3</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">ovrpreds.class</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">ovrpreds</span>, <span class="fl">1</span>, <span class="va">which.max</span><span class="op">)</span></span></code></pre></div>
-<p>This is all done automatically within <code>ptLasso</code>; we show a
-more detailed example in the next section. The example above is intended
-only to show how pretraining works for multinomial outcomes, and some
-technical details have been omitted. (For example, <code>ptLasso</code>
-takes care of crossfitting between the first and second steps.)</p>
+<p>This is all done automatically within <code>ptLasso</code>; we will
+now show a more detailed example using the <code>ptLasso</code>
+functions. The example above is intended only to show how pretraining
+works for multinomial outcomes, and some technical details have been
+omitted. (For example, <code>ptLasso</code> takes care of crossfitting
+between the first and second steps.)</p>
+</div>
 <div class="section level3">
-<h3 id="base-case-data-with-a-multinomial-outcome">Base case: data with a multinomial outcome<a class="anchor" aria-label="anchor" href="#base-case-data-with-a-multinomial-outcome"></a>
+<h3 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h3>
-<p>We will use <code>ptLasso</code> for data with a multinomial outcome.
-First, let’s simulate multinomial data with 5 classes. We start by
+<p>First, let’s simulate multinomial data with 5 classes. We start by
 drawing <span class="math inline">\(X\)</span> from a normal
 distribution (uncorrelated features), and then we shift the columns
 differently for each group.</p>
@@ -1839,11 +1845,17 @@ Pearson correlation around 0.5.</p>
 <div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">n</span> <span class="op">=</span> <span class="fl">1000</span>; <span class="va">ntrain</span> <span class="op">=</span> <span class="fl">500</span>;</span>
-<span><span class="va">p</span> <span class="op">=</span> <span class="fl">500</span></span>
-<span><span class="va">sigma</span> <span class="op">=</span> <span class="fl">2</span></span>
+<span><span class="co"># Define constants</span></span>
+<span><span class="va">n</span> <span class="op">=</span> <span class="fl">1000</span>         <span class="co"># Total number of samples</span></span>
+<span><span class="va">ntrain</span> <span class="op">=</span> <span class="fl">650</span>     <span class="co"># Number of training samples</span></span>
+<span><span class="va">p</span> <span class="op">=</span> <span class="fl">500</span>          <span class="co"># Number of features</span></span>
+<span><span class="va">sigma</span> <span class="op">=</span> <span class="fl">2</span>        <span class="co"># Standard deviation of noise</span></span>
 <span>     </span>
-<span><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Generate covariate matrix</span></span>
+<span><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="va">p</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Define coefficients for responses 1 and 2</span></span>
 <span><span class="va">beta1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span> <span class="op">-</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">beta2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span> <span class="op">-</span> <span class="fl">15</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -1880,7 +1892,7 @@ each response).</p>
 <div class="sourceCode" id="cb81"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
-<p><img src="ptLasso_files/figure-html/unnamed-chunk-156-1.png" width="672"></p>
+<p><img src="ptLasso_files/figure-html/unnamed-chunk-156-1.png" width="700"></p>
 <p>As in previous examples, we can predict using the
 <code>predict</code>; if <code>ytest</code> is supplied, this will print
 the mean squared error as well as the support size for the pretrained,
@@ -1895,20 +1907,20 @@ MSE across both responses.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; alpha =  0.2 </span></span>
+<span><span class="co">#&gt; alpha =  0.3 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Performance (Mean squared error):</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            allGroups  mean response_1 response_2</span></span>
-<span><span class="co">#&gt; Overall        9.394 4.697      4.227      5.168</span></span>
-<span><span class="co">#&gt; Pretrain       8.907 4.453      4.186      4.721</span></span>
-<span><span class="co">#&gt; Individual     9.465 4.733      4.243      5.222</span></span>
+<span><span class="co">#&gt; Overall        9.217 4.608      4.092      5.125</span></span>
+<span><span class="co">#&gt; Pretrain       9.006 4.503      4.149      4.857</span></span>
+<span><span class="co">#&gt; Individual     9.324 4.662      4.168      5.157</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Support size:</span></span>
 <span><span class="co">#&gt;                                         </span></span>
 <span><span class="co">#&gt; Overall    57                           </span></span>
-<span><span class="co">#&gt; Pretrain   23 (19 common + 4 individual)</span></span>
-<span><span class="co">#&gt; Individual 80</span></span></code></pre></div>
+<span><span class="co">#&gt; Pretrain   22 (20 common + 2 individual)</span></span>
+<span><span class="co">#&gt; Individual 75</span></span></code></pre></div>
 <p>Also as before, we can choose to use the value of <span class="math inline">\(\alpha\)</span> that minimizes the CV MSE for
 <em>each</em> response.</p>
 <div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
@@ -1922,25 +1934,26 @@ MSE across both responses.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; alpha:</span></span>
 <span><span class="co">#&gt; group_1 group_2 </span></span>
-<span><span class="co">#&gt;     0.3     0.2 </span></span>
+<span><span class="co">#&gt;     0.3     0.3 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Performance (Mean squared error):</span></span>
 <span><span class="co">#&gt;            allGroups  mean response_1 response_2</span></span>
-<span><span class="co">#&gt; Overall        9.394 4.697      4.227      5.168</span></span>
-<span><span class="co">#&gt; Pretrain       8.877 4.438      4.156      4.721</span></span>
-<span><span class="co">#&gt; Individual     9.465 4.733      4.243      5.222</span></span>
+<span><span class="co">#&gt; Overall        9.217 4.608      4.092      5.125</span></span>
+<span><span class="co">#&gt; Pretrain       9.006 4.503      4.149      4.857</span></span>
+<span><span class="co">#&gt; Individual     9.324 4.662      4.168      5.157</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Support size:</span></span>
 <span><span class="co">#&gt;                                         </span></span>
 <span><span class="co">#&gt; Overall    57                           </span></span>
-<span><span class="co">#&gt; Pretrain   23 (19 common + 4 individual)</span></span>
-<span><span class="co">#&gt; Individual 80</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="multi-response-data-with-mixed-response-types-glmnet-only">Multi-response data with mixed response types (<code>glmnet</code>
+<span><span class="co">#&gt; Pretrain   22 (20 common + 2 individual)</span></span>
+<span><span class="co">#&gt; Individual 75</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="multi-response-data-with-mixed-response-types-glmnet-only">Multi-response data with mixed response types (<code>glmnet</code>
 only)<a class="anchor" aria-label="anchor" href="#multi-response-data-with-mixed-response-types-glmnet-only"></a>
-</h3>
+</h2>
 <p>Muti-response data consists of datasets with covariates <span class="math inline">\(X\)</span> and multiple outcomes <span class="math inline">\(y_1, y_2, y_3, \dots\)</span>. If these outcomes
 are all continuous, then it may be natural to treat this as a multitask
 learning problem (see the section “Multi-response data with Gaussian
@@ -1972,9 +1985,12 @@ have 5 features unique to them. We’ll define <span class="math inline">\(y_1\)
 <div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">n</span> <span class="op">=</span> <span class="fl">600</span>; <span class="va">ntrain</span> <span class="op">=</span> <span class="fl">300</span></span>
-<span><span class="va">p</span> <span class="op">=</span> <span class="fl">50</span></span>
-<span>     </span>
+<span><span class="co"># Define constants</span></span>
+<span><span class="va">n</span> <span class="op">=</span> <span class="fl">600</span>          <span class="co"># Total number of samples</span></span>
+<span><span class="va">ntrain</span> <span class="op">=</span> <span class="fl">300</span>     <span class="co"># Number of training samples</span></span>
+<span><span class="va">p</span> <span class="op">=</span> <span class="fl">50</span>           <span class="co"># Number of features</span></span>
+<span></span>
+<span><span class="co"># Define covariates     </span></span>
 <span><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># y1: continuous response</span></span>
@@ -2066,7 +2082,7 @@ outcome:</p>
 <span>     xlab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">alpha</span><span class="op">)</span>,</span>
 <span>     ylab <span class="op">=</span> <span class="st">"CV C index"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">alphalist</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.max</a></span><span class="op">(</span><span class="va">cv.error.y3</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p><img src="ptLasso_files/figure-html/unnamed-chunk-173-1.png" width="672"></p>
+<p><img src="ptLasso_files/figure-html/unnamed-chunk-173-1.png" width="700"></p>
 <p>Fit the final models for <span class="math inline">\(y_2\)</span> and
 <span class="math inline">\(y_3\)</span>:</p>
 <div class="sourceCode" id="cb89"><pre class="downlit sourceCode r">
@@ -2174,7 +2190,6 @@ recommend relying on domain knowledge for selecting an approach (though
 many options may be tried and compared with cross-validation or a
 validation set).</p>
 </div>
-</div>
 <div class="section level2">
 <h2 id="time-series-data-glmnet-only">Time series data (<code>glmnet</code> only)<a class="anchor" aria-label="anchor" href="#time-series-data-glmnet-only"></a>
 </h2>
@@ -2183,140 +2198,220 @@ observe patients at two different points in time. We expect that the
 relationship between <span class="math inline">\(X\)</span> and <span class="math inline">\(y\)</span> will be different at time 1 and time 2,
 but not completely unrelated. Therefore, pretraining can be useful: we
 can use the model fitted at time 1 to inform the model for time 2.</p>
-<p><code>ptLasso</code> does not natively support this setting, but we
-can use pretraining nonetheless – below is an example. We assume that
-<span class="math inline">\(X\)</span> has changed between times 1 and
-2. However, if <span class="math inline">\(X\)</span> is constant across
-time, we can also treat this as a multitask problem – see the section
-“Multitask learning or coaching” for an example.</p>
-<p>To do pretraining, our plan is as follows:</p>
+<p><code>ptLasso</code> supports this setting, and below is an example.
+We first assume that <span class="math inline">\(X\)</span> is constant
+across time, and <span class="math inline">\(y\)</span> changes. Later,
+we will show an example where <span class="math inline">\(X\)</span>
+changes across time.</p>
+<p>To do pretraining, we:</p>
 <ol style="list-style-type: decimal">
 <li>fit a model for time 1 and extract its offset and support,</li>
 <li>use the offset and support (the usual pretraining) to train a model
 for time 2.</li>
 </ol>
+<div class="section level3">
+<h3 id="example-1-covariates-are-constant-over-time">Example 1: covariates are constant over time<a class="anchor" aria-label="anchor" href="#example-1-covariates-are-constant-over-time"></a>
+</h3>
 <p>We’ll start by simulating data – more details in the comments.</p>
 <div class="sourceCode" id="cb97"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">n</span> <span class="op">=</span> <span class="fl">600</span>; <span class="va">ntrain</span> <span class="op">=</span> <span class="fl">300</span>;</span>
-<span><span class="va">p</span> <span class="op">=</span> <span class="fl">20</span></span>
+<span><span class="co"># Define constants</span></span>
+<span><span class="va">n</span> <span class="op">=</span> <span class="fl">600</span>          <span class="co"># Total number of samples</span></span>
+<span><span class="va">ntrain</span> <span class="op">=</span> <span class="fl">300</span>     <span class="co"># Number of training samples</span></span>
+<span><span class="va">p</span> <span class="op">=</span> <span class="fl">100</span>          <span class="co"># Number of features</span></span>
+<span><span class="va">sigma</span> <span class="op">=</span> <span class="fl">3</span>        <span class="co"># Standard deviation of noise</span></span>
 <span></span>
-<span><span class="co"># We assume that X at time 1 (x1) and X at time 2 (x2) are related:</span></span>
-<span><span class="co"># to get X2, we modify X1.</span></span>
-<span><span class="va">x1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span></span>
-<span><span class="va">x2</span> <span class="op">=</span> <span class="va">x1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0.2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span></span>
+<span><span class="co"># Generate covariate matrix</span></span>
+<span><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="va">p</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># The relationship between X and y at time 1 and 2 will be similarly related.</span></span>
-<span><span class="co"># The coefficients at time 2 are a function of those at time 1.</span></span>
-<span><span class="co"># Importantly, they share the same support.</span></span>
-<span><span class="va">beta1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">-</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">beta2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span><span class="op">*</span><span class="va">beta1</span></span>
+<span><span class="co"># Define coefficients for time points 1 and 2</span></span>
+<span><span class="va">beta1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span> <span class="op">-</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Coefs at time 1</span></span>
+<span><span class="va">beta2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p</span>, <span class="fl">0.5</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="va">beta1</span>       <span class="co"># Coefs at time 2, shared support with time 1</span></span>
 <span></span>
-<span><span class="co"># Finally, we compute y.</span></span>
-<span><span class="co"># y2 is a function of y1, x2 and beta2.</span></span>
-<span><span class="va">y1</span> <span class="op">=</span> <span class="va">x1</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
-<span><span class="va">y2</span> <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">y1</span> <span class="op">+</span> <span class="va">x2</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span></code></pre></div>
-<p>Split into train and test, and define folds to use for cross
-validation:</p>
+<span><span class="co"># Generate response variables for times 1 and 2</span></span>
+<span><span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta1</span> <span class="op">+</span> <span class="va">sigma</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta2</span> <span class="op">+</span> <span class="va">sigma</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Split data into training and testing sets</span></span>
+<span><span class="va">xtest</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span>, <span class="op">]</span>  <span class="co"># Test covariates</span></span>
+<span><span class="va">ytest</span> <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span>, <span class="op">]</span>  <span class="co"># Test response</span></span>
+<span></span>
+<span><span class="va">x</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span>, <span class="op">]</span>  <span class="co"># Train covariates</span></span>
+<span><span class="va">y</span> <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span>, <span class="op">]</span>  <span class="co"># Train response</span></span></code></pre></div>
+<p>Having simulated data, we are ready to call <code>ptLasso</code>; the
+call to <code>ptLasso</code> looks much the same as in all our other
+examples, only now (1) <span class="math inline">\(y\)</span> is a
+matrix with one column for each time point and (2) we specify
+<code>use.case = "timeSeries"</code>. After fitting, a call to
+<code>plot</code> shows the models fitted for both of the time points
+with and without using pretraining.</p>
 <div class="sourceCode" id="cb98"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Split into train and test:</span></span>
-<span><span class="va">x1test</span> <span class="op">=</span> <span class="va">x1</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span>, <span class="op">]</span></span>
-<span><span class="va">x2test</span> <span class="op">=</span> <span class="va">x2</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span>, <span class="op">]</span></span>
-<span><span class="va">y1test</span> <span class="op">=</span> <span class="va">y1</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="va">y2test</span> <span class="op">=</span> <span class="va">y2</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span><span class="op">]</span></span>
-<span></span>
-<span><span class="va">x1</span> <span class="op">=</span> <span class="va">x1</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span>, <span class="op">]</span></span>
-<span><span class="va">x2</span> <span class="op">=</span> <span class="va">x2</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span>, <span class="op">]</span></span>
-<span><span class="va">y1</span> <span class="op">=</span> <span class="va">y1</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">]</span></span>
-<span><span class="va">y2</span> <span class="op">=</span> <span class="va">y2</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">]</span></span>
-<span></span>
-<span><span class="co"># Define 10 training folds:</span></span>
-<span><span class="va">nfolds</span> <span class="op">=</span> <span class="fl">10</span></span>
-<span><span class="va">foldid</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">trunc</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span><span class="op">/</span><span class="va">nfolds</span><span class="op">)</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<p>Now we have our simulated data and we are ready to train models. The
-first step is to fit a model for time 1 and extract the cross-fitted
-offset and support. Note that <code>cv.glmnet</code> will store
-cross-fitted predictions if we use the argument
-<code>keep = TRUE</code>.</p>
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/ptLasso.html">ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"timeSeries"</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
+<p><img src="ptLasso_files/figure-html/unnamed-chunk-194-1.png" width="700"></p>
+<p>And as before, we can <code>predict</code> with <code>xtest</code>.
+In this example, pretraining helps performance: the two time points
+share the same support, and pretraining discovers and leverages
+this.</p>
 <div class="sourceCode" id="cb99"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">y1_fit</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x1</span>, <span class="va">y1</span>, keep<span class="op">=</span><span class="cn">TRUE</span>, foldid <span class="op">=</span> <span class="va">foldid</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Identify the support: coefficients which are nonzero:</span></span>
-<span><span class="va">support</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">y1_fit</span>, s <span class="op">=</span> <span class="va">y1_fit</span><span class="op">$</span><span class="va">lambda.1se</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Glmnet computed the cross-fitted predictions:</span></span>
-<span><span class="va">offset</span> <span class="op">=</span> <span class="va">y1_fit</span><span class="op">$</span><span class="va">fit.preval</span><span class="op">[</span>, <span class="va">y1_fit</span><span class="op">$</span><span class="va">lambda</span> <span class="op">==</span> <span class="va">y1_fit</span><span class="op">$</span><span class="va">lambda.1se</span><span class="op">]</span></span></code></pre></div>
-<p>The last step is to train a model for time 2 using the offset and
-support from the previous model. As always with pretraining, there is a
-hyperparameter <span class="math inline">\(\alpha\)</span> that
-determines the influence of the time 1 model on the time 2 model; we can
-choose this with cross validation. Here, we train models for a range of
-values of <span class="math inline">\(\alpha\)</span> (0, 0.1, 0.2, …
-1), and store the cross validated MSE – we will choose <span class="math inline">\(\alpha\)</span> corresponding to the model with
-the lowest CV MSE.</p>
+<code class="sourceCode R"><span><span class="va">preds</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
+<span><span class="va">preds</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:  </span></span>
+<span><span class="co">#&gt; predict.ptLasso(object = fit, xtest = xtest, ytest = ytest) </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; alpha =  0 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Performance (Mean squared error):</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;              mean response_1 response_2</span></span>
+<span><span class="co">#&gt; Pretrain    9.604      10.78      8.428</span></span>
+<span><span class="co">#&gt; Individual 10.428      10.78     10.076</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Support size:</span></span>
+<span><span class="co">#&gt;                                          </span></span>
+<span><span class="co">#&gt; Pretrain   26 (10 common + 16 individual)</span></span>
+<span><span class="co">#&gt; Individual 39</span></span></code></pre></div>
+<p>We specified <code>alpha = 0</code> in this example, but cross
+validation would advise us to choose <span class="math inline">\(\alpha
+= 0.2\)</span>. Plotting shows us the average performance across the two
+time points as well as the performance for each time point. Note that,
+at time 1, the the individual model and the pretrained model are the
+same; we do not see the advantage of pretraining until time 2 (when we
+use information from time 1).</p>
 <div class="sourceCode" id="cb100"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cv.error</span> <span class="op">=</span> <span class="cn">NULL</span></span>
-<span><span class="va">alphalist</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">11</span><span class="op">)</span></span>
-<span></span>
-<span><span class="kw">for</span><span class="op">(</span><span class="va">alpha</span> <span class="kw">in</span> <span class="va">alphalist</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="co"># Penalty factor:</span></span>
-<span>  <span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">alpha</span>, <span class="va">p</span><span class="op">)</span></span>
-<span>  <span class="va">pf</span><span class="op">[</span><span class="va">support</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
-<span>  </span>
-<span>  <span class="co"># Offset:</span></span>
-<span>  <span class="va">offset.alpha</span> <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">alpha</span><span class="op">)</span> <span class="op">*</span> <span class="va">offset</span></span>
-<span>    </span>
-<span>  <span class="co"># Model fitting:</span></span>
-<span>  <span class="va">y2_fit</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x2</span>, <span class="va">y2</span>, </span>
-<span>                     foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
-<span>                     offset <span class="op">=</span> <span class="va">offset.alpha</span>,</span>
-<span>                     penalty.factor <span class="op">=</span> <span class="va">pf</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># Use the CV MSE computed by cv.glmnet:</span></span>
-<span>  <span class="va">cv.error</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cv.error</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">y2_fit</span><span class="op">$</span><span class="va">cvm</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>Which <span class="math inline">\(\alpha\)</span> gave us the best
-performance? Plotting the CV MSE across all <span class="math inline">\(\alpha\)</span>s we compared reveals that the best
-<span class="math inline">\(\alpha = 0.5\)</span>.</p>
+<code class="sourceCode R"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"timeSeries"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvfit</span>, plot.alphahat <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="ptLasso_files/figure-html/unnamed-chunk-196-1.png" width="700"></p>
 <div class="sourceCode" id="cb101"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">alphalist</span>, <span class="va">cv.error</span>, type <span class="op">=</span> <span class="st">"b"</span>,</span>
-<span>     xlab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">alpha</span><span class="op">)</span>,</span>
-<span>     ylab <span class="op">=</span> <span class="st">"CV AUC"</span><span class="op">)</span></span>
-<span><span class="va">best.alpha</span> <span class="op">=</span> <span class="va">alphalist</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">cv.error</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">alphalist</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">cv.error</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p><img src="ptLasso_files/figure-html/unnamed-chunk-197-1.png" width="672"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:  </span></span>
+<span><span class="co">#&gt; predict.cv.ptLasso(object = cvfit, xtest = xtest, ytest = ytest) </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; alpha =  0.2 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Performance (Mean squared error):</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;             mean response_1 response_2</span></span>
+<span><span class="co">#&gt; Pretrain   10.62      10.87      10.37</span></span>
+<span><span class="co">#&gt; Individual 10.45      10.87      10.03</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Support size:</span></span>
+<span><span class="co">#&gt;                                          </span></span>
+<span><span class="co">#&gt; Pretrain   28 (10 common + 18 individual)</span></span>
+<span><span class="co">#&gt; Individual 40</span></span></code></pre></div>
+<p>A minor detail: we could also have treated this as a
+<em>multireponse</em> problem, and ignored the time-ordering of the
+responses. See more in the section called “Multi-response data with
+Gaussian responses”.</p>
 <div class="sourceCode" id="cb102"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Train a model using alpha = 0.5</span></span>
-<span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">best.alpha</span>, <span class="va">p</span><span class="op">)</span></span>
-<span><span class="va">pf</span><span class="op">[</span><span class="va">support</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
-<span></span>
-<span><span class="va">offset.alpha</span> <span class="op">=</span> <span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">best.alpha</span><span class="op">)</span> <span class="op">*</span> <span class="va">offset</span></span>
-<span></span>
-<span><span class="va">y2_fit</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x2</span>, <span class="va">y2</span>, foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
-<span>                   offset <span class="op">=</span> <span class="va">offset.alpha</span>,</span>
-<span>                   penalty.factor <span class="op">=</span> <span class="va">pf</span><span class="op">)</span></span></code></pre></div>
-<p>Out of curiosity, let’s train an entirely separate model for time 2
-(though we have done this already – this is the special case of
-pretraining where <span class="math inline">\(\alpha = 1\)</span>). This
-will give us a baseline performance measure.</p>
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/ptLasso.html">ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="example-2-covariates-change-over-time">Example 2: covariates change over time<a class="anchor" aria-label="anchor" href="#example-2-covariates-change-over-time"></a>
+</h3>
+<p>Now, we’ll repeat what we did above, but we’ll simulate data where
+<span class="math inline">\(x\)</span> changes with time. In this
+setting, <code>ptLasso</code> expects <span class="math inline">\(x\)</span> to be a list with one covariate matrix
+for each time.</p>
 <div class="sourceCode" id="cb103"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">y2_fit_no_pretrain</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x2</span>, <span class="va">y2</span>, foldid <span class="op">=</span> <span class="va">foldid</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span>  <span class="co"># Set seed for reproducibility</span></span>
 <span></span>
-<span><span class="va">testoffset</span> <span class="op">=</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">best.alpha</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">y1_fit</span>, <span class="va">x1test</span>, s<span class="op">=</span><span class="st">"lambda.1se"</span><span class="op">)</span></span>
-<span><span class="va">pretrain_preds</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">y2_fit</span>, <span class="va">x2test</span>, newoffset <span class="op">=</span> <span class="va">testoffset</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Pretrain PSE:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">y2test</span> <span class="op">-</span> <span class="va">pretrain_preds</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Pretrain PSE: 1.35</span></span></code></pre></div>
+<span><span class="co"># Define constants</span></span>
+<span><span class="va">n</span> <span class="op">=</span> <span class="fl">600</span>          <span class="co"># Total number of samples</span></span>
+<span><span class="va">ntrain</span> <span class="op">=</span> <span class="fl">300</span>     <span class="co"># Number of training samples</span></span>
+<span><span class="va">p</span> <span class="op">=</span> <span class="fl">100</span>          <span class="co"># Number of features</span></span>
+<span><span class="va">sigma</span> <span class="op">=</span> <span class="fl">3</span>        <span class="co"># Standard deviation of noise</span></span>
+<span></span>
+<span><span class="co"># Covariates for times 1 and 2</span></span>
+<span><span class="va">x1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="va">p</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span></span>
+<span><span class="va">x2</span> <span class="op">=</span> <span class="va">x1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0.2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="va">p</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span>  <span class="co"># Perturbed covariates for time 2</span></span>
+<span><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">x1</span>, <span class="va">x2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Define coefficients for time points 1 and 2</span></span>
+<span><span class="va">beta1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span> <span class="op">-</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Coefs at time 1</span></span>
+<span><span class="va">beta2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">p</span>, <span class="fl">0.5</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="va">beta1</span>       <span class="co"># Coefs at time 2, shared support with time 1</span></span>
+<span></span>
+<span><span class="co"># Response variables for times 1 and 2:</span></span>
+<span><span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta1</span> <span class="op">+</span> <span class="va">sigma</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta2</span> <span class="op">+</span> <span class="va">sigma</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Split data into training and testing sets</span></span>
+<span><span class="va">xtest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">x</span>, <span class="kw">function</span><span class="op">(</span><span class="va">xx</span><span class="op">)</span> <span class="va">xx</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span>  <span class="co"># Test covariates</span></span>
+<span><span class="va">ytest</span> <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span>, <span class="op">]</span>  <span class="co"># Test response</span></span>
+<span></span>
+<span><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">x</span>, <span class="kw">function</span><span class="op">(</span><span class="va">xx</span><span class="op">)</span> <span class="va">xx</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span>, <span class="op">]</span><span class="op">)</span>  <span class="co"># Train covariates</span></span>
+<span><span class="va">y</span> <span class="op">=</span> <span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span>, <span class="op">]</span>  <span class="co"># Train response</span></span></code></pre></div>
+<p>Now, <span class="math inline">\(x\)</span> is a list of length
+two:</p>
 <div class="sourceCode" id="cb104"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 2</span></span>
+<span><span class="co">#&gt;  $ : num [1:300, 1:100] -1.207 0.277 1.084 -2.346 0.429 ...</span></span>
+<span><span class="co">#&gt;  $ : num [1:300, 1:100] -1.493 0.303 1.172 -2.316 0.224 ...</span></span></code></pre></div>
+<p>We can call <code>ptLasso</code>, <code>cv.ptLasso</code>,
+<code>plot</code> and <code>predict</code> just as before:</p>
+<div class="sourceCode" id="cb105"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/ptLasso.html">ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"timeSeries"</span>, alpha <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>  <span class="co"># Plot the fitted model</span></span></code></pre></div>
+<p><img src="ptLasso_files/figure-html/unnamed-chunk-200-1.png" width="700"></p>
+<div class="sourceCode" id="cb106"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span>  <span class="co"># Predict using the fitted model</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:  </span></span>
+<span><span class="co">#&gt; predict.ptLasso(object = fit, xtest = xtest, ytest = ytest) </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; alpha =  0 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Performance (Mean squared error):</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;             mean response_1 response_2</span></span>
+<span><span class="co">#&gt; Pretrain   11.92       12.1      11.75</span></span>
+<span><span class="co">#&gt; Individual 11.46       12.1      10.82</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Support size:</span></span>
+<span><span class="co">#&gt;                                          </span></span>
+<span><span class="co">#&gt; Pretrain   36 (16 common + 20 individual)</span></span>
+<span><span class="co">#&gt; Individual 61</span></span></code></pre></div>
+<div class="sourceCode" id="cb107"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">individual_preds</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">y2_fit_no_pretrain</span>, <span class="va">x2test</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Individual PSE:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">y2test</span> <span class="op">-</span> <span class="va">individual_preds</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Individual PSE: 1.7</span></span></code></pre></div>
-<p>Pretraining gives us a 20% lower PSE than just using individual
-models. This is not surprising – we simulated data to favor pretraining.
-Recall, however, that if the true models at times 1 and 2 are unrelated,
-cross validation over the pretraining hyperparameter <span class="math inline">\(\alpha\)</span> will encourage us to choose the
-individual model, and pretraining should not hurt our performance.</p>
+<span><span class="co"># With cross validation:</span></span>
+<span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"timeSeries"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvfit</span>, plot.alphahat <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>  <span class="co"># Plot cross-validated model</span></span></code></pre></div>
+<p><img src="ptLasso_files/figure-html/unnamed-chunk-200-2.png" width="700"></p>
+<div class="sourceCode" id="cb108"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span>  <span class="co"># Predict using cross-validated model</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:  </span></span>
+<span><span class="co">#&gt; predict.cv.ptLasso(object = cvfit, xtest = xtest, ytest = ytest) </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; alpha =  0.4 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Performance (Mean squared error):</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;             mean response_1 response_2</span></span>
+<span><span class="co">#&gt; Pretrain   15.73      12.11      19.35</span></span>
+<span><span class="co">#&gt; Individual 11.53      12.11      10.96</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Support size:</span></span>
+<span><span class="co">#&gt;                                          </span></span>
+<span><span class="co">#&gt; Pretrain   54 (19 common + 35 individual)</span></span>
+<span><span class="co">#&gt; Individual 65</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="conditional-average-treatment-effect-estimation-glmnet-only">Conditional average treatment effect estimation (<code>glmnet</code>
@@ -2369,7 +2464,7 @@ outcomes.</p>
 </h3>
 <p>Here is an example. We will simplify the problem by assuming
 treatment has been randomized – the true <span class="math inline">\(e^*(x_i) = 0.5\)</span> for all <span class="math inline">\(i\)</span>.</p>
-<div class="sourceCode" id="cb105"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb109"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">n</span> <span class="op">=</span> <span class="fl">600</span>; <span class="va">ntrain</span> <span class="op">=</span> <span class="fl">300</span></span>
@@ -2392,7 +2487,7 @@ treatment has been randomized – the true <span class="math inline">\(e^*(x_i) 
 <span><span class="va">y</span>  <span class="op">=</span> <span class="va">mu</span> <span class="op">+</span> <span class="fl">10</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Signal to noise ratio:"</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">mu</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">y</span><span class="op">-</span><span class="va">mu</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Signal to noise ratio: 2.301315</span></span></code></pre></div>
-<div class="sourceCode" id="cb106"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb110"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Split into train/test</span></span>
 <span><span class="va">xtest</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span>, <span class="op">]</span></span>
@@ -2409,7 +2504,7 @@ treatment has been randomized – the true <span class="math inline">\(e^*(x_i) 
 <p>We begin model fitting, starting with our estimate of <span class="math inline">\(e^*\)</span> (the probability of receiving the
 treatment). To fit <span class="math inline">\(\tau\)</span>, we will
 also need to record the cross-fitted <span class="math inline">\(\hat{e}^*(x)\)</span>.</p>
-<div class="sourceCode" id="cb107"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb111"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">e_fit</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">w</span>, foldid <span class="op">=</span> <span class="va">foldid</span>,</span>
 <span>                  family<span class="op">=</span><span class="st">"binomial"</span>, type.measure<span class="op">=</span><span class="st">"deviance"</span>,</span>
@@ -2419,7 +2514,7 @@ also need to record the cross-fitted <span class="math inline">\(\hat{e}^*(x)\)<
 <span><span class="va">e_hat</span> <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">e_hat</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Now, stage 1 of pretraining: fit a model for <span class="math inline">\(m^*\)</span> and record the support. As before, we
 also record the cross-fitted <span class="math inline">\(\hat{m}^*(x)\)</span>.</p>
-<div class="sourceCode" id="cb108"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb112"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">m_fit</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, keep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -2431,7 +2526,7 @@ also record the cross-fitted <span class="math inline">\(\hat{m}^*(x)\)</span>.<
 <span class="math inline">\(\tilde{y} = y_i - \hat{m}^*(x_i)\)</span> on
 <span class="math inline">\(\tilde{x} = (w_i - \hat{e}^*(x_i))
 x_i\)</span>; we’ll define them here:</p>
-<div class="sourceCode" id="cb109"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb113"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">y_tilde</span> <span class="op">=</span> <span class="va">y</span> <span class="op">-</span> <span class="va">m_hat</span></span>
 <span><span class="va">x_tilde</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">w</span> <span class="op">-</span> <span class="va">e_hat</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">x</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>And now, pretraining for <span class="math inline">\(\tau\)</span>.
@@ -2440,7 +2535,7 @@ Loop over <span class="math inline">\(\alpha = 0, 0.1, \dots,
 model for <span class="math inline">\(\tau\)</span> using the penalty
 factor defined by the support of <span class="math inline">\(\hat{m}\)</span> and <span class="math inline">\(\alpha\)</span>. We’ll keep track of our CV MSE at
 each step so that we can choose the <span class="math inline">\(\alpha\)</span> that minimizes the MSE.</p>
-<div class="sourceCode" id="cb110"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb114"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv.error</span> <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="va">alphalist</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">11</span><span class="op">)</span></span>
 <span></span>
@@ -2463,19 +2558,19 @@ each step so that we can choose the <span class="math inline">\(\alpha\)</span> 
 <span>     ylab <span class="op">=</span> <span class="st">"CV MSE"</span>, </span>
 <span>     main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/bquote.html" class="external-link">bquote</a></span><span class="op">(</span><span class="st">"CV mean squared error as a function of "</span> <span class="op">~</span> <span class="va">alpha</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">alphalist</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">cv.error</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p><img src="ptLasso_files/figure-html/unnamed-chunk-215-1.png" width="672"></p>
+<p><img src="ptLasso_files/figure-html/unnamed-chunk-218-1.png" width="700"></p>
 <p>In the plot above, the value at <span class="math inline">\(\alpha =
 1\)</span> corresponds to the usual R learner, which makes no assumption
 about a shared support between <span class="math inline">\(\tau\)</span>
 and <span class="math inline">\(m^*\)</span>. Based on the plot, we
 choose <span class="math inline">\(\alpha = 0.2\)</span> as our best
 performing model:</p>
-<div class="sourceCode" id="cb111"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">best.alpha</span> <span class="op">=</span> <span class="va">alphalist</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">cv.error</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Chosen alpha:"</span>, <span class="va">best.alpha</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Chosen alpha: 0.2</span></span></code></pre></div>
-<div class="sourceCode" id="cb112"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb116"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">best.alpha</span>, <span class="va">p</span><span class="op">)</span></span>
 <span><span class="va">pf</span><span class="op">[</span><span class="va">support</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
@@ -2486,20 +2581,20 @@ performing model:</p>
 <span>                    standardize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>To concretely compare the pretrained R-learner with the usual
 R-learner, we’ll train the usual R-learner here:</p>
-<div class="sourceCode" id="cb113"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb117"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tau_rlearner</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x_tilde</span>, <span class="va">y_tilde</span>, foldid <span class="op">=</span> <span class="va">foldid</span>, </span>
 <span>                         penalty.factor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                         intercept <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                         standardize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>As anticipated, pretraining improves the prediction squared error
 relative to the R learner – this is how we designed our simulation:</p>
-<div class="sourceCode" id="cb114"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb118"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">rlearner_preds</span>   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">tau_rlearner</span>, <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">xtest</span><span class="op">)</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"R-learner PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">rlearner_preds</span> <span class="op">-</span> <span class="va">tautest</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R-learner PSE:  45.85</span></span></code></pre></div>
-<div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb119"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">pretrained_preds</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">tau_fit</span>, <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">xtest</span><span class="op">)</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Pretrained R-learner PSE: "</span>, </span>
@@ -2511,7 +2606,7 @@ relative to the R learner – this is how we designed our simulation:</p>
 </h3>
 <p>Here, we repeat everything from above, only now there is no overlap
 in the support of <span class="math inline">\(m^*\)</span> and <span class="math inline">\(\tau\)</span>.</p>
-<div class="sourceCode" id="cb116"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb120"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">######################################################</span></span>
 <span><span class="co"># Simulate data</span></span>
 <span><span class="co">######################################################</span></span>
@@ -2533,7 +2628,7 @@ in the support of <span class="math inline">\(m^*\)</span> and <span class="math
 <span><span class="va">y</span>  <span class="op">=</span> <span class="va">mu</span> <span class="op">+</span> <span class="fl">10</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Signal to noise ratio:"</span>, <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">mu</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">y</span><span class="op">-</span><span class="va">mu</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Signal to noise ratio: 0.6938152</span></span></code></pre></div>
-<div class="sourceCode" id="cb117"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb121"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Split into train/test</span></span>
 <span><span class="va">xtest</span> <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">ntrain</span><span class="op">)</span>, <span class="op">]</span></span>
@@ -2589,7 +2684,7 @@ in the support of <span class="math inline">\(m^*\)</span> and <span class="math
 <span><span class="va">best.alpha</span> <span class="op">=</span> <span class="va">alphalist</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">cv.error</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Chosen alpha:"</span>, <span class="va">best.alpha</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Chosen alpha: 1</span></span></code></pre></div>
-<div class="sourceCode" id="cb118"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">best.alpha</span>, <span class="va">p</span><span class="op">)</span></span>
 <span><span class="va">pf</span><span class="op">[</span><span class="va">support</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
@@ -2614,7 +2709,7 @@ in the support of <span class="math inline">\(m^*\)</span> and <span class="math
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"R-learner prediction squared error: "</span>, </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">rlearner_preds</span> <span class="op">-</span> <span class="va">tautest</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R-learner prediction squared error:  31.11</span></span></code></pre></div>
-<div class="sourceCode" id="cb119"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb123"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">pretrained_preds</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">tau_fit</span>, <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">xtest</span><span class="op">)</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Pretrained R-learner prediction squared error: "</span>, </span>
@@ -2643,7 +2738,7 @@ through an example.</p>
 <div class="section level3">
 <h3 id="example-1-xgboost-pretraining">Example 1: xgboost pretraining<a class="anchor" aria-label="anchor" href="#example-1-xgboost-pretraining"></a>
 </h3>
-<div class="sourceCode" id="cb120"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dmlc/xgboost" class="external-link">xgboost</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: xgboost</span></span></code></pre></div>
 <p>We start by simulating data (<span class="math inline">\(n =
@@ -2653,7 +2748,7 @@ will be drawn from a standard univariate normal, and the remainder are
 <span class="math inline">\(0\)</span>. We define <span class="math inline">\(y\)</span> as <span class="math inline">\(y = 1(X
 &gt; 0) \beta + \epsilon\)</span>, where <span class="math inline">\(\epsilon\)</span> is noise; we hope that
 <code>xgboost</code> will learn the splits corresponding to <span class="math inline">\(X &gt; 0\)</span>.</p>
-<div class="sourceCode" id="cb121"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb125"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">n</span> <span class="op">=</span> <span class="fl">1800</span>; <span class="va">p</span> <span class="op">=</span> <span class="fl">1000</span>; <span class="va">noise</span> <span class="op">=</span> <span class="fl">5</span>;</span>
@@ -2671,7 +2766,7 @@ will be drawn from a standard univariate normal, and the remainder are
 <span></span>
 <span><span class="va">train.folds</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="va">n</span><span class="op">/</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Now, we run <code>xgboost</code> to get our basis functions:</p>
-<div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb126"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">xgbfit</span>      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/xgboost/man/xgb.train.html" class="external-link">xgboost</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">x</span>, label<span class="op">=</span><span class="va">y</span>, nrounds<span class="op">=</span><span class="fl">200</span>, max_depth<span class="op">=</span><span class="fl">1</span>, verbose<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">x.boost</span>     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">xgbfit</span>, <span class="va">x</span>, predleaf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
@@ -2681,19 +2776,19 @@ two baselines are (1) a linear model that does not pretrain with
 <code>xgboost</code>, and (2) <code>xgboost</code>. We find that
 <code>glmnet</code> together with <code>xgboost</code> outperforms
 <code>glmnet</code> alone and <code>xgboost</code> alone.</p>
-<div class="sourceCode" id="cb123"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb127"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x.boost</span>, <span class="va">y</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, foldid <span class="op">=</span> <span class="va">train.folds</span><span class="op">)</span></span>
 <span><span class="va">cvfit.noboost</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, foldid <span class="op">=</span> <span class="va">train.folds</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Lasso with xgboost pretraining PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">cvfit</span>, newx <span class="op">=</span> <span class="va">xtest.boost</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Lasso with xgboost pretraining PSE:  46.23225</span></span></code></pre></div>
-<div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb128"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Lasso without xgboost pretraining PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">cvfit.noboost</span>, newx <span class="op">=</span> <span class="va">xtest</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Lasso without xgboost pretraining PSE:  60.68818</span></span></code></pre></div>
-<div class="sourceCode" id="cb125"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb129"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"xgboost alone PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">xgbfit</span>, <span class="va">xtest</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>
@@ -2748,7 +2843,7 @@ pretraining</caption>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb126"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb130"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">n</span> <span class="op">=</span> <span class="fl">1800</span>; <span class="va">p</span> <span class="op">=</span> <span class="fl">500</span>; <span class="va">k</span> <span class="op">=</span> <span class="fl">3</span>;</span>
@@ -2778,7 +2873,7 @@ pretraining</caption>
 <span><span class="va">ytest</span><span class="op">[</span><span class="va">groups</span> <span class="op">==</span> <span class="fl">3</span><span class="op">]</span> <span class="op">=</span> <span class="va">ytest</span><span class="op">[</span><span class="va">groups</span> <span class="op">==</span> <span class="fl">3</span><span class="op">]</span> <span class="op">+</span> <span class="va">xtest.model</span><span class="op">[</span><span class="va">groups</span> <span class="op">==</span> <span class="fl">3</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta.3</span></span></code></pre></div>
 <p>Here are the dummy variables for our group indicators; we will use
 them to fit and predict with <code>xgboost</code>.</p>
-<div class="sourceCode" id="cb127"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb131"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">group.ids</span>     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> </span>
 <span><span class="va">grouptest.ids</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">groupstest</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> </span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">grouptest.ids</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">group.ids</span><span class="op">)</span></span></code></pre></div>
@@ -2786,7 +2881,7 @@ them to fit and predict with <code>xgboost</code>.</p>
 our new features. Note that we now use <code>max_depth = 2</code>: this
 is intended to allow interactions between the group indicators and the
 other features.</p>
-<div class="sourceCode" id="cb128"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb132"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">xgbfit</span>      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/xgboost/man/xgb.train.html" class="external-link">xgboost</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">group.ids</span><span class="op">)</span>, label<span class="op">=</span><span class="va">y</span>, </span>
 <span>                      nrounds<span class="op">=</span><span class="fl">200</span>, max_depth<span class="op">=</span><span class="fl">2</span>, verbose<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span>
 <span></span>
@@ -2797,7 +2892,7 @@ other features.</p>
 does not. As before, we find that pretraining with xgboost improves
 performance relative to (1) model fitting in the original feature space
 and (2) xgboost alone.</p>
-<div class="sourceCode" id="cb129"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb133"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x.boost</span>, <span class="va">y</span>, groups<span class="op">=</span><span class="va">groups</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span>
 <span><span class="va">preds</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest.boost</span>, groups<span class="op">=</span><span class="va">groupstest</span>, alphatype <span class="op">=</span> <span class="st">"varying"</span><span class="op">)</span></span>
 <span><span class="va">preds</span> <span class="op">=</span> <span class="va">preds</span><span class="op">$</span><span class="va">yhatpre</span></span>
@@ -2810,12 +2905,12 @@ and (2) xgboost alone.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"ptLasso with xgboost pretraining PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">preds</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ptLasso with xgboost pretraining PSE:  55.1535</span></span></code></pre></div>
-<div class="sourceCode" id="cb130"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb134"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"ptLasso without xgboost pretraining PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">preds.noboost</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ptLasso without xgboost pretraining PSE:  66.37259</span></span></code></pre></div>
-<div class="sourceCode" id="cb131"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb135"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"xgboost alone PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">xgbfit</span>, <span class="va">xtest</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>
@@ -2849,10 +2944,10 @@ and <span class="math inline">\(y\)</span> is defined as <span class="math inlin
 nonzero and <span class="math inline">\(\epsilon\)</span> is noise. In
 this example, we have 10 times as much unlabeled data as labeled data;
 this generally happens when labels are difficult to obtain.</p>
-<div class="sourceCode" id="cb132"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb136"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">MASS</a></span><span class="op">)</span> <span class="co"># for mvrnorm</span></span>
 <span><span class="co">#&gt; Loading required package: MASS</span></span></code></pre></div>
-<div class="sourceCode" id="cb133"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb137"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
@@ -2878,10 +2973,10 @@ this generally happens when labels are difficult to obtain.</p>
 and we identify the features with nonzero loadings in the first PC. The
 argument <span class="math inline">\(k = 1\)</span> means that we only
 obtain the first PC.</p>
-<div class="sourceCode" id="cb134"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb138"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/erichson/spca" class="external-link">sparsepca</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: sparsepca</span></span></code></pre></div>
-<div class="sourceCode" id="cb135"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb139"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">pcs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/sparsepca/man/spca.html" class="external-link">spca</a></span><span class="op">(</span><span class="va">xstar</span>, k <span class="op">=</span> <span class="fl">1</span>, verbose<span class="op">=</span><span class="cn">FALSE</span>, alpha<span class="op">=</span><span class="fl">1e-2</span>, beta<span class="op">=</span><span class="fl">1e-2</span><span class="op">)</span></span>
 <span><span class="va">nonzero.loadings</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">pcs</span><span class="op">$</span><span class="va">loadings</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
@@ -2890,7 +2985,7 @@ data, we know that the first 10 features are those that explain the
 variance in <span class="math inline">\(X\)</span>. These are also the
 features that define the relationship between <span class="math inline">\(X\)</span> and <span class="math inline">\(y\)</span>. Let’s check that sparse PCA has found
 the right features:</p>
-<div class="sourceCode" id="cb136"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb140"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nonzero.loadings</span></span>
 <span><span class="co">#&gt; [1]  1  2  3  4  5  6  7  8 10</span></span></code></pre></div>
 <p>Now, we are ready to model! We don’t need to call
@@ -2904,7 +2999,7 @@ coefficients.</p>
 Fortunately, <code>cv.glmnet</code> will record the CV MSE for each
 model in a vector called <code>cvm</code>; we just need to keep track of
 the minimum error from each model.</p>
-<div class="sourceCode" id="cb137"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb141"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">alphalist</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, length.out <span class="op">=</span> <span class="fl">11</span><span class="op">)</span></span>
 <span></span>
@@ -2932,11 +3027,11 @@ the minimum error from each model.</p>
 <span>     ylab <span class="op">=</span> <span class="st">"Mean squared error (CV)"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">best.alpha</span><span class="op">)</span></span></code></pre></div>
-<p><img src="ptLasso_files/figure-html/unnamed-chunk-261-1.png" width="672"></p>
+<p><img src="ptLasso_files/figure-html/unnamed-chunk-264-1.png" width="700"></p>
 <p>So, using CV performance as a metric, we choose <span class="math inline">\(\alpha = 0.2\)</span>. Now, we train our final
 model and predict and measure performance with our held-out data. We
 find that pretraining gives us a boost in performance.</p>
-<div class="sourceCode" id="cb138"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb142"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">best.alpha</span>, <span class="va">p</span><span class="op">)</span></span>
 <span><span class="va">pf</span><span class="op">[</span><span class="va">nonzero.loadings</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
 <span></span>
@@ -2951,7 +3046,7 @@ find that pretraining gives us a boost in performance.</p>
 <span><span class="co">#&gt;   11.10926 </span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
 <span><span class="co">#&gt; [1] "Mean-Squared Error"</span></span></code></pre></div>
-<div class="sourceCode" id="cb139"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb143"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">without.pretraining</span> <span class="op">=</span>  <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>,</span>
 <span>                                 foldid <span class="op">=</span> <span class="va">train.folds</span><span class="op">)</span></span>
