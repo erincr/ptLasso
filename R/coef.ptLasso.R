@@ -301,9 +301,12 @@ coef.ptLasso=function(object, model = c("all", "individual", "overall", "pretrai
 #' @export
 coef.cv.ptLasso=function(object, model = c("all", "individual", "overall", "pretrain"), alpha = NULL, ...){
     model = match.arg(model)
+    
+    is.ts = (object$call$use.case == "timeSeries")
+    if(is.ts && (model == "overall")) stop("There is no 'overall' model for time series pretraining.")
 
-    if((model == "all") | (model == "individual")) individual = lapply(object$fitind, function(x) coef(x, ...))
-    if((model == "all") | (model == "overall"))    overall    = coef(object$fitoverall, ...)
+    if((model == "all") | (model == "individual"))          individual = lapply(object$fitind, function(x) coef(x, ...))
+    if(!is.ts && ((model == "all") | (model == "overall"))) overall    = coef(object$fitoverall, ...)
 
     if((model == "all") | (model == "pretrain")){
         if(is.null(alpha)){
@@ -315,9 +318,10 @@ coef.cv.ptLasso=function(object, model = c("all", "individual", "overall", "pret
         }
     }
 
-    if(model == "all")        return(list( individual = individual,  pretrain = pretrain, overall = overall))
-    if(model == "individual") return(individual)
-    if(model == "pretrain")   return(pretrain)
-    if(model == "overall")    return(overall)
+    if(is.ts && (model == "all")) return(list(individual = individual,  pretrain = pretrain))
+    if(model == "all")            return(list(individual = individual,  pretrain = pretrain, overall = overall))
+    if(model == "individual")     return(individual)
+    if(model == "pretrain")       return(pretrain)
+    if(model == "overall")        return(overall)
 
 }
