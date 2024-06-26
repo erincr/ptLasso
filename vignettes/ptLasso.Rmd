@@ -16,7 +16,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>"#,
+  #fig.width = 12,
+  #fig.height = 8
 )
 require(knitr)
 ```
@@ -26,11 +28,11 @@ require(knitr)
 
 Suppose we have a dataset spanning ten cancers and we want to fit a lasso penalized Cox model to predict survival time. Some of the cancer classes in our dataset are large  (e.g. breast, lung) and some are small (e.g. head and neck). There are two obvious approaches: (1) fit a "pancancer model" to the entire training set and use it to make predictions for all cancer classes and (2) fit a separate (class specific) model for each cancer and use it to make predictions for that class only. 
 
-Pretraining (@craig2024pretraining) is a method that bridges these two options; it has a parameter that allows you to fit the pancancer model, the class specific models, and everything in between. `ptLasso` is a package that fits pretrained models using the `glmnet` package (@glmnet), including lasso, elasticnet and ridge models .
+Pretraining (@craig2024pretraining) is a method that bridges these two options; it has a parameter that allows you to fit the pancancer model, the class specific models, and everything in between. `ptLasso` is a package that fits pretrained models using the `glmnet` package (@glmnet), including lasso, elasticnet and ridge models.
 
-Our example dataset consisting of ten different cancers is called __input grouped__. There is a grouping on the rows of $X$ and each row belongs to one of the cancer classes. Alternatively, data can be __target grouped__, where there is no grouping on the rows of $X$, but we have (for example) a multinomial outcome. We could fit one multinomial model, or we could fit a set of one-vs-rest models. Pretraining again bridges the two approaches, and this is described in detail in the section "Target grouped data". The remainder of this introduction describes the input grouped setting. 
+Our example dataset consisting of ten different cancers is called __input grouped__. There is a grouping on the rows of $X$ and each row belongs to one of the cancer classes. We want to fit a specific model for each of the ten cancers, but we also want to share information across all cancers. Importantly, pretraining is a general method to pass information from one model to another -- it has many uses beyond what has already been discussed here, including time series data, multi-response data and conditional average treatment effect estimation. Some of these modeling tasks are not supported by the `ptLasso` package, and the final section in this vignette shows how to do pretraining for them using the `glmnet` package. The remainder of this introduction describes the input grouped setting.
 
-Importantly, pretraining is a general method to pass information from one model to another -- it has many uses beyond what has already been discussed here, including time series data, multi-response data and conditional average treatment effect estimation. Some of these modeling tasks are not supported by the `ptLasso` package, and the final section in this vignette shows how to do pretraining for them using the `glmnet` package. 
+<!--Alternatively, data can be __target grouped__, where there is no grouping on the rows of $X$, but we have (for example) a multinomial outcome. We could fit one multinomial model, or we could fit a set of one-vs-rest models. Pretraining again bridges the two approaches, and this is described in detail in the section "Target grouped data". The remainder of this introduction describes the input grouped setting. --> 
 
 Before we describe pretraining in more detail, we will first give a quick review of the lasso.
 

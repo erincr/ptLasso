@@ -224,7 +224,7 @@
 #' @references Friedman, J., Hastie, T., & Tibshirani, R. (2010). Regularization paths for generalized linear models via coordinate descent. Journal of Statistical Software, 33(1), 1-22.
 #'
 #' 
-ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binomial","cox"),
+ptLasso=function(x,y,groups=NULL,alpha=0.5,family=c("default", "gaussian", "multinomial", "binomial","cox"),
                  type.measure=c("default", "mse", "mae", "auc","deviance","class", "C"),
                  use.case=c("inputGroups","targetGroups", "multiresponse", "timeSeries"),
                  overall.lambda = c("lambda.1se", "lambda.min"),
@@ -240,12 +240,19 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                  group.intercepts = TRUE,
                  ...
                  ) {
-
     # Capture the original function call
     this.call = match.call()
 
+   if(is.null(groups) && (use.case == "targetGroups")) groups = y
+
     # Ensure valid values for parameters using match.arg
     family = match.arg(family)
+    if((family == "default") && (use.case == "targetGroups")) {
+        family = "multinomial"
+    } else if(family == "default"){
+        family = "gaussian"
+    } 
+    
     type.measure = match.arg(type.measure)
 
     # Set default type.measure based on family if "default"
@@ -255,7 +262,7 @@ ptLasso=function(x,y,groups,alpha=0.5,family=c("gaussian", "multinomial", "binom
                        } else {
                            "deviance"
                        }
-    }
+    }    
 
     # Ensure valid use.case argument
     use.case = match.arg(use.case, c("inputGroups", "targetGroups", "multiresponse", "timeSeries"), several.ok = FALSE)

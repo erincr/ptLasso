@@ -705,16 +705,16 @@ xtest=out2$x
 ytest=out2$y
 groupstest=ytest
 
-fit=ptLasso(x,y,groups=groups,alpha=0.222,family="multinomial",use.case="targetGroups", type.measure="class",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
-pred=predict(fit,xtest,groupstest=groupstest, ytest=ytest)
+fit=ptLasso(x,y,alpha=0.222,family="multinomial",use.case="targetGroups", type.measure="class",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
+pred=predict(fit,xtest,ytest=ytest)
 
 fit2=ptLasso(x,y,groups=groups,alpha=0.222,family="multinomial",use.case="targetGroups", type.measure="deviance",foldid=NULL, nfolds=5, overall.lambda="lambda.min")
-pred2=predict.ptLasso(fit2,xtest,groupstest=groupstest, ytest=ytest)
+pred2=predict.ptLasso(fit2,xtest, ytest=ytest)
 
 cvfit = cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="class", use.case="targetGroups", foldid=NULL, nfolds=3, overall.lambda="lambda.min")
 cvfit2 = cv.ptLasso(x,y,groups=groups,family="multinomial",type.measure="deviance", use.case="targetGroups", foldid=NULL, nfolds=3, overall.lambda="lambda.min")
-pred2=predict(cvfit2,xtest,groupstest=groupstest, ytest=ytest)
-pred3=predict(cvfit2,xtest,groupstest=groupstest, ytest=ytest, alphatype = "varying")
+pred2=predict(cvfit2,xtest, ytest=ytest)
+pred3=predict(cvfit2,xtest, ytest=ytest, alphatype = "varying")
 
 test_that("target_groups_misclassification_alphahat", {
     expect_equal(cvfit$alphahat,

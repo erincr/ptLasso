@@ -142,9 +142,9 @@ kable(
 ```{r}
 set.seed(1234)
 
-n = 500; p = 75; k = 5
+n = 500; p = 50; k = 5
 class.sizes = rep(n/k, k)
-ncommon = 3; nindiv = 5;
+ncommon = 10; nindiv = 5;
 shift.common = seq(-.2, .2, length.out = k)
 shift.indiv  = seq(-.1, .1, length.out = k)
 

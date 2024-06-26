@@ -234,7 +234,7 @@ subset.y <- function(y, ix, family) {
 #' 
 #' @export
 cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
-                       family = c("gaussian", "multinomial", "binomial","cox"),
+                       family = c("default", "gaussian", "multinomial", "binomial","cox"),
                        use.case=c("inputGroups","targetGroups", "multiresponse", "timeSeries"),
                        type.measure = c("default", "mse", "mae", "auc","deviance","class", "C"),
                        nfolds = 10, foldid = NULL,
@@ -247,7 +247,16 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
                        ...) { 
      
     use.case = match.arg(use.case, c("inputGroups","targetGroups", "multiresponse", "timeSeries"), several.ok=FALSE)
+
     family = match.arg(family)
+    if((family == "default") && (use.case == "targetGroups")) {
+        family = "multinomial"
+    } else if(family == "default"){
+        family = "gaussian"
+    }
+
+    if(is.null(groups) && (use.case == "targetGroups")) groups = y
+
     type.measure = match.arg(type.measure)
         
     this.call <- match.call()
