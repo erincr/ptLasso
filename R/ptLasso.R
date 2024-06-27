@@ -243,7 +243,10 @@ ptLasso=function(x,y,groups=NULL,alpha=0.5,family=c("default", "gaussian", "mult
     # Capture the original function call
     this.call = match.call()
 
-   if(is.null(groups) && (use.case == "targetGroups")) groups = y
+    # Ensure valid use.case argument
+    use.case = match.arg(use.case, c("inputGroups", "targetGroups", "multiresponse", "timeSeries"), several.ok = FALSE)
+
+    if(is.null(groups) && (use.case == "targetGroups")) groups = y
 
     # Ensure valid values for parameters using match.arg
     family = match.arg(family)
@@ -264,9 +267,7 @@ ptLasso=function(x,y,groups=NULL,alpha=0.5,family=c("default", "gaussian", "mult
                        }
     }    
 
-    # Ensure valid use.case argument
-    use.case = match.arg(use.case, c("inputGroups", "targetGroups", "multiresponse", "timeSeries"), several.ok = FALSE)
-
+    
     # Ensure valid overall.lambda argument
     overall.lambda = match.arg(overall.lambda, c("lambda.1se", "lambda.min"))
 
