@@ -164,7 +164,7 @@ for (i in 1:k) {
 }
 ```
 
-The calls to `ptLasso` and `cv.ptLasso` are almost the same as in the input grouped setting, only now we specify `use.case = "targetGroups"`. Note also that we use `groups = y`. The call to `predict` does not require a `groups` argument because the groups are unknown at prediction time.
+The calls to `ptLasso` and `cv.ptLasso` are almost the same as in the input grouped setting, only now we specify `use.case = "targetGroups"`. The call to `predict` does not require a `groups` argument because the groups are unknown at prediction time.
 
 ```{r}
 ################################################################################
@@ -172,7 +172,7 @@ The calls to `ptLasso` and `cv.ptLasso` are almost the same as in the input grou
 # By default, ptLasso uses type.measure = "deviance", but for ease of
 # interpretability, we use type.measure = "class" (the misclassification rate).
 ################################################################################
-fit = ptLasso(x = x, y = y, groups = y, family = "multinomial", 
+fit = ptLasso(x = x, y = y, 
               use.case = "targetGroups", type.measure = "class")
 
 ################################################################################
@@ -183,7 +183,7 @@ predict(fit, xtest, ytest = ytest)
 ################################################################################
 # Fit with CV to choose the alpha parameter
 ################################################################################
-cvfit = cv.ptLasso(x = x, y = y, groups = y, family = "multinomial", 
+cvfit = cv.ptLasso(x = x, y = y,
               use.case = "targetGroups", type.measure = "class")
 
 ################################################################################

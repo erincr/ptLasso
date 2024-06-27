@@ -9,7 +9,7 @@ cv.ptLasso(
   y,
   groups = NULL,
   alphalist = seq(0, 1, length = 11),
-  family = c("gaussian", "multinomial", "binomial", "cox"),
+  family = c("default", "gaussian", "multinomial", "binomial", "cox"),
   use.case = c("inputGroups", "targetGroups", "multiresponse", "timeSeries"),
   type.measure = c("default", "mse", "mae", "auc", "deviance", "class", "C"),
   nfolds = 10,

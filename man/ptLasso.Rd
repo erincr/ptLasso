@@ -7,9 +7,9 @@
 ptLasso(
   x,
   y,
-  groups,
+  groups = NULL,
   alpha = 0.5,
-  family = c("gaussian", "multinomial", "binomial", "cox"),
+  family = c("default", "gaussian", "multinomial", "binomial", "cox"),
   type.measure = c("default", "mse", "mae", "auc", "deviance", "class", "C"),
   use.case = c("inputGroups", "targetGroups", "multiresponse", "timeSeries"),
   overall.lambda = c("lambda.1se", "lambda.min"),
