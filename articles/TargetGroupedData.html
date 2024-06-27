@@ -207,9 +207,9 @@ differently for each group.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">n</span> <span class="op">=</span> <span class="fl">500</span>; <span class="va">p</span> <span class="op">=</span> <span class="fl">75</span>; <span class="va">k</span> <span class="op">=</span> <span class="fl">5</span></span>
+<span><span class="va">n</span> <span class="op">=</span> <span class="fl">500</span>; <span class="va">p</span> <span class="op">=</span> <span class="fl">50</span>; <span class="va">k</span> <span class="op">=</span> <span class="fl">5</span></span>
 <span><span class="va">class.sizes</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">n</span><span class="op">/</span><span class="va">k</span>, <span class="va">k</span><span class="op">)</span></span>
-<span><span class="va">ncommon</span> <span class="op">=</span> <span class="fl">3</span>; <span class="va">nindiv</span> <span class="op">=</span> <span class="fl">5</span>;</span>
+<span><span class="va">ncommon</span> <span class="op">=</span> <span class="fl">10</span>; <span class="va">nindiv</span> <span class="op">=</span> <span class="fl">5</span>;</span>
 <span><span class="va">shift.common</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">.2</span>, <span class="fl">.2</span>, length.out <span class="op">=</span> <span class="va">k</span><span class="op">)</span></span>
 <span><span class="va">shift.indiv</span>  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">.1</span>, <span class="fl">.1</span>, length.out <span class="op">=</span> <span class="va">k</span><span class="op">)</span></span>
 <span></span>
@@ -257,15 +257,15 @@ prediction time.</p>
 <span><span class="co">#&gt; Performance (Misclassification error):</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            overall   mean group_1 group_2 group_3 group_4 group_5</span></span>
-<span><span class="co">#&gt; Overall      0.772                                               </span></span>
-<span><span class="co">#&gt; Pretrain     0.748 0.2008   0.202     0.2     0.2     0.2   0.202</span></span>
-<span><span class="co">#&gt; Individual   0.754 0.2000   0.202     0.2     0.2     0.2   0.198</span></span>
+<span><span class="co">#&gt; Overall      0.738                                               </span></span>
+<span><span class="co">#&gt; Pretrain     0.728 0.2000   0.200     0.2     0.2     0.2   0.200</span></span>
+<span><span class="co">#&gt; Individual   0.736 0.1984   0.196     0.2     0.2     0.2   0.196</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Support size:</span></span>
 <span><span class="co">#&gt;                                         </span></span>
-<span><span class="co">#&gt; Overall    52                           </span></span>
-<span><span class="co">#&gt; Pretrain   41 (8 common + 33 individual)</span></span>
-<span><span class="co">#&gt; Individual 33</span></span></code></pre></div>
+<span><span class="co">#&gt; Overall    29                           </span></span>
+<span><span class="co">#&gt; Pretrain   23 (23 common + 0 individual)</span></span>
+<span><span class="co">#&gt; Individual 32</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">################################################################################</span></span>
@@ -284,20 +284,20 @@ prediction time.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; alpha =  0.5 </span></span>
+<span><span class="co">#&gt; alpha =  0.9 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Performance (Misclassification error):</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            overall   mean group_1 group_2 group_3 group_4 group_5</span></span>
-<span><span class="co">#&gt; Overall      0.758                                               </span></span>
-<span><span class="co">#&gt; Pretrain     0.748 0.2016     0.2     0.2     0.2     0.2   0.208</span></span>
-<span><span class="co">#&gt; Individual   0.786 0.2000     0.2     0.2     0.2     0.2   0.200</span></span>
+<span><span class="co">#&gt; Overall      0.738                                               </span></span>
+<span><span class="co">#&gt; Pretrain     0.722 0.1992     0.2     0.2     0.2     0.2   0.196</span></span>
+<span><span class="co">#&gt; Individual   0.742 0.2000     0.2     0.2     0.2     0.2   0.200</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Support size:</span></span>
 <span><span class="co">#&gt;                                         </span></span>
-<span><span class="co">#&gt; Overall    67                           </span></span>
-<span><span class="co">#&gt; Pretrain   46 (8 common + 38 individual)</span></span>
-<span><span class="co">#&gt; Individual 21</span></span></code></pre></div>
+<span><span class="co">#&gt; Overall    39                           </span></span>
+<span><span class="co">#&gt; Pretrain   32 (23 common + 9 individual)</span></span>
+<span><span class="co">#&gt; Individual 36</span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">################################################################################</span></span>
@@ -310,20 +310,20 @@ prediction time.</p>
 <span><span class="co">#&gt;     alphatype = "varying") </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; alpha =  0.4 0.7 0.7 0 0.5 </span></span>
+<span><span class="co">#&gt; alpha =  0.1 0 0.7 0 0.1 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Performance (Misclassification error):</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            overall   mean group_1 group_2 group_3 group_4 group_5</span></span>
-<span><span class="co">#&gt; Overall      0.758                                               </span></span>
-<span><span class="co">#&gt; Pretrain     0.778 0.2028   0.202   0.202   0.202     0.2   0.208</span></span>
-<span><span class="co">#&gt; Individual   0.786 0.2000   0.200   0.200   0.200     0.2   0.200</span></span>
+<span><span class="co">#&gt; Overall      0.738                                               </span></span>
+<span><span class="co">#&gt; Pretrain     0.742 0.2016   0.208     0.2     0.2   0.202   0.198</span></span>
+<span><span class="co">#&gt; Individual   0.742 0.2000   0.200     0.2     0.2   0.200   0.200</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Support size:</span></span>
-<span><span class="co">#&gt;                                         </span></span>
-<span><span class="co">#&gt; Overall    67                           </span></span>
-<span><span class="co">#&gt; Pretrain   63 (8 common + 55 individual)</span></span>
-<span><span class="co">#&gt; Individual 21</span></span></code></pre></div>
+<span><span class="co">#&gt;                                          </span></span>
+<span><span class="co">#&gt; Overall    39                            </span></span>
+<span><span class="co">#&gt; Pretrain   36 (23 common + 13 individual)</span></span>
+<span><span class="co">#&gt; Individual 36</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

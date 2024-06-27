@@ -98,23 +98,20 @@ method that bridges these two options; it has a parameter that allows
 you to fit the pancancer model, the class specific models, and
 everything in between. <code>ptLasso</code> is a package that fits
 pretrained models using the <code>glmnet</code> package (<span class="citation">Friedman, Tibshirani, and Hastie (2010)</span>),
-including lasso, elasticnet and ridge models .</p>
+including lasso, elasticnet and ridge models.</p>
 <p>Our example dataset consisting of ten different cancers is called
 <strong>input grouped</strong>. There is a grouping on the rows of <span class="math inline">\(X\)</span> and each row belongs to one of the
-cancer classes. Alternatively, data can be <strong>target
-grouped</strong>, where there is no grouping on the rows of <span class="math inline">\(X\)</span>, but we have (for example) a
-multinomial outcome. We could fit one multinomial model, or we could fit
-a set of one-vs-rest models. Pretraining again bridges the two
-approaches, and this is described in detail in the section “Target
-grouped data”. The remainder of this introduction describes the input
-grouped setting.</p>
-<p>Importantly, pretraining is a general method to pass information from
+cancer classes. We want to fit a specific model for each of the ten
+cancers, but we also want to share information across all cancers.
+Importantly, pretraining is a general method to pass information from
 one model to another – it has many uses beyond what has already been
 discussed here, including time series data, multi-response data and
 conditional average treatment effect estimation. Some of these modeling
 tasks are not supported by the <code>ptLasso</code> package, and the
 final section in this vignette shows how to do pretraining for them
-using the <code>glmnet</code> package.</p>
+using the <code>glmnet</code> package. The remainder of this
+introduction describes the input grouped setting.</p>
+<!--Alternatively, data can be __target grouped__, where there is no grouping on the rows of $X$, but we have (for example) a multinomial outcome. We could fit one multinomial model, or we could fit a set of one-vs-rest models. Pretraining again bridges the two approaches, and this is described in detail in the section "Target grouped data". The remainder of this introduction describes the input grouped setting. -->
 <p>Before we describe pretraining in more detail, we will first give a
 quick review of the lasso.</p>
 <div class="section level3">
@@ -1682,9 +1679,9 @@ differently for each group.</p>
 <div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">n</span> <span class="op">=</span> <span class="fl">500</span>; <span class="va">p</span> <span class="op">=</span> <span class="fl">75</span>; <span class="va">k</span> <span class="op">=</span> <span class="fl">5</span></span>
+<span><span class="va">n</span> <span class="op">=</span> <span class="fl">500</span>; <span class="va">p</span> <span class="op">=</span> <span class="fl">50</span>; <span class="va">k</span> <span class="op">=</span> <span class="fl">5</span></span>
 <span><span class="va">class.sizes</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">n</span><span class="op">/</span><span class="va">k</span>, <span class="va">k</span><span class="op">)</span></span>
-<span><span class="va">ncommon</span> <span class="op">=</span> <span class="fl">3</span>; <span class="va">nindiv</span> <span class="op">=</span> <span class="fl">5</span>;</span>
+<span><span class="va">ncommon</span> <span class="op">=</span> <span class="fl">10</span>; <span class="va">nindiv</span> <span class="op">=</span> <span class="fl">5</span>;</span>
 <span><span class="va">shift.common</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">.2</span>, <span class="fl">.2</span>, length.out <span class="op">=</span> <span class="va">k</span><span class="op">)</span></span>
 <span><span class="va">shift.indiv</span>  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">.1</span>, <span class="fl">.1</span>, length.out <span class="op">=</span> <span class="va">k</span><span class="op">)</span></span>
 <span></span>
@@ -1732,15 +1729,15 @@ prediction time.</p>
 <span><span class="co">#&gt; Performance (Misclassification error):</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            overall   mean group_1 group_2 group_3 group_4 group_5</span></span>
-<span><span class="co">#&gt; Overall      0.772                                               </span></span>
-<span><span class="co">#&gt; Pretrain     0.748 0.2008   0.202     0.2     0.2     0.2   0.202</span></span>
-<span><span class="co">#&gt; Individual   0.754 0.2000   0.202     0.2     0.2     0.2   0.198</span></span>
+<span><span class="co">#&gt; Overall      0.738                                               </span></span>
+<span><span class="co">#&gt; Pretrain     0.728 0.2000   0.200     0.2     0.2     0.2   0.200</span></span>
+<span><span class="co">#&gt; Individual   0.736 0.1984   0.196     0.2     0.2     0.2   0.196</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Support size:</span></span>
 <span><span class="co">#&gt;                                         </span></span>
-<span><span class="co">#&gt; Overall    52                           </span></span>
-<span><span class="co">#&gt; Pretrain   41 (8 common + 33 individual)</span></span>
-<span><span class="co">#&gt; Individual 33</span></span></code></pre></div>
+<span><span class="co">#&gt; Overall    29                           </span></span>
+<span><span class="co">#&gt; Pretrain   23 (23 common + 0 individual)</span></span>
+<span><span class="co">#&gt; Individual 32</span></span></code></pre></div>
 <div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">################################################################################</span></span>
@@ -1759,20 +1756,20 @@ prediction time.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; alpha =  0.5 </span></span>
+<span><span class="co">#&gt; alpha =  0.9 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Performance (Misclassification error):</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            overall   mean group_1 group_2 group_3 group_4 group_5</span></span>
-<span><span class="co">#&gt; Overall      0.758                                               </span></span>
-<span><span class="co">#&gt; Pretrain     0.748 0.2016     0.2     0.2     0.2     0.2   0.208</span></span>
-<span><span class="co">#&gt; Individual   0.786 0.2000     0.2     0.2     0.2     0.2   0.200</span></span>
+<span><span class="co">#&gt; Overall      0.738                                               </span></span>
+<span><span class="co">#&gt; Pretrain     0.722 0.1992     0.2     0.2     0.2     0.2   0.196</span></span>
+<span><span class="co">#&gt; Individual   0.742 0.2000     0.2     0.2     0.2     0.2   0.200</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Support size:</span></span>
 <span><span class="co">#&gt;                                         </span></span>
-<span><span class="co">#&gt; Overall    67                           </span></span>
-<span><span class="co">#&gt; Pretrain   46 (8 common + 38 individual)</span></span>
-<span><span class="co">#&gt; Individual 21</span></span></code></pre></div>
+<span><span class="co">#&gt; Overall    39                           </span></span>
+<span><span class="co">#&gt; Pretrain   32 (23 common + 9 individual)</span></span>
+<span><span class="co">#&gt; Individual 36</span></span></code></pre></div>
 <div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">################################################################################</span></span>
@@ -1785,20 +1782,20 @@ prediction time.</p>
 <span><span class="co">#&gt;     alphatype = "varying") </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; alpha =  0.4 0.7 0.7 0 0.5 </span></span>
+<span><span class="co">#&gt; alpha =  0.1 0 0.7 0 0.1 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Performance (Misclassification error):</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            overall   mean group_1 group_2 group_3 group_4 group_5</span></span>
-<span><span class="co">#&gt; Overall      0.758                                               </span></span>
-<span><span class="co">#&gt; Pretrain     0.778 0.2028   0.202   0.202   0.202     0.2   0.208</span></span>
-<span><span class="co">#&gt; Individual   0.786 0.2000   0.200   0.200   0.200     0.2   0.200</span></span>
+<span><span class="co">#&gt; Overall      0.738                                               </span></span>
+<span><span class="co">#&gt; Pretrain     0.742 0.2016   0.208     0.2     0.2   0.202   0.198</span></span>
+<span><span class="co">#&gt; Individual   0.742 0.2000   0.200     0.2     0.2   0.200   0.200</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Support size:</span></span>
-<span><span class="co">#&gt;                                         </span></span>
-<span><span class="co">#&gt; Overall    67                           </span></span>
-<span><span class="co">#&gt; Pretrain   63 (8 common + 55 individual)</span></span>
-<span><span class="co">#&gt; Individual 21</span></span></code></pre></div>
+<span><span class="co">#&gt;                                          </span></span>
+<span><span class="co">#&gt; Overall    39                            </span></span>
+<span><span class="co">#&gt; Pretrain   36 (23 common + 13 individual)</span></span>
+<span><span class="co">#&gt; Individual 36</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
