@@ -229,17 +229,16 @@ differently for each group.</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p>The calls to <code>ptLasso</code> and <code>cv.ptLasso</code> are
 almost the same as in the input grouped setting, only now we specify
-<code>use.case = "targetGroups"</code>. Note also that we use
-<code>groups = y</code>. The call to <code>predict</code> does not
-require a <code>groups</code> argument because the groups are unknown at
-prediction time.</p>
+<code>use.case = "targetGroups"</code>. The call to <code>predict</code>
+does not require a <code>groups</code> argument because the groups are
+unknown at prediction time.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">################################################################################</span></span>
 <span><span class="co"># Fit the pretrained model.</span></span>
 <span><span class="co"># By default, ptLasso uses type.measure = "deviance", but for ease of</span></span>
 <span><span class="co"># interpretability, we use type.measure = "class" (the misclassification rate).</span></span>
 <span><span class="co">################################################################################</span></span>
-<span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/ptLasso.html">ptLasso</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, groups <span class="op">=</span> <span class="va">y</span>, family <span class="op">=</span> <span class="st">"multinomial"</span>, </span>
+<span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/ptLasso.html">ptLasso</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, </span>
 <span>              use.case <span class="op">=</span> <span class="st">"targetGroups"</span>, type.measure <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">################################################################################</span></span>
@@ -271,7 +270,7 @@ prediction time.</p>
 <span><span class="co">################################################################################</span></span>
 <span><span class="co"># Fit with CV to choose the alpha parameter</span></span>
 <span><span class="co">################################################################################</span></span>
-<span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, groups <span class="op">=</span> <span class="va">y</span>, family <span class="op">=</span> <span class="st">"multinomial"</span>, </span>
+<span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>,</span>
 <span>              use.case <span class="op">=</span> <span class="st">"targetGroups"</span>, type.measure <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">################################################################################</span></span>
