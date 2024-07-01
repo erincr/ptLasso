@@ -75,7 +75,7 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
     forplot = data.frame(
         "alpha"   = c(err.pre[,"alpha"], err.pre[,"alpha"], err.pre[,"alpha"]),
         "overall" = c(err.pre[, "overall"], rep(err.ind["overall"], n.alpha), rep(err.pan["overall"], n.alpha)),
-        "model"   = c(rep("Pretrain", n.alpha), rep("Individual", n.alpha), rep("Overall (grouped)", n.alpha))
+        "model"   = c(rep("Pretrain", n.alpha), rep("Individual", n.alpha), rep("Overall\n(grouped)", n.alpha))
     )
     ylims = range(forplot$overall)
     nudge = .1 * (ylims[2] - ylims[1])
@@ -91,7 +91,7 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
         labs(x = expression(alpha), y = y.label, color = "", subtitle=paste0(as.character(k)," class problem")) +
         ylim(ylims[1], ylims[2]) +
         theme_minimal(base_size = 12) +
-        scale_color_manual(values = c(overall.color, pretrain.color, individual.color), breaks = c("Overall (grouped)", "Pretrain", "Individual")) +
+        scale_color_manual(values = c(overall.color, pretrain.color, individual.color), breaks = c("Overall\n(grouped)", "Pretrain", "Individual")) +
         guides(color="none")
 
     group.cols = colnames(err.pre)[grepl("group", colnames(err.pre))]
@@ -108,13 +108,13 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
 
     plot2 <- ggplot() +
         geom_line(aes(x=forplot2$alpha, y=forplot2$individualsum,
-                      group = forplot2$model, color = forplot2$model)) +
+                      group = forplot2$model, color = forplot2$model), show.legend = TRUE) +
         geom_text(aes(x=.2, y=sum.of.indiv.ind, label=as.character(supind), vjust=-1), size=3, color="#666666") +
         scale_x_continuous(sec.axis = dup_axis(breaks = err.pre[, "alpha"][c(TRUE, FALSE)], labels = as.character(suppre)[c(TRUE, FALSE)], name = "")) + 
         labs(x = expression(alpha), y = y.label, color = "", subtitle="Sum of individual one vs. rest problems") +
         ylim(ylims2[1], ylims2[2]) +
         theme_minimal(base_size = 12) +
-        scale_color_manual(values = c(overall.color, pretrain.color, individual.color), breaks = c("Overall\n(grouped)", "Pretrain", "Individual"), drop = FALSE) 
+        scale_color_manual(values = c(overall.color, pretrain.color, individual.color), limits = c("Overall\n(grouped)", "Pretrain", "Individual"), drop = FALSE) 
 
     if(plot.alphahat) {
         plot1 = plot1 + geom_vline(aes(xintercept = x$alphahat), color = '#666666', lty=2)
