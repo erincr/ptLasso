@@ -1,108 +1,38 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://erincr.github.io/ptLasso/404.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/articles/ConditionalAverageTreatmentEffect.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/articles/DifferentGroupsTrainAndTest.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/articles/InputGroupedData.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/articles/LearningTheInputGroups.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/articles/MultiResponseGaussian.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/articles/MultiResponseMixed.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/articles/TargetGroupedData.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/articles/TimeSeriesData.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/articles/UnsupervisedPretraining.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/articles/UsingNonlinearBases.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/articles/ptLasso.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/index.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/binomial.example.data.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/coef.cv.ptLasso.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/coef.ptLasso.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/cv.ptLasso.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/gaussian.example.data.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/get.individual.support.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/get.overall.support.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/get.pretrain.support.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/makedata.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/makedata.targetgroups.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/plot.cv.ptLasso.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/plot.ptLasso.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/predict.cv.ptLasso.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/predict.ptLasso.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/print.cv.ptLasso.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/print.predict.cv.ptLasso.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/print.predict.ptLasso.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/print.ptLasso.html</loc>
-  </url>
-  <url>
-    <loc>https://erincr.github.io/ptLasso/reference/ptLasso.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://erincr.github.io/ptLasso/404.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/articles/ConditionalAverageTreatmentEffect.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/articles/DifferentGroupsTrainAndTest.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/articles/InputGroupedData.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/articles/LearningTheInputGroups.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/articles/MultiResponseGaussian.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/articles/MultiResponseMixed.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/articles/TargetGroupedData.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/articles/TimeSeriesData.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/articles/UnsupervisedPretraining.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/articles/UsingNonlinearBases.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/articles/index.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/articles/ptLasso.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/authors.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/index.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/binomial.example.data.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/coef.cv.ptLasso.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/coef.ptLasso.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/cv.ptLasso.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/gaussian.example.data.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/get.individual.support.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/get.overall.support.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/get.pretrain.support.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/index.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/makedata.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/makedata.targetgroups.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/plot.cv.ptLasso.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/plot.ptLasso.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/predict.cv.ptLasso.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/predict.ptLasso.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/print.cv.ptLasso.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/print.predict.cv.ptLasso.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/print.predict.ptLasso.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/print.ptLasso.html</loc></url>
+<url><loc>https://erincr.github.io/ptLasso/reference/ptLasso.html</loc></url>
 </urlset>
+

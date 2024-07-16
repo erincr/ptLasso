@@ -5,66 +5,56 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="ptLasso">
 <title>Input grouped data • ptLasso</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Input grouped data">
-<meta property="og:description" content="ptLasso">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Input grouped data">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary" data-bs-theme="dark"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">ptLasso</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../articles/ptLasso.html">Get started</a>
-</li>
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../articles/ptLasso.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/InputGroupedData.html">Input grouped data</a>
-    <a class="dropdown-item" href="../articles/LearningTheInputGroups.html">Learning the input groups</a>
-    <a class="dropdown-item" href="../articles/DifferentGroupsTrainAndTest.html">Different groups in train and test data</a>
-    <a class="dropdown-item" href="../articles/TargetGroupedData.html">Target grouped (multinomial response) data</a>
-    <a class="dropdown-item" href="../articles/MultiResponseGaussian.html">Multi-response data with Gaussian responses</a>
-    <a class="dropdown-item" href="../articles/TimeSeriesData.html">Time series data</a>
-    <a class="dropdown-item" href="../articles/MultiResponseMixed.html">Multi-response data with mixed response types</a>
-    <a class="dropdown-item" href="../articles/ConditionalAverageTreatmentEffect.html">Conditional average treatment effects</a>
-    <a class="dropdown-item" href="../articles/UsingNonlinearBases.html">Pretraining with nonlinear bases</a>
-    <a class="dropdown-item" href="../articles/UnsupervisedPretraining.html">Unsupervised pretraining</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="../articles/InputGroupedData.html">Input grouped data</a></li>
+    <li><a class="dropdown-item" href="../articles/LearningTheInputGroups.html">Learning the input groups</a></li>
+    <li><a class="dropdown-item" href="../articles/DifferentGroupsTrainAndTest.html">Different groups in train and test data</a></li>
+    <li><a class="dropdown-item" href="../articles/TargetGroupedData.html">Target grouped (multinomial response) data</a></li>
+    <li><a class="dropdown-item" href="../articles/MultiResponseGaussian.html">Multi-response data with Gaussian responses</a></li>
+    <li><a class="dropdown-item" href="../articles/TimeSeriesData.html">Time series data</a></li>
+    <li><a class="dropdown-item" href="../articles/MultiResponseMixed.html">Multi-response data with mixed response types</a></li>
+    <li><a class="dropdown-item" href="../articles/ConditionalAverageTreatmentEffect.html">Conditional average treatment effects</a></li>
+    <li><a class="dropdown-item" href="../articles/UsingNonlinearBases.html">Pretraining with nonlinear bases</a></li>
+    <li><a class="dropdown-item" href="../articles/UnsupervisedPretraining.html">Unsupervised pretraining</a></li>
+  </ul>
 </li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav"></ul>
+<ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
+      </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
@@ -73,10 +63,11 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Input grouped data</h1>
+
+      <h1>Input grouped data</h1>
             
       
-      
+
       <div class="d-none name"><code>InputGroupedData.Rmd</code></div>
     </div>
 
@@ -95,9 +86,12 @@
 </h2>
 <p>In the Quick Start, we applied <code>ptLasso</code> to data with a
 continuous response. Here, we’ll use data with a binary outcome. This
-creates a dataset with <span class="math inline">\(k = 3\)</span> groups
-(each with <span class="math inline">\(100\)</span> observations), 5
-shared coefficients, and 5 coefficients specific to each group.</p>
+creates a dataset with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">k = 3</annotation></semantics></math>
+groups (each with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>100</mn><annotation encoding="application/x-tex">100</annotation></semantics></math>
+observations), 5 shared coefficients, and 5 coefficients specific to
+each group.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
@@ -209,9 +203,8 @@ ridge models”).</p>
 <span><span class="co">#&gt; returned</span></span>
 <span><span class="co">#&gt; Warning: from glmnet C++ code (error code -90); Convergence for 90th lambda</span></span>
 <span><span class="co">#&gt; value not reached after maxit=100000 iterations; solutions for larger lambdas</span></span>
-<span><span class="co">#&gt; returned</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; returned</span></span>
+<span></span>
 <span><span class="co">##################################################</span></span>
 <span><span class="co"># Predict with a common alpha for all groups:</span></span>
 <span><span class="co">##################################################</span></span>
@@ -235,9 +228,8 @@ ridge models”).</p>
 <span><span class="co">#&gt;                                         </span></span>
 <span><span class="co">#&gt; Overall    7                            </span></span>
 <span><span class="co">#&gt; Pretrain   40 (3 common + 37 individual)</span></span>
-<span><span class="co">#&gt; Individual 37</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; Individual 37</span></span>
+<span></span>
 <span><span class="co">##################################################</span></span>
 <span><span class="co"># Predict with a different alpha for each group:</span></span>
 <span><span class="co">##################################################</span></span>
@@ -268,19 +260,20 @@ ridge models”).</p>
 <div class="section level2">
 <h2 id="base-case-input-grouped-survival-data">Base case: input grouped survival data<a class="anchor" aria-label="anchor" href="#base-case-input-grouped-survival-data"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/therneau/survival" class="external-link">survival</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: survival</span></span></code></pre></div>
 <p>Now, we will simulate survival times with 3 groups; the three groups
 have overlapping support, with 5 shared features and each has 5
 individual features. To compute survival time, we start by computing
-<span class="math inline">\(\text{survival} = X \beta +
-\epsilon\)</span>, where <span class="math inline">\(\beta\)</span> is
-specific to each group and <span class="math inline">\(\epsilon\)</span>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">survival</mtext><mo>=</mo><mi>X</mi><mi>β</mi><mo>+</mo><mi>ϵ</mi></mrow><annotation encoding="application/x-tex">\text{survival} = X \beta + \epsilon</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+is specific to each group and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϵ</mi><annotation encoding="application/x-tex">\epsilon</annotation></semantics></math>
 is noise. Because survival times must be positive, we modify this to be
-<span class="math inline">\(\text{survival} = \text{survival} + 1.1 *
-\text{abs}(\text{min}(\text{survival}))\)</span>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">survival</mtext><mo>=</mo><mtext mathvariant="normal">survival</mtext><mo>+</mo><mn>1.1</mn><mo>*</mo><mtext mathvariant="normal">abs</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mtext mathvariant="normal">min</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mtext mathvariant="normal">survival</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{survival} = \text{survival} + 1.1 * \text{abs}(\text{min}(\text{survival}))</annotation></semantics></math>.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">n</span> <span class="op">=</span> <span class="fl">600</span>; <span class="va">ntrain</span> <span class="op">=</span> <span class="fl">300</span></span>
@@ -324,7 +317,7 @@ continuous and binomial cases; the only difference is that we specify
 <code>family = "cox"</code>. By default, <code>ptLasso</code> uses the
 partial likelihood for model selection. We could instead use the C
 index.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">############################################################</span></span>
 <span><span class="co"># Default -- use partial likelihood as the type.measure:</span></span>
 <span><span class="co">############################################################</span></span>
@@ -349,17 +342,15 @@ index.</p>
 <span><span class="co">#&gt;                                         </span></span>
 <span><span class="co">#&gt; Overall    10                           </span></span>
 <span><span class="co">#&gt; Pretrain   20 (4 common + 16 individual)</span></span>
-<span><span class="co">#&gt; Individual 24</span></span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; Individual 24</span></span>
+<span></span>
 <span><span class="co">############################################################</span></span>
 <span><span class="co"># Alternatively -- use the C index:</span></span>
 <span><span class="co">############################################################</span></span>
 <span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/ptLasso.html">ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">groups</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, family <span class="op">=</span> <span class="st">"cox"</span>, type.measure <span class="op">=</span> <span class="st">"C"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: from glmnet C++ code (error code -30075); Numerical error at 75th</span></span>
-<span><span class="co">#&gt; lambda value; solutions for larger values of lambda returned</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
+<span><span class="co">#&gt; lambda value; solutions for larger values of lambda returned</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
 <span><span class="co">#&gt; predict.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
@@ -384,7 +375,7 @@ index.</p>
 need to specify <code>family</code> (“cox”) and
 <code>type.measure</code> (if we want to use the C index instead of the
 partial likelihood).</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">##################################################</span></span>
 <span><span class="co"># Fit:</span></span>
 <span><span class="co">##################################################</span></span>
@@ -413,9 +404,8 @@ partial likelihood).</p>
 <span><span class="co">#&gt;                                        </span></span>
 <span><span class="co">#&gt; Overall    8                           </span></span>
 <span><span class="co">#&gt; Pretrain   13 (4 common + 9 individual)</span></span>
-<span><span class="co">#&gt; Individual 31</span></span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; Individual 31</span></span>
+<span></span>
 <span><span class="co">##################################################</span></span>
 <span><span class="co"># Predict with a different alpha for each group:</span></span>
 <span><span class="co">##################################################</span></span>
@@ -443,7 +433,7 @@ partial likelihood).</p>
 <span><span class="co">#&gt; Pretrain   28 (4 common + 24 individual)</span></span>
 <span><span class="co">#&gt; Individual 31</span></span></code></pre></div>
 </div>
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
@@ -454,15 +444,15 @@ partial likelihood).</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>
