@@ -1,8 +1,23 @@
 # Pretraining and the Lasso
 
-This package fits pretrained generalized linear models for (1) data with grouped observations and (2) data without grouped observations, but with multinomial responses. Details of this method may be found in Craig et al. ([2024](#ref-ptlasso)).
+This package fits pretrained generalized linear models for: 
+(1) data with grouped observations,
+(2) data without grouped observations, but with multinomial responses,
+(3) data with multiple Gaussian responses and
+(4) time series data (data with repeated measurements over time).
+
+Documentation and examples are available as vignettes within this package, or on the [package's webpage](https://erincr.github.io/ptLasso/).
+The vignettes also include examples of pretraining for settings not yet supported by this package, including conditional average treatment effect estimation and unsupervised pretraining.
+
+Details of pretraining may be found in Craig et al. ([2024](#ref-ptlasso)).
 
 All model fitting in this package is done with `cv.glmnet`, and our syntax closely follows that of the `glmnet` package ([2010](#ref-glmnet)).
+
+# Installation
+To install this package, we recommend following the instructions [here](https://cran.r-project.org/web/packages/githubinstall/vignettes/githubinstall.html).
+
+# Having trouble?
+If you find a bug or have a feature request, please open a new issue.
 
 # References
 
