@@ -13,6 +13,9 @@ Details of pretraining may be found in Craig et al. ([2024](#ref-ptlasso)).
 
 All model fitting in this package is done with `cv.glmnet`, and our syntax closely follows that of the `glmnet` package ([2010](#ref-glmnet)).
 
+# Tutorials 
+For introductory YouTube tutorials and R Markdown examples, please visit the [website](https://erincraig.me/pretraining-and-the-lasso) for lasso pretraining.
+
 # Installation
 To install this package, we recommend following the instructions [here](https://cran.r-project.org/web/packages/githubinstall/vignettes/githubinstall.html).
 
