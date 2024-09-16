@@ -292,14 +292,24 @@ predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=N
         if(object$call$use.case == "inputGroups") {
             predgroups = sort(unique(groupstest))
 
-            results = lapply(predgroups,
-                             function(ix) {predict.ptLasso(object$fit[[model.ix[ix]]],
-                                                           xtest[groupstest == ix, ],
-                                                           groupstest=original.groups[groupstest == ix],
-                                                           ytest=ytest[groupstest == ix],
-                                                           type = type, s = s, gamma = gamma, return.link=TRUE)}
+            if(check.Surv(ytest)) {
+              results = lapply(predgroups,
+                               function(ix) {predict.ptLasso(object$fit[[model.ix[ix]]],
+                                                             xtest[groupstest == ix, ],
+                                                             groupstest=original.groups[groupstest == ix],
+                                                             ytest=ytest[groupstest == ix, ],
+                                                             type = type, s = s, gamma = gamma, return.link=TRUE)}
                              )
-            
+            } else {
+              results = lapply(predgroups,
+                               function(ix) {predict.ptLasso(object$fit[[model.ix[ix]]],
+                                                             xtest[groupstest == ix, ],
+                                                             groupstest=original.groups[groupstest == ix],
+                                                             ytest=ytest[groupstest == ix],
+                                                             type = type, s = s, gamma = gamma, return.link=TRUE)}
+              )
+              
+            }
             all.preds = pre.preds = ind.preds = rep(NA, nrow(xtest))
             all.link = pre.link = ind.link = rep(NA, nrow(xtest))
             for(kk in 1:length(predgroups)){
@@ -796,7 +806,9 @@ predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, typ
 #' @noRd
 check.Surv <- function(y){
     if(inherits(y, "Surv")) return(TRUE)
-    if(is.matrix(y) & ncol(y) == 2) return(TRUE)
+    if(is.matrix(y)){ 
+      if(ncol(y) == 2) return(TRUE)
+    }
     return(FALSE)
 }
 
