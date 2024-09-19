@@ -440,7 +440,12 @@ cv.ptLasso <- function(x, y, groups = NULL, alphalist=seq(0,1,length=11),
             }
         }
         err.overall = c(mean(err.overall), weighted.mean(err.overall, w = table(groups)/length(groups)), err.overall)
-        err.overall = c(get.cvm(m, gamma = gamma)[m$lambda == lamhat], err.overall)
+        if(family == "multinomial"){
+          err.overall = c(get.cvm(m, gamma = gamma)[m$lambda == lamhat], err.overall)
+        } else {
+          err.overall = c(as.numeric(assess.glmnet(get.preval(m, gamma = gamma)[, m$lambda == lamhat], newy = y, family=family)[type.measure]),
+                          err.overall)
+        }
         names(err.ind) = names(err.overall) = colnames(res)[2:ncol(res)]                
     }  
 

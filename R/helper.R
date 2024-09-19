@@ -218,14 +218,35 @@ print.predict.cv.ptLasso=function (x, ...)
                             length(x$supind)), ncol=1)
             rownames(disp.support) = c("Pretrain", "Individual")
         }
+      colnames(disp.support) = ""
+      
+      cat("Performance (", yaxis.name(x$type.measure), "):", "\n", sep="")
+      print(disp, digits = digits)  
+      cat("\n",fill=TRUE)
     }
-    colnames(disp.support) = ""
-
     
-    cat("Performance (", yaxis.name(x$type.measure), "):", "\n", sep="")
-    print(disp, digits = digits)  
-    cat("\n",fill=TRUE)
-
+    
+    if("yhatpre" %in% names(x)){
+      if("yhatoverall" %in% names(x)){
+        disp.support = matrix(c(length(x$supoverall),
+                                paste0(length(x$suppre.common) + length(x$suppre.individual),
+                                       " (", length(x$suppre.common), " common + ",
+                                       length(x$suppre.individual), " individual)"),
+                                length(x$supind)), ncol=1)
+        rownames(disp.support) = c("Overall", "Pretrain", "Individual")
+        
+      } else {
+        disp.support = matrix(
+          c(paste0(length(x$suppre.common) + length(x$suppre.individual),
+                   " (", length(x$suppre.common), " common + ",
+                   length(x$suppre.individual), " individual)"),
+            length(x$supind)), ncol=1)
+        rownames(disp.support) = c("Pretrain", "Individual")
+      }
+      colnames(disp.support) = ""
+      
+    }
+    
     cat("Support size:\n")
     print(noquote(disp.support))
 }
