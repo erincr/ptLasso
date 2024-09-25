@@ -26,8 +26,14 @@ print.cv.ptLasso=function (x, ...)
     
     if("errpre" %in% names(x)){
         cat("type.measure: ", x$call$type.measure, "\n\n")
-        disp = rbind(c(NA, x$erroverall), rbind(x$errpre, c(NA, x$errind)))
-        rownames(disp) = c("Overall", rep("Pretrain", nrow(x$errpre)), "Individual")
+        
+        if("erroverall" %in% names(x)){
+          disp = rbind(c(NA, x$erroverall), rbind(x$errpre, c(NA, x$errind)))
+          rownames(disp) = c("Overall", rep("Pretrain", nrow(x$errpre)), "Individual")
+        } else {
+          disp = rbind(rbind(x$errpre, c(NA, x$errind)))
+          rownames(disp) = c(rep("Pretrain", nrow(x$errpre)), "Individual")
+        }
         colnames(disp)[1] = "alpha"
         cat("",fill=TRUE)
         print(disp, digits = digits, na.print="")        
