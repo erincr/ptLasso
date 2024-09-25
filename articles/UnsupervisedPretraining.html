@@ -194,7 +194,7 @@ just need to keep track of the minimum error from each model.</p>
 <span>  <span class="va">pf</span><span class="op">[</span><span class="va">nonzero.loadings</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
 <span>  </span>
 <span>  <span class="co"># Train a model:</span></span>
-<span>  <span class="va">model</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>,</span>
+<span>  <span class="va">model</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>,</span>
 <span>                              penalty.factor <span class="op">=</span> <span class="va">pf</span>, </span>
 <span>                              foldid <span class="op">=</span> <span class="va">train.folds</span><span class="op">)</span></span>
 <span>  </span>
@@ -221,23 +221,23 @@ performance.</p>
 <code class="sourceCode R"><span><span class="va">pf</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="va">best.alpha</span>, <span class="va">p</span><span class="op">)</span></span>
 <span><span class="va">pf</span><span class="op">[</span><span class="va">nonzero.loadings</span><span class="op">]</span> <span class="op">=</span> <span class="fl">1</span></span>
 <span></span>
-<span><span class="va">selected.model</span> <span class="op">=</span>  <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>,</span>
+<span><span class="va">selected.model</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>,</span>
 <span>                              penalty.factor <span class="op">=</span> <span class="va">pf</span>, </span>
 <span>                              foldid <span class="op">=</span> <span class="va">train.folds</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Prediction squared error with pretraining:</span></span>
-<span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">selected.model</span>, <span class="va">xtest</span>, newy <span class="op">=</span> <span class="va">ytest</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span><span class="op">[</span><span class="st">"mse"</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/glmnet/man/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">selected.model</span>, <span class="va">xtest</span>, newy <span class="op">=</span> <span class="va">ytest</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span><span class="op">[</span><span class="st">"mse"</span><span class="op">]</span></span>
 <span><span class="co">#&gt; $mse</span></span>
 <span><span class="co">#&gt; lambda.min </span></span>
 <span><span class="co">#&gt;   9.914999 </span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
 <span><span class="co">#&gt; [1] "Mean-Squared Error"</span></span>
 <span></span>
-<span><span class="va">without.pretraining</span> <span class="op">=</span>  <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>,</span>
+<span><span class="va">without.pretraining</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/pkg/glmnet/man/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>,</span>
 <span>                                 foldid <span class="op">=</span> <span class="va">train.folds</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Prediction squared error without pretraining:</span></span>
-<span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">without.pretraining</span>, <span class="va">xtest</span>, newy <span class="op">=</span> <span class="va">ytest</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span><span class="op">[</span><span class="st">"mse"</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/glmnet/man/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">without.pretraining</span>, <span class="va">xtest</span>, newy <span class="op">=</span> <span class="va">ytest</span>, s <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span><span class="op">[</span><span class="st">"mse"</span><span class="op">]</span></span>
 <span><span class="co">#&gt; $mse</span></span>
 <span><span class="co">#&gt; lambda.min </span></span>
 <span><span class="co">#&gt;   14.42903 </span></span>
