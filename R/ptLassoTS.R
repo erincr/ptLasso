@@ -300,9 +300,12 @@ cv.ptLassoTS <- function(x, y, alphalist=seq(0,1,length=11),
     
     type.measure = match.arg(type.measure, c("default", "mse", "mae", "auc","deviance","class"))
     if(type.measure == "default") type.measure = if(family == "gaussian") { "mse" } else { "deviance" }
+    
+    family = match.arg(family, c("gaussian", "binomial"))
 
     this.call$type.measure = type.measure
     this.call$use.case = "timeSeries"
+    this.call$family = family
 
     if(length(alphalist) < 2) stop("Need more than one alpha in alphalist.")
         
