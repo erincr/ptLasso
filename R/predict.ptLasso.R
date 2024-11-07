@@ -528,7 +528,7 @@ predict.ptLassoTS = function(fit, xtest, type, family, call, type.measure = fit$
         # Pretraining predictions
         phatpre[, kk] = predict(fit$fitpre[[kk]], this.xtest, newoffset=offset, type="link", s=s, gamma=gamma)
         yhatpre[, kk] = predict(fit$fitpre[[kk]], this.xtest, newoffset=offset, type=type, s=s, gamma=gamma)
-        offset = phatpre[, kk]
+        offset = (1 - fit$alpha) * phatpre[, kk]
         
         # Individual model predictions
         phatind[, kk] = predict(fit$fitind[[kk]], this.xtest, type="link", s=s, gamma=gamma)
