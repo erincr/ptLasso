@@ -19,7 +19,12 @@ The vignette for this package is available online [here](https://erincr.github.i
 For introductory YouTube tutorials and R Markdown examples, please visit the [website](https://erincraig.me/lasso-pretraining) for lasso pretraining.
 
 # Installation
-To install this package, we recommend following [these instructions](https://cran.r-project.org/web/packages/githubinstall/vignettes/githubinstall.html).
+
+Installation is easiest with the package `devtools`:
+```
+library(devtools)
+install_github(repo="erincr/ptLasso")
+```
 
 # Having trouble?
 If you find a bug or have a feature request, please open a new issue.
