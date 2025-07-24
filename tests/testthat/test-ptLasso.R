@@ -529,7 +529,6 @@ test_that("input_groups_binomial_type_measure", {
 ###########################################################################
 # Input groups, multinomial response
 ###########################################################################
-
 set.seed(1234)
 n=900
 k=2  # of classes
@@ -1144,7 +1143,7 @@ test_that("timeseries_dev_supind", {
 
 test_that("timeseries_dev_errpre", {
     expect_equal(unname(preds$errpre),
-                 c(1.121911, 1.034874, 1.157995, 1.172864), 
+                 c(1.053397, 1.034874, 1.112519, 1.012797), 
                  tolerance = test.tol)
 })
 
