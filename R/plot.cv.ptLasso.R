@@ -121,7 +121,8 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
         plot2 = plot2 + geom_vline(aes(xintercept = x$alphahat), color = '#666666', lty=2)
     }
     
-    gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.75, 1))
+    combined.plot <- gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.75, 1))
+    return(combined.plot)
 }
 
 
@@ -186,8 +187,9 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
     }
     
     if( (y.label == "Mean squared error") || is.ts) {
-        print(plot1)
-        return()
+        # print(plot1)
+        # return()
+        return(plot1)
     }
     
     plot1 = plot1 + guides(color="none")
@@ -217,7 +219,9 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
             plot2 <- plot2 + labs(linetype = "")
     }
 
-    gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.8, 1))
+    # gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.8, 1))
+    combined_plot <- gridExtra::grid.arrange(plot1, plot2, ncol=2, widths=c(.8, 1))
+    return(combined_plot)
 }
 
 
@@ -290,5 +294,7 @@ plot.ptLasso = function(x, ...){
                           cex = 1.3) 
     }
    
+    invisible(NULL)
+    
 }
 
