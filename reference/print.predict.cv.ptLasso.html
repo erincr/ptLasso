@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ptLasso</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,20 +96,20 @@ Erin Craig &lt;erincr@stanford.edu&gt;</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     ytest = ytest, s = "lambda.min") </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.3 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Performance (Mean squared error):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            allGroups  mean group_1 group_2 group_3 group_4 group_5    r^2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Overall        653.8 653.8   699.0   477.3   398.2   647.3  1047.4 0.5271</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain       519.6 519.6   428.4   482.6   551.9   526.1   609.1 0.6242</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Individual     563.6 563.6   481.3   545.4   590.1   582.0   619.0 0.5924</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Overall        653.7 653.7   705.0   473.6   397.6   643.1    1049 0.5264</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain       519.1 519.1   489.6   449.0   539.9   507.9     609 0.6239</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual     561.0 561.0   486.5   547.9   573.3   577.4     620 0.5936</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Support size:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                          </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Overall    57                            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   89 (14 common + 75 individual)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 108                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   99 (14 common + 85 individual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 111                           </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># If ytest is not supplied, just prints the pretrained predictions.</span></span></span>
 <span class="r-in"><span><span class="va">pred</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, s<span class="op">=</span><span class="st">"lambda.min"</span><span class="op">)</span></span></span>
@@ -120,13 +120,13 @@ Erin Craig &lt;erincr@stanford.edu&gt;</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     s = "lambda.min") </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.3 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Support size:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                          </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Overall    57                            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   89 (14 common + 75 individual)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 108                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   99 (14 common + 85 individual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 111                           </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

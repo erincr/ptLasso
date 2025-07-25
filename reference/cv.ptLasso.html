@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ptLasso</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -244,7 +244,6 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> group_1 group_2 group_3 group_4 group_5 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     0.6     0.6     0.6     0.7     0.9 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvfit</span><span class="op">)</span> <span class="co"># to see CV performance as a function of alpha </span></span></span>
-<span class="r-plt img"><img src="cv.ptLasso-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, s<span class="op">=</span><span class="st">"lambda.min"</span><span class="op">)</span> <span class="co"># to predict with held out data</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
@@ -570,7 +569,6 @@
 <span class="r-in"><span><span class="co"># Now, we can fit a ptLasso model:</span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">cv.ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="co"># to see the cv curve.</span></span></span>
-<span class="r-plt img"><img src="cv.ptLasso-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span><span class="op">)</span> <span class="co"># to predict with new data</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
@@ -641,7 +639,6 @@
 <span class="r-in"><span><span class="va">cvfit</span> <span class="op">=</span>  <span class="fu">cv.ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case<span class="op">=</span><span class="st">"timeSeries"</span>, family<span class="op">=</span><span class="st">"binomial"</span>,</span></span>
 <span class="r-in"><span>                    type.measure<span class="op">=</span><span class="st">"auc"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvfit</span>, plot.alphahat <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="cv.ptLasso-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest</span>, ytest<span class="op">=</span><span class="va">ytest</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
