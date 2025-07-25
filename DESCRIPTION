@@ -5,7 +5,6 @@ Description: Implements lasso pretraining for generalized linear models for data
  The method fits a lasso model to an initial dataset and then uses its support and coefficient values to guide model fitting for a related task, which can improve performance by leveraging larger datasets and preserve interpretability by identifying features which are generally shared, and which are task specific. See Craig et al. (2025) for details. 
  Model fitting in this package is done with cv.glmnet, and syntax closely follows that of the glmnet package (Friedman, Hastie & Tibshirani, 2010).
 Version: 0.1.0
-Date:
 Authors@R: c(person("Erin", "Craig", role=c("aut", "cre"), email = "ercr@umich.edu"),
 	     person("Rob", "Tibshirani", role="aut"))
 Maintainer: Erin Craig  <ercr@umich.edu>
@@ -30,5 +29,6 @@ Suggests:
     survival,
     xgboost,
     sparsepca,
-    MASS
+    MASS,
+    testthat 
 VignetteBuilder: knitr

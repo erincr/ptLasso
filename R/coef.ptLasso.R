@@ -120,19 +120,19 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", gamma="gamma
                 suppre[[ix]] = sort(unique(c(suppre[[ix]], include.these)))
             } else {
                 if(fit$call$family=="cox"){
-                    bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=F))
+                    bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=FALSE))
                 } else {
-                    bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=F)[-1])
+                    bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=FALSE)[-1])
                 }
                 suppre[[ix]]=sort(unique(c(which(bhatpre[[ix]]!=0), include.these)))
             }
         } else if(fit$call$use.case == "targetGroups"){
             # This should always be a binomial (one vs. rest) model:
-            bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=F)[-1])
+            bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=FALSE)[-1])
             suppre[[ix]] = sort(unique(c(which(bhatpre[[ix]]!=0), include.these)))
         } else if(fit$call$use.case %in% c("multiresponse", "timeSeries")){
             # This should always be gaussian (or logistic for timeSeries):
-            bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=F)[-1])
+            bhatpre[[ix]] = as.numeric(coef(model[[kk]], s=s, gamma=gamma, exact=FALSE)[-1])
             suppre[[ix]] = sort(unique(c(which(bhatpre[[ix]]!=0), include.these)))
         } 
       
