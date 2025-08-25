@@ -10,8 +10,8 @@ Authors@R: c(person("Erin", "Craig", role=c("aut", "cre"), email = "ercr@umich.e
 Maintainer: Erin Craig  <ercr@umich.edu>
 License: GPL-2
 Encoding: UTF-8
-URL: <https://erincr.github.io/ptLasso/>, <https://doi.org/10.1093/jrsssb/qkaf050>
-BugReports: <https://github.com/erincr/ptLasso/issues>
+URL: https://erincr.github.io/ptLasso/, https://doi.org/10.1093/jrsssb/qkaf050
+BugReports: https://github.com/erincr/ptLasso/issues
 Packaged: 
 Repository:
 Date/Publication:
@@ -22,7 +22,6 @@ Depends:
     glmnet,
     gridExtra,
     Matrix,
-    stats
 Suggests: 
     knitr,
     rmarkdown,

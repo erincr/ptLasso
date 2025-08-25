@@ -16,6 +16,12 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+need <- c("glmnet", "rpart")
+ok <- vapply(need, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1))
+if (!all(ok)) {
+  knitr::knit_exit()  
+}
 ```
 
 Suppose we have a dataset with features $X$ and response $y$, and no input grouping. Suppose we also have a small set of meaningful features $Z$ that we expect to stratify observations (e.g. in biomedicine, $Z$ may consist of age and sex). In this setting, we can _learn_ input groups using $Z$. 
@@ -32,6 +38,7 @@ Here, we show an example using simulated data. We use `rpart` to train a CART tr
 ```{r, echo=FALSE}
 require(ptLasso)
 ```
+
 ```{r}
 require(rpart)
 ```

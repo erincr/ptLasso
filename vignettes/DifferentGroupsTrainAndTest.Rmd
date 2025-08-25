@@ -16,6 +16,12 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+need <- c("glmnet")
+ok <- vapply(need, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1))
+if (!all(ok)) {
+  knitr::knit_exit()  
+}
 ```
 
 Suppose we observe groups at test time that were unobserved at train time. For example, our training set may consist of $K$ *people* -- each with many observations -- and at test time, we wish to make predictions for observations from new people. We can still use pretraining in this setting: train a model using all data, and use this to guide the training for person-specific models.

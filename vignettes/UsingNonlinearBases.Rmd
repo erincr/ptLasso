@@ -16,6 +16,12 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+need <- c("glmnet", "xgboost")
+ok <- vapply(need, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1))
+if (!all(ok)) {
+  knitr::knit_exit()  
+}
 ```
 
 

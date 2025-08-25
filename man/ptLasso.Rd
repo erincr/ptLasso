@@ -88,13 +88,15 @@ Fits a pretrained lasso model using the glmnet package, for a fixed choice of th
 \examples{
 # Getting started. First, we simulate data: we need covariates x, response y and group IDs.
 set.seed(1234)
-x = matrix(rnorm(1000*20), 1000, 20)
-y = rnorm(1000)
-groups = sort(rep(1:5, 200))
+n=100
+p=10
+x = matrix(rnorm(n*p), n, p)
+y = rnorm(n)
+groups = sort(rep(1:5, n/5))
 
-xtest = matrix(rnorm(1000*20), 1000, 20)
-ytest = rnorm(1000)
-groupstest = sort(rep(1:5, 200))
+xtest = matrix(rnorm(n*p), n, p)
+ytest = rnorm(n)
+groupstest = sort(rep(1:5, n/5))
 
 # Now, we can fit a ptLasso model:
 fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
@@ -278,5 +280,5 @@ predict(fit, xtest, ytest=ytest)
 Friedman, J., Hastie, T., & Tibshirani, R. (2010). Regularization paths for generalized linear models via coordinate descent. Journal of Statistical Software, 33(1), 1-22.
 }
 \seealso{
-\code{\link{glmnet}}
+\code{\link[glmnet]{glmnet}}
 }

@@ -71,7 +71,8 @@ get.pretrain.support <- function(fit, s="lambda.min", gamma="gamma.min", commonO
 #' # group 1 only
 #' get.individual.support(fit, groups = 1) 
 #' 
-#' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+#' cvfit = cv.ptLasso(x, y, groups = groups, alphalist = c(0, .5, 1), 
+#'                    family = "gaussian", type.measure = "mse")
 #' 
 #' get.individual.support(cvfit)
 #' 

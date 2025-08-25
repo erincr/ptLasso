@@ -1,6 +1,9 @@
 citHeader("To cite the ptLasso package in publications, use:")
 
-bibentry(
+ver  <- if (!is.null(meta$Version)) meta$Version else "0.0.0"
+year <- "2025"
+
+article <- bibentry(
   bibtype = "Article",
   title   = "Pretraining and the lasso",
   author  = c(
@@ -25,20 +28,18 @@ bibentry(
 )
 
 
-# Optional: also provide a “cite the package itself” entry
-bibentry(
+package = bibentry(
   bibtype = "Manual",
   title   = "ptLasso: Pretraining and the lasso in R",
   author  = c(person("Erin", "Craig"), person("Robert", "Tibshirani")),
-  year    = format(Sys.Date(), "%Y"),
-  note    = paste("R package version", utils::packageVersion("ptLasso")),
+  year    = year,
+  note    = paste("R package version", ver),
   url     = "https://erincr.github.io/ptLasso/",
   textVersion = sprintf(
     "Craig E, Tibshirani R (%s). ptLasso: Pretraining and the lasso in R. R package version %s. URL: %s.",
-    format(Sys.Date(), "%Y"),
-    utils::packageVersion("ptLasso"),
-    "https://erincr.github.io/ptLasso/"
+    year, ver, "https://erincr.github.io/ptLasso/"
   )
 )
 
 citFooter("Please also cite R and glmnet where appropriate.")
+c(article, package)

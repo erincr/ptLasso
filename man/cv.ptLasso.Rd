@@ -85,13 +85,15 @@ This function runs \code{ptLasso} once for each requested choice of alpha, and r
 \examples{
 # Getting started. First, we simulate data: we need covariates x, response y and group IDs.
 set.seed(1234)
-x = matrix(rnorm(100*20), 100, 20)
-y = rnorm(100)
-groups = sort(rep(1:5, 20))
+n = 80
+p = 20
+x = matrix(rnorm(n*p), n, p)
+y = rnorm(n)
+groups = sort(rep(1:5, n/5))
 
-xtest = matrix(rnorm(100*20), 100, 20)
-ytest = rnorm(100)
-groupstest = sort(rep(1:5, 20))
+xtest = matrix(rnorm(n*p), n, p)
+ytest = rnorm(n)
+groupstest = sort(rep(1:5, n/5))
 
 # Model fitting
 cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", nfolds=3, 

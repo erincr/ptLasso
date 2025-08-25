@@ -20,6 +20,13 @@ knitr::opts_chunk$set(
   #fig.width = 12,
   #fig.height = 8
 )
+
+need <- c("knitr", "doMC")
+ok <- vapply(need, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1))
+if (!all(ok)) {
+  knitr::knit_exit()  
+}
+
 require(knitr)
 ```
 
