@@ -319,7 +319,7 @@ example is at the end of this section.</p>
 </h3>
 <p>First, we load the <code>ptLasso</code> package:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://erincr.github.io/ptLasso/">ptLasso</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">ptLasso</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: ptLasso</span></span>
 <span><span class="co">#&gt; Loading required package: ggplot2</span></span>
 <span><span class="co">#&gt; Loading required package: glmnet</span></span>
@@ -924,7 +924,7 @@ beforehand:</p>
 <h2 id="input-grouped-data">Input grouped data<a class="anchor" aria-label="anchor" href="#input-grouped-data"></a>
 </h2>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://erincr.github.io/ptLasso/">ptLasso</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">ptLasso</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="base-case-input-grouped-data-with-a-binomial-outcome">Base case: input grouped data with a binomial outcome<a class="anchor" aria-label="anchor" href="#base-case-input-grouped-data-with-a-binomial-outcome"></a>
 </h3>
@@ -1308,7 +1308,7 @@ compute the weighted average of the pretrained predictions with respect
 to the similarity vector. Here is an example using simulated data.</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://glmnet.stanford.edu" class="external-link">glmnet</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://erincr.github.io/ptLasso/">ptLasso</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">ptLasso</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
@@ -1663,7 +1663,7 @@ at all:</p>
 <h2 id="target-grouped-data">Target grouped data<a class="anchor" aria-label="anchor" href="#target-grouped-data"></a>
 </h2>
 <div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://erincr.github.io/ptLasso/">ptLasso</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">ptLasso</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="intuition">Intuition<a class="anchor" aria-label="anchor" href="#intuition"></a>
 </h3>
@@ -1907,7 +1907,7 @@ unknown at prediction time.</p>
 <h2 id="multi-response-data-with-gaussian-responses">Multi-response data with Gaussian responses<a class="anchor" aria-label="anchor" href="#multi-response-data-with-gaussian-responses"></a>
 </h2>
 <div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://erincr.github.io/ptLasso/">ptLasso</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">ptLasso</span><span class="op">)</span></span></code></pre></div>
 <p>Multitask learning consists of data
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>X</mi><annotation encoding="application/x-tex">X</annotation></semantics></math>
 with two or more responses
@@ -2060,7 +2060,7 @@ that minimizes the CV MSE for <em>each</em> response.</p>
 <h2 id="time-series-data">Time series data<a class="anchor" aria-label="anchor" href="#time-series-data"></a>
 </h2>
 <div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://erincr.github.io/ptLasso/">ptLasso</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">ptLasso</span><span class="op">)</span></span></code></pre></div>
 <p>We may have repeated measurements of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>X</mi><annotation encoding="application/x-tex">X</annotation></semantics></math>
 and
@@ -2998,7 +2998,7 @@ predictive performance.</p>
 </h3>
 <div class="sourceCode" id="cb102"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://glmnet.stanford.edu" class="external-link">glmnet</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://erincr.github.io/ptLasso/">ptLasso</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va">ptLasso</span><span class="op">)</span></span></code></pre></div>
 <p>Suppose we have a dataset with features
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>X</mi><annotation encoding="application/x-tex">X</annotation></semantics></math>
 and response

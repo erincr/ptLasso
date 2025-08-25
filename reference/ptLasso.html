@@ -281,6 +281,7 @@
 <span class="r-in"><span><span class="co"># and measure performance with a validation set, or (2) use cv.ptLasso.</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Now, we are ready to simulate slightly more realistic data.</span></span></span>
 <span class="r-in"><span><span class="co"># This continuous outcome example has k = 5 groups, where each group has 200 observations.</span></span></span>
 <span class="r-in"><span><span class="co"># There are scommon = 10 features shared across all groups, and</span></span></span>
@@ -337,7 +338,9 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> Overall    64                            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   94 (21 common + 73 individual)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Individual 109                           </span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Now, we repeat with a binomial outcome.</span></span></span>
 <span class="r-in"><span><span class="co"># This example has k = 3 groups, where each group has 100 observations.</span></span></span>
 <span class="r-in"><span><span class="co"># There are scommon = 5 features shared across all groups, and</span></span></span>
@@ -389,6 +392,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> Overall    8                            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   40 (3 common + 37 individual)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Individual 40                           </span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="co">### Model fitting with parallel = TRUE</span></span></span>
@@ -397,6 +401,7 @@
 <span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, parallel<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Multiresponse pretraining:</span></span></span>
 <span class="r-in"><span><span class="co"># Now let's consider the case of a multiresponse outcome. We'll start by simulating data:</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></span>
@@ -485,7 +490,9 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># We could also use the glmnet option relax = TRUE:</span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>, relax <span class="op">=</span> <span class="cn">TRUE</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Time series pretraining</span></span></span>
 <span class="r-in"><span><span class="co"># Now suppose we have time series data with a binomial outcome measured at 3 different time points.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></span>
@@ -554,6 +561,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                          </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   26 (12 common + 14 individual)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Individual 29                            </span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
