@@ -60,9 +60,6 @@ get.pretrain.support(cvfit, groups = 1)
 \seealso{
 \code{ptLasso}, \code{cv.ptLasso}.
 }
-\author{
-Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@stanford.edu>
-}
 \keyword{classification}
 \keyword{models}
 \keyword{regression}

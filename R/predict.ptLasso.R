@@ -73,7 +73,7 @@
 predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=NULL, alphatype = c("fixed", "varying"),
                             type = c("link", "response", "class"), s = "lambda.min", gamma = "gamma.min", return.link = FALSE, ...){
 
-    if(missing("xtest")) stop("Please supply xtest.")
+    if(missing(xtest)) stop("Please supply xtest.")
 
     type = match.arg(type, several.ok = FALSE)
     
@@ -124,7 +124,7 @@ predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=N
         ########################################################################################################
         if(object$call$use.case == "targetGroups") {
             results = lapply(1:object$fit[[1]]$k,
-                             function(ix) {predict.ptLasso.targetGroups(object$fit[[model.ix[ix]]],
+                             function(ix) {.predict.ptLasso.targetGroups(object$fit[[model.ix[ix]]],
                                                            xtest, ytest = ytest,
                                                            pred.groups = ix,
                                                            process.results = FALSE,
@@ -152,7 +152,7 @@ predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=N
         if(object$call$use.case == "timeSeries") {
             k = object$fit[[1]]$nresps
             results = lapply(1:k,
-                             function(ix) {predict.ptLassoTS(object$fit[[model.ix[ix]]],
+                             function(ix) {.predict.ptLassoTS(object$fit[[model.ix[ix]]],
                                                            xtest, 
                                                            type = type,
                                                            call = this.call,
@@ -215,10 +215,9 @@ predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=N
         # Multiresponse
         ########################################################################################################
         if(object$call$use.case == "multiresponse") {
-
             k = object$fit[[1]]$nresps
             results = lapply(1:k,
-                             function(ix) {predict.ptLassoMult(object$fit[[model.ix[ix]]],
+                             function(ix) {.predict.ptLassoMult(object$fit[[model.ix[ix]]],
                                                            xtest, 
                                                            type = type,
                                                            call = this.call,
@@ -403,7 +402,7 @@ predict.cv.ptLasso=function(object, xtest,  groupstest=NULL, ytest=NULL, alpha=N
 #' @param object Fitted \code{"ptLasso"} object.
 #' @param xtest Input matrix, matching the form used by \code{"ptLasso"} for model training.
 #' @param groupstest  A vector indicating to which group each observation belongs. Coding should match that used for model training. Will be NULL for target grouped data.
-#' @param ytest Response variable. Optional. If included, \code{"predict"} will compute performance measures for xtest using code{"type.measure"} from the cvfit object.
+#' @param ytest Response variable. Optional. If included, \code{"predict"} will compute performance measures for xtest using \code{"type.measure"} from the cvfit object.
 #' @param type Type of prediction required. Type '"link"' gives the linear predictors for '"binomial", '"multinomial"' or '"cox"' models; for '"gaussian"' models it gives the fitted values. Type '"response"' gives the fitted probabilities for '"binomial"' or '"multinomial"', and the fitted relative-risk for '"cox"'; for '"gaussian"' type '"response"' is equivalent to type '"link"'. Note that for '"binomial"' models, results are returned only for the class corresponding to the second level of the factor response. Type '"class"' applies only to '"binomial"' or '"multinomial"' models, and produces the class label corresponding to the maximum probability.
 #' @param s Value of the penalty parameter 'lambda' at which predictions are required. Will use the same lambda for all models; can be a numeric value, '"lambda.min"' or '"lambda.1se"'. Default is '"lambda.min"'.
 #' @param gamma For use only when 'relax = TRUE' was specified during training. Value of the penalty parameter 'gamma' at which predictions are required. Will use the same gamma for all models; can be a numeric value, '"gamma.min"' or '"gamma.1se"'. Default is '"gamma.min"'.
@@ -485,17 +484,17 @@ predict.ptLasso=function(object, xtest, groupstest=NULL, ytest=NULL,
     }
 
     
-    if(object$call$use.case=="inputGroups") out=predict.ptLasso.inputGroups(object, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s, gamma=gamma, return.link=return.link, group.intercepts=group.intercepts)
-    if(object$call$use.case=="multiresponse") out=predict.ptLassoMult(object, xtest, ytest=ytest, type=type, call=this.call, type.measure=type.measure, s=s, gamma=gamma)
-    if(object$call$use.case=="timeSeries") out=predict.ptLassoTS(object, xtest, ytest=ytest, family=family, type=type, call=this.call, type.measure=type.measure, s=s, gamma=gamma)
-    if(object$call$use.case=="targetGroups") out=predict.ptLasso.targetGroups(object, xtest, ytest=ytest, type=type, call=this.call, family=family, type.measure=type.measure, s=s, gamma=gamma, return.link=return.link)
+    if(object$call$use.case=="inputGroups") out=.predict.ptLasso.inputGroups(object, xtest, groupstest=groupstest, ytest=ytest, errFun=errFun, type=type, call=this.call, family=family, type.measure=type.measure, s=s, gamma=gamma, return.link=return.link, group.intercepts=group.intercepts)
+    if(object$call$use.case=="multiresponse") out=.predict.ptLassoMult(object, xtest, ytest=ytest, type=type, call=this.call, type.measure=type.measure, s=s, gamma=gamma)
+    if(object$call$use.case=="timeSeries") out=.predict.ptLassoTS(object, xtest, ytest=ytest, family=family, type=type, call=this.call, type.measure=type.measure, s=s, gamma=gamma)
+    if(object$call$use.case=="targetGroups") out=.predict.ptLasso.targetGroups(object, xtest, ytest=ytest, type=type, call=this.call, family=family, type.measure=type.measure, s=s, gamma=gamma, return.link=return.link)
     class(out)="predict.ptLasso"
     return(out)
 }
 
 #' Predict function for time series data
 #' @noRd
-predict.ptLassoTS = function(fit, xtest, type, family, call, type.measure = fit$call$type.measure, s="lambda.min", gamma="gamma.min", ytest=NULL, return.link = FALSE, ...){
+.predict.ptLassoTS = function(fit, xtest, type, family, call, type.measure = fit$call$type.measure, s="lambda.min", gamma="gamma.min", ytest=NULL, return.link = FALSE, ...){
     
     k=fit$nresps
     n = if(is.list(xtest)) { nrow(xtest[[1]]) } else { nrow(xtest) }
@@ -578,7 +577,7 @@ predict.ptLassoTS = function(fit, xtest, type, family, call, type.measure = fit$
 
 #' Predict function for multiresponse data
 #' @noRd
-predict.ptLassoMult = function(fit, xtest, type, call, type.measure = fit$call$type.measure, s="lambda.min", gamma="gamma.min", ytest=NULL, return.link = FALSE, ...){
+.predict.ptLassoMult = function(fit, xtest, type, call, type.measure = fit$call$type.measure, s="lambda.min", gamma="gamma.min", ytest=NULL, return.link = FALSE, ...){
     
     k=fit$nresps
 
@@ -662,7 +661,7 @@ predict.ptLassoMult = function(fit, xtest, type, call, type.measure = fit$call$t
 
 #' Predict function for input grouped data
 #' @noRd
-predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, type.measure, type, call, group.intercepts,
+.predict.ptLasso.inputGroups=function(fit, xtest, groupstest, errFun, family, type.measure, type, call, group.intercepts,
                                      s="lambda.min", gamma="gamma.min", return.link=FALSE, ytest=NULL){
 
     if(is.null(groupstest)) stop("Need group IDs for test data.")
@@ -824,7 +823,7 @@ binomial.measure = function(newy, one.phat.column, measure = "deviance"){
 
 #' Predict function for target grouped data
 #' @noRd
-predict.ptLasso.targetGroups=function(fit, xtest, family, type.measure, type, call,
+.predict.ptLasso.targetGroups=function(fit, xtest, family, type.measure, type, call,
                                       return.link=FALSE, ytest=NULL, s="lambda.min",
                                       gamma="gamma.min", pred.groups = 1:fit$k, process.results=TRUE){
    

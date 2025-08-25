@@ -126,6 +126,7 @@ fit = ptLasso(x, y, groups = groups, alpha = 0.5,
 # and measure performance with a validation set, or (2) use cv.ptLasso.
 
 
+\donttest{
 # Now, we are ready to simulate slightly more realistic data.
 # This continuous outcome example has k = 5 groups, where each group has 200 observations.
 # There are scommon = 10 features shared across all groups, and
@@ -161,7 +162,9 @@ xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
 plot(fit) # to see all of the cv.glmnet models trained
 predict(fit, xtest, groupstest, ytest=ytest)
+}
 
+\donttest{
 # Now, we repeat with a binomial outcome.
 # This example has k = 3 groups, where each group has 100 observations.
 # There are scommon = 5 features shared across all groups, and
@@ -192,6 +195,7 @@ xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "binomial", type.measure = "auc")
 plot(fit) # to see all of the cv.glmnet models trained
 predict(fit, xtest, groupstest, ytest=ytest)
+}
 
 \dontrun{
 ### Model fitting with parallel = TRUE
@@ -200,6 +204,7 @@ registerDoMC(cores = 4)
 fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse", parallel=TRUE)
 }
 
+\donttest{
 # Multiresponse pretraining:
 # Now let's consider the case of a multiresponse outcome. We'll start by simulating data:
 set.seed(1234)
@@ -233,7 +238,9 @@ predict(fit, xtest, ytest=ytest, s="lambda.1se")
 
 # We could also use the glmnet option relax = TRUE:
 fit = ptLasso(x, y, type.measure = "mse", relax = TRUE, use.case = "multiresponse")
+}
 
+\donttest{
 # Time series pretraining
 # Now suppose we have time series data with a binomial outcome measured at 3 different time points.
 set.seed(1234)
@@ -264,6 +271,7 @@ fit = ptLasso(x, y, type.measure = "auc", family = "binomial", relax = TRUE,
               use.case = "timeSeries")
 plot(fit)
 predict(fit, xtest, ytest=ytest)
+}
 
 }
 \references{

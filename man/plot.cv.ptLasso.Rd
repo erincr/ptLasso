@@ -28,9 +28,6 @@ plot(cvfit)
 \seealso{
 \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 }
-\author{
-Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@stanford.edu>
-}
 \keyword{classification}
 \keyword{models}
 \keyword{regression}

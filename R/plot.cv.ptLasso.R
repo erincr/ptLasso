@@ -17,7 +17,6 @@ yaxis.name = function(x){
 #' @param x Fitted \code{"cv.ptLasso"} object.
 #' @param plot.alphahat If \code{TRUE}, show a dashed vertical line indicating the single value of alpha that maximized overall cross-validated performance.
 #' @param \dots Other graphical parameters to plot.
-#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
@@ -34,8 +33,8 @@ yaxis.name = function(x){
 #'
 #'
 plot.cv.ptLasso = function(x, plot.alphahat = FALSE, ...){
-    if(x$call$use.case %in% c("inputGroups", "multiresponse", "timeSeries"))  ggplot.ptLasso.inputGroups(x,  plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
-    if(x$call$use.case == "targetGroups") ggplot.ptLasso.targetGroups(x, plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
+    if(x$call$use.case %in% c("inputGroups", "multiresponse", "timeSeries"))  .plot_ptLasso_inputGroups(x,  plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
+    if(x$call$use.case == "targetGroups") .plot_ptLasso_targetGroups(x, plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
 }
 
 
@@ -47,7 +46,7 @@ pretrain.color   <- "#2A9D8F"
 ##################
 #' Plot function for target grouped data
 #' @noRd
-ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
+.plot_ptLasso_targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
 
     err.pre = x$errpre
     err.pan = x$erroverall
@@ -128,7 +127,7 @@ ggplot.ptLasso.targetGroups=function(x, y.label, plot.alphahat = FALSE,...){
 
 #' Plot function for input grouped data
 #' @noRd
-ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
+.plot_ptLasso_inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 
     is.ts = (x$call$use.case == "timeSeries")
     
@@ -201,7 +200,7 @@ ggplot.ptLasso.inputGroups=function(x, y.label, plot.alphahat = FALSE,...){
 
     ylims2 = range(forplot2$overall)
     nudge = .1 * (ylims2[2] - ylims2[1])
-    ylims[2] = ylims2[2] + nudge
+    ylims2[2] = ylims2[2] + nudge
     plot2 <- ggplot() +
             geom_line(aes(x=forplot2$alpha, y=forplot2$overall,
                           group = forplot2$model, color = forplot2$model)) +

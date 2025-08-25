@@ -8,7 +8,6 @@
 #' @param includeOverall whether to return the features that are chosen by the overall model and not the group-specific models (TRUE) or the features that are chosen by the overall model or the group-specific models (FALSE). Default is TRUE. Not used when 'use.case = "timeSeries"'.
 #' @param commonOnly whether to return the features that are chosen by more than half of the group- or response-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.
 #' @param groups which groups or responses to include when computing the support. Default is to include all groups/responses. 
-#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples

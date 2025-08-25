@@ -85,16 +85,17 @@ This function runs \code{ptLasso} once for each requested choice of alpha, and r
 \examples{
 # Getting started. First, we simulate data: we need covariates x, response y and group IDs.
 set.seed(1234)
-x = matrix(rnorm(1000*20), 1000, 20)
-y = rnorm(1000)
-groups = sort(rep(1:5, 200))
+x = matrix(rnorm(100*20), 100, 20)
+y = rnorm(100)
+groups = sort(rep(1:5, 20))
 
-xtest = matrix(rnorm(1000*20), 1000, 20)
-ytest = rnorm(1000)
-groupstest = sort(rep(1:5, 200))
+xtest = matrix(rnorm(100*20), 100, 20)
+ytest = rnorm(100)
+groupstest = sort(rep(1:5, 20))
 
 # Model fitting
-cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", nfolds=3, 
+                   type.measure = "mse")
 cvfit
 plot(cvfit) # to see CV performance as a function of alpha 
 predict(cvfit, xtest, groupstest, s="lambda.min") # to predict with held out data
@@ -102,20 +103,22 @@ predict(cvfit, xtest, groupstest, s="lambda.min", ytest=ytest) # to also measure
 
 # By default, we used s = "lambda.min" to compute CV performance.
 # We could instead use s = "lambda.1se":
-cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
-                   s = "lambda.1se")
+cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", nfolds=3, 
+                   type.measure = "mse", s = "lambda.1se")
 
+\donttest{
 # We could have used the glmnet option relax = TRUE:
-cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
-                   relax = TRUE)
+cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", nfolds=3, 
+                   type.measure = "mse", relax = TRUE)
 # And, as we did with lambda, we may want to specify the choice of gamma to compute CV performance:
-cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse",
-                   relax = TRUE, gamma = "gamma.1se")
-
+cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", nfolds=3, 
+                   type.measure = "mse", relax = TRUE, gamma = "gamma.1se")
+}
 # Note that the first stage of pretraining uses "lambda.1se" and "gamma.1se" by default.
 # This behavior can be modified by specifying overall.lambda and overall.gamma;
 # see the documentation for ptLasso for more information.
 
+\donttest{
 # Now, we are ready to simulate slightly more realistic data.
 # This continuous outcome example has k = 5 groups, where each group has 200 observations.
 # There are scommon = 10 features shared across all groups, and
@@ -152,7 +155,9 @@ cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "m
 cvfit
 # plot(cvfit) # to see CV performance as a function of alpha 
 predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min")
+}
 
+\donttest{
 # Now, we repeat with a binomial outcome.
 # This example has k = 3 groups, where each group has 100 observations.
 # There are scommon = 5 features shared across all groups, and
@@ -181,10 +186,13 @@ outtest = binomial.example.data(k=k, class.sizes=class.sizes,
 xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 
 cvfit = cv.ptLasso(x, y, groups = groups, family = "binomial",
-                   type.measure = "auc", nfolds=3, verbose=TRUE, alphahat.choice="mean")
+                   type.measure = "auc", nfolds=3, verbose=TRUE, 
+                   alpha = c(0, .5, 1),
+                   alphahat.choice="mean")
 cvfit
 # plot(cvfit) # to see CV performance as a function of alpha 
 predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.1se")
+}
 
 \dontrun{
 ### Model fitting with parallel = TRUE
@@ -193,7 +201,7 @@ registerDoMC(cores = 4)
 cvfit = cv.ptLasso(x, y, groups = groups, family = "binomial",
                    type.measure = "auc", parallel=TRUE)
 }
-
+\donttest{
 # Multiresponse pretraining
 # Now let's consider the case of a multiresponse outcome. We'll start by simulating data:
 set.seed(1234)
@@ -231,7 +239,9 @@ cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, use.case = "multire
 # And, as we did with lambda, we may want to specify the choice of gamma to compute CV performance:
 cvfit = cv.ptLasso(x, y, type.measure = "mse", relax = TRUE, gamma = "gamma.1se",
                    use.case = "multiresponse")
+}
 
+\donttest{
 # Time series pretraining
 # Now suppose we have time series data with a binomial outcome measured at 3 different time points.
 set.seed(1234)
@@ -262,7 +272,7 @@ predict(cvfit, xtest, ytest=ytest)
 # The glmnet option relax = TRUE:
 cvfit = cv.ptLasso(x, y, type.measure = "auc", family = "binomial", relax = TRUE,
                    use.case = "timeSeries")
-
+}
 }
 \seealso{
 \code{\link{ptLasso}} and \code{\link{plot.cv.ptLasso}}.

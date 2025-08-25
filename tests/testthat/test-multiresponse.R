@@ -214,7 +214,7 @@ test_that("multresponse_cv_errall", {
 })
 
 test_that("ggplot.ptLasso.inputGroups returns gtable (multiresponse)", {
-  plot_obj <- ggplot.ptLasso.inputGroups(fit, y.label = "MSE")
+  plot_obj <- .plot_ptLasso_inputGroups(fit, y.label = "MSE")
   
   expect_true(inherits(plot_obj, "gtable"))
 })

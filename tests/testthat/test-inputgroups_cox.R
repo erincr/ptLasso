@@ -97,7 +97,7 @@ test_that("input_groups_print_ok", {
 
 
 test_that("ggplot.ptLasso.inputGroups returns gtable (cox)", {
-  plot_obj <- ggplot.ptLasso.inputGroups(cvfit, y.label = "MSE")
+  plot_obj <- .plot_ptLasso_inputGroups(cvfit, y.label = "MSE")
   
   expect_true(inherits(plot_obj, "gtable"))
 })

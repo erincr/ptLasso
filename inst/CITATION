@@ -1,0 +1,44 @@
+citHeader("To cite the ptLasso package in publications, use:")
+
+bibentry(
+  bibtype = "Article",
+  title   = "Pretraining and the lasso",
+  author  = c(
+    person("Erin", "Craig"),
+    person("Mert", "Pilanci"),
+    person("Thomas", "Le Menestrel"),
+    person("Balasubramanian", "Narasimhan"),
+    person("Manuel A", "Rivas"),
+    person("Stein-Erik", "Gullaksen"),
+    person("Roozbeh", "Dehghannasiri"),
+    person("Julia", "Salzman"),
+    person("Jonathan", "Taylor"),
+    person("Robert", "Tibshirani")
+  ),
+  journal = "Journal of the Royal Statistical Society: Series B (Statistical Methodology)",
+  year    = 2025,
+  pages   = "qkaf050",
+  doi = "10.1093/jrsssb/qkaf050",
+  url = "https://doi.org/10.1093/jrsssb/qkaf050",
+  textVersion =
+    "Craig E, Pilanci M, Le Menestrel T, Narasimhan B, Rivas MA, Gullaksen S-E, Dehghannasiri R, Salzman J, Taylor J, Tibshirani R (2025). Pretraining and the lasso. Journal of the Royal Statistical Society: Series B (Statistical Methodology), qkaf050."
+)
+
+
+# Optional: also provide a “cite the package itself” entry
+bibentry(
+  bibtype = "Manual",
+  title   = "ptLasso: Pretraining and the lasso in R",
+  author  = c(person("Erin", "Craig"), person("Robert", "Tibshirani")),
+  year    = format(Sys.Date(), "%Y"),
+  note    = paste("R package version", utils::packageVersion("ptLasso")),
+  url     = "https://erincr.github.io/ptLasso/",
+  textVersion = sprintf(
+    "Craig E, Tibshirani R (%s). ptLasso: Pretraining and the lasso in R. R package version %s. URL: %s.",
+    format(Sys.Date(), "%Y"),
+    utils::packageVersion("ptLasso"),
+    "https://erincr.github.io/ptLasso/"
+  )
+)
+
+citFooter("Please also cite R and glmnet where appropriate.")
