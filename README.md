@@ -16,7 +16,7 @@ All model fitting in this package is done with `cv.glmnet`, and our syntax close
 # Tutorials 
 The vignette for this package is available online [here](https://erincr.github.io/ptLasso/).
 
-For introductory YouTube tutorials and R Markdown examples, please visit the [website](https://erincraig.me/lasso-pretraining) for lasso pretraining.
+For introductory YouTube tutorials and R Markdown examples, please visit the [website](https://www.erincraig.me/lasso-pretraining) for lasso pretraining.
 
 # Installation
 
