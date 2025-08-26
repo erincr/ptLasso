@@ -5,7 +5,6 @@ bibliography: ptLasso.bib
 vignette: >
   %\VignetteIndexEntry{ptLasso}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{rpart, xgboost, survival, sparsepca, MASS}
   %\VignetteEngine{knitr::rmarkdown}
 ---
 

@@ -9,6 +9,9 @@ authors:
     href: http://statistics.stanford.edu/people/robert-tibshirani
 navbar:
   components:
+    home:
+      text: Get started
+      href: articles/ptLasso.html 
     articles:
       text: Articles
       menu:
