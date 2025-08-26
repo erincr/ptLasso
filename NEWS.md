@@ -1,5 +1,7 @@
-# ptLasso 1.0.0
+# ptLasso 1.0.1
 
-# ptLasso 0.1.0
+* Improved timings for tests and vignettes.
+
+# ptLasso 1.0.0
 
 * Initial CRAN submission.
