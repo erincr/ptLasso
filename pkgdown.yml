@@ -13,7 +13,7 @@ articles:
   TimeSeriesData: TimeSeriesData.html
   UnsupervisedPretraining: UnsupervisedPretraining.html
   UsingNonlinearBases: UsingNonlinearBases.html
-last_built: 2025-08-26T17:27Z
+last_built: 2025-08-26T18:17Z
 urls:
   reference: https://erincr.github.io/ptLasso/reference
   article: https://erincr.github.io/ptLasso/articles
