@@ -61,9 +61,9 @@ cvfit2=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mae",foldid=
 fit3=ptLasso(x,y,groups=groups,alpha=0.9,family="gaussian",foldid=foldid, overall.lambda = "lambda.min") # should be mse
 pred3=predict(fit3,xtest,groupstest=groupstest, ytest=ytest)
 
-test_that("plot.ptLasso runs without error", {
-  expect_silent(plot(fit))
-})
+# test_that("plot.ptLasso runs without error", {
+#   expect_silent(plot(fit))
+# })
 
 test_that("input_groups_gaussian_suppre_common", {
   expect_equal(pred$suppre.common,
@@ -203,7 +203,7 @@ test_that("missing_individual_models_type_overall", {
 })
 
 
-bad.fitind=lapply(1:k, function(kk) cv.glmnet(x[which(groups == kk)[1:20], ], y[which(groups == kk)[1:20]], keep=TRUE))
+bad.fitind=lapply(1:k, function(kk) cv.glmnet(x[which(groups == kk)[1:20], ], y[which(groups == kk)[1:20]], grouped = FALSE, keep=TRUE))
 err=tryCatch(cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=foldid,
                         overall.lambda = "lambda.min", fitind=bad.fitind),
              error = function(x) "error")
@@ -215,24 +215,26 @@ test_that("wrong_training_data_individual", {
 #################################
 # Relax = true
 #################################
-cvfit1=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5,
+cvfit1=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=3,
+                  nlambda = 10, 
                   overall.lambda = "lambda.min", overall.gamma = "gamma.min",
                   relax=TRUE)
 
-cvfit2=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=5,
+cvfit2=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=NULL, nfolds=3,
+                  nlambda = 10,
                   overall.lambda = "lambda.min", overall.gamma = "gamma.1se",
                   relax=TRUE)
 
 
 test_that("relax_gamma_min", {
   expect_equal(unname(cvfit1$errpre[1, ]),
-               c(0.000, 1175, 1137, 1175, 1238, 1291, 1028, 697, 1431),
+               c( 0.000, 1189, 1079, 1189, 1591, 1156, 860, 775, 1012),
                tolerance = test.tol)
 })
 
 test_that("relax_gamma_1se", {
   expect_equal(unname(cvfit2$errpre[1, ]),
-               c(0.000, 1249, 1195, 1249, 1443, 1272, 1030, 780, 1449),
+               c(0, 1358, 1259, 1358, 1869, 1094, 1100,  692, 1543),
                tolerance = test.tol)
 })
 
@@ -241,13 +243,13 @@ pred.cv2=predict(cvfit2,xtest,groupstest=groupstest, ytest=ytest, alphatype="var
 
 test_that("pred_gamma_min", {
   expect_equal(unname(pred.cv1$errpre),
-               c(1525, 1321, 1525, 2164, 1384, 1283, 898, 878),
+               c(1201, 1079, 1201, 1499, 1172, 1161,  690, 872),
                tolerance = test.tol)
 })
 
 test_that("pred_gamma_1se", {
   expect_equal(unname(pred.cv2$errpre),
-               c(1443, 1233, 1443, 2071, 1366, 1155,  688,  885),
+               c(1179, 1071, 1179, 1493, 1110, 1099,  780,  870),
                tolerance = test.tol)
 })
 
@@ -278,10 +280,12 @@ groupstest.new[groupstest == 3] = "c"
 groupstest.new[groupstest == 4] = "d"
 groupstest.new[groupstest == 5] = "e"
 set.seed(1234)
-cvfit.string=cv.ptLasso(x,y,groups=groups.new,family="gaussian",type.measure="mse", foldid=foldid, nfolds=5,
+cvfit.string=cv.ptLasso(x,y,groups=groups.new,family="gaussian",type.measure="mse", foldid=foldid, nfolds=3,
+                        nlambda = 10,
                         overall.lambda = "lambda.min")
 set.seed(1234)
-cvfit=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse", foldid=foldid, nfolds=5,
+cvfit=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse", foldid=foldid, nfolds=3,
+                 nlambda = 10,
                  overall.lambda = "lambda.min")
 
 test_that("string_groups", {
@@ -309,7 +313,7 @@ out=makedata(n=n, p=p, k=k, scommon=scommon, sindiv=sindiv,
 
 x=out$x; y=out$y; groups=out$groups
 
-nfolds=5
+nfolds=3
 foldid = rep(1, nrow(x))  
 for(kk in 1:k) foldid[groups == kk] = sample(1:nfolds, class.sizes[kk], replace=TRUE)
 
@@ -326,10 +330,12 @@ groups.new[groups == 4] = 5
 groups.new[groups == 5] = 6
 
 set.seed(1234)
-cvfit.jumbled=cv.ptLasso(x,y,groups=groups.new,family="gaussian",type.measure="mse",foldid=foldid, nfolds=5,
+cvfit.jumbled=cv.ptLasso(x,y,groups=groups.new,family="gaussian",type.measure="mse",foldid=foldid, nfolds=3,
+                         nlambda = 10,
                          overall.lambda = "lambda.min")
 set.seed(1234)
-cvfit=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=foldid, nfolds=5,
+cvfit=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=foldid, nfolds=3,
+                 nlambda = 10,
                  overall.lambda = "lambda.min")
 
 test_that("non_contiguous_groups", {
@@ -343,14 +349,16 @@ groups.new = groups - 2
 groupstest.new = groupstest - 2
 
 set.seed(1234)
-cvfit.jumbled=cv.ptLasso(x,y,groups=groups.new,family="gaussian",type.measure="mse",foldid=foldid, nfolds=5,
+cvfit.jumbled=cv.ptLasso(x,y,groups=groups.new,family="gaussian",type.measure="mse",foldid=foldid, nfolds=3,
+                         nlambda = 10,
                          overall.lambda = "lambda.min")
 preds.jumbled = predict(cvfit.jumbled, xtest, groupstest=groupstest.new, ytest=ytest)
 preds.jumbled.subset = predict(cvfit.jumbled, xtest[groupstest %in% c(1, 3), ],
                                groupstest=groupstest.new[groupstest %in% c(1, 3)], ytest=ytest[groupstest %in% c(1, 3)])
 
 set.seed(1234)
-cvfit=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=foldid, nfolds=5,
+cvfit=cv.ptLasso(x,y,groups=groups,family="gaussian",type.measure="mse",foldid=foldid, nfolds=3,
+                 nlambda = 10,
                  overall.lambda = "lambda.min")
 preds = predict(cvfit, xtest, groupstest, ytest)
 

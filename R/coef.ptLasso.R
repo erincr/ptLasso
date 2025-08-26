@@ -13,7 +13,7 @@
 #' @examples
 #' # Train data
 #' set.seed(1234)
-#' out = gaussian.example.data()
+#' out = gaussian.example.data(k=2, class.sizes = c(50, 50))
 #' x = out$x; y=out$y; groups = out$group;
 #'
 #' fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
@@ -159,7 +159,7 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", gamma="gamma
 #' @examples
 #' # Train data
 #' set.seed(1234)
-#' out = gaussian.example.data()
+#' out = gaussian.example.data(k=2, class.sizes = c(50, 50))
 #' x = out$x; y=out$y; groups = out$group;
 #'
 #' fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
@@ -286,7 +286,7 @@ coef.ptLasso=function(object, model = c("all", "individual", "overall", "pretrai
 #' @keywords models regression classification
 #' @examples
 #' set.seed(1234)
-#' out = gaussian.example.data()
+#' out = gaussian.example.data(k=2, class.sizes = c(50, 50))
 #' x = out$x; y=out$y; groups = out$group;
 #'
 #' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")

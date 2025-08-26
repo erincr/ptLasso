@@ -1,0 +1,15 @@
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^index\.md$
+^README\.md$
+^\.Rproj$
+^\.gitignore$
+^\.Rproj\.user$
+^\.DS_Store$
+^\.github($|/)
+^cran-comments\.md$
+^CRAN-SUBMISSION$
+^doc$
+^Meta$
+^vignettes-articles/

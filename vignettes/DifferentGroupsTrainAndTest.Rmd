@@ -37,9 +37,9 @@ require(ptLasso)
 ```{r}
 set.seed(1234)
 
-# Start with 5 people, each with 300 observations and 200 features.
+# Start with 5 people, each with 300 observations and 50 features.
 # 3 people will be used for training, and 2 for testing.
-n = 300*5; p = 200;
+n = 300*5; p = 50;
 groups = sort(rep(1:5, n/5))
 
 # We will have different coefficients for each of the 3 training people, 
@@ -102,7 +102,7 @@ cvfit = cv.ptLasso(xtrain, ytrain, gpstrain,
 
 Now, we train a model to predict the person ID from the covariates. Because this example is simulated, we can measure the performance of our model on test data (via the confusion matrix comparing predicted group labels to true labels). In real settings, this would be impossible.
 ```{r}
-simmod = cv.glmnet(xtrain, as.factor(gpstrain), family = "multinomial")
+simmod = cv.glmnet(xtrain, as.factor(gpstrain), nlambda = 10, family = "multinomial")
 
 # Peek at performance on test data.
 # Not possible with real data.
@@ -176,7 +176,7 @@ pred.data.test = cbind(pretrained.preds,
 assess.glmnet(predict(final.model, pred.data.test), newy = ytest)$mse
 ```
 
-Comparing performance of all models side-by-side shows that (1) using input groups improved performance -- including for the individual models and (2) including the final model did not help performance dramatically (but we still recommend trying this with real data).
+Comparing performance of all models side-by-side shows that (1) using input groups improved performance -- including for the individual models and (2) including the final model did not help performance (but is included because we observed its usefulness with real data).
 ```{r}
 rd = function(x) round(x, 2)
 

@@ -110,7 +110,7 @@ predgroupstest  = predict(treefit, data.frame(ztest))
 Finally, we are ready to apply pretraining using the predicted groups as our grouping variable. 
 ```{r}
 cvfit = cv.ptLasso(xtrain, ytrain, predgroupstrain, family = "binomial", 
-                   type.measure = "auc", nfolds = 10, 
+                   type.measure = "auc", nfolds = 3, 
                    overall.lambda = "lambda.min")
 predict(cvfit, xtest, predgroupstest, ytest = ytest)
 ```

@@ -43,16 +43,18 @@
 #' set.seed(1234)
 #' n=100
 #' p=10
+#' n.groups=2
 #' x = matrix(rnorm(n*p), n, p)
 #' y = rnorm(n)
-#' groups = sort(rep(1:5, n/5))
+#' groups = sort(rep(1:n.groups, n/n.groups))
 #'
 #' xtest = matrix(rnorm(n*p), n, p)
 #' ytest = rnorm(n)
-#' groupstest = sort(rep(1:5, n/5))
+#' groupstest = sort(rep(1:n.groups, n/n.groups))
 #'
 #' # Now, we can fit a ptLasso model:
-#' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
+#' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", 
+#'               nfolds = 3, type.measure = "mse")
 #' plot(fit) # to see all of the cv.glmnet models trained
 #' predict(fit, xtest, groupstest) # to predict on new data
 #' predict(fit, xtest, groupstest, ytest=ytest) # if ytest is included, we also measure performance
@@ -61,8 +63,8 @@
 #' # This is a necessary choice to make during model training; we need to select the model
 #' # we want to use to define the offset and penalty factor for the second stage of pretraining.
 #' # We could instead have used "lambda.min":
-#' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse",
-#'               overall.lambda = "lambda.min")
+#' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", 
+#'               type.measure = "mse", nfolds = 3, overall.lambda = "lambda.min")
 #'
 #' # We can use the 'relax' option to fit relaxed lasso models:
 #' fit = ptLasso(x, y, groups = groups, alpha = 0.5,

@@ -70,13 +70,13 @@ y = y[1:ntrain, ]
 
 Now, we are ready to call `ptLasso` with our covariates `x` and response matrix `y`, and we specify the argument `use.case = "multiresponse"`. A call to `plot` shows the CV curves over the lasso parameter $\lambda$ for each model.
 ```{r, fig.width=7, fig.height=7, dpi=100}
-fit = ptLasso(x, y, use.case = "multiresponse")
+fit = ptLasso(x, y, use.case = "multiresponse", nfolds = 3)
 plot(fit)
 ```
 
 To choose the pretraining parameter $\alpha$, we can use `cv.ptLasso`. Using `plot`, we can view the CV curve for pretraining together with the overall model (multi-response Gaussian model) and the individual model (a separate Gaussian model for each response).
 ```{r}
-fit = cv.ptLasso(x, y, use.case = "multiresponse")
+fit = cv.ptLasso(x, y, nfolds = 3, use.case = "multiresponse")
 plot(fit)
 ```
 

@@ -41,9 +41,9 @@
 #' @examples
 #' #### Gaussian example
 #' set.seed(1234)
-#' out = gaussian.example.data()
+#' out = gaussian.example.data(k=2, class.sizes = c(50, 50))
 #' x = out$x; y=out$y; groups = out$group;
-#' outtest = gaussian.example.data()
+#' outtest = gaussian.example.data(k=2, class.sizes = c(50, 50))
 #' xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups;
 #'
 #' # Model fitting
@@ -63,7 +63,7 @@
 #'
 #' # Specify a vector of choices for alpha: 
 #' pred = predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min",
-#'                alphatype = "varying", alpha = c(.1, .2, .3, .4, .5))
+#'                alphatype = "varying", alpha = c(.1, .5))
 #' pred
 #'
 #' @import glmnet

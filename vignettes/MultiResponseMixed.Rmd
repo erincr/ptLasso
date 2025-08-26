@@ -84,8 +84,8 @@ y2 = y2[1:ntrain]
 y3 = y3[1:ntrain, ]
 
 # Define training folds
-nfolds = 10
-foldid = sample(rep(1:10, trunc(nrow(x)/nfolds)+1))[1:nrow(x)]
+nfolds = 5
+foldid = sample(rep(1:nfolds, trunc(nrow(x)/nfolds)+1))[1:nrow(x)]
 ```
 
 For the first step of pretraining, train a model for the primary outcome ($y_1$) and record the offset and support -- these will be used when training the models for $y_2$ and $y_3$.
@@ -204,7 +204,7 @@ cat("Model 3 C-index without pretraining:",
     )
 ```
 
-For both $y_2$ and $y_3$, we saw a performance improvement using pretraining. We didn't technically need to train the individual (non-pretrained) models for $y_2$ and $y_3$: during our CV loop to choose $\alpha$, we saw the cross validation performance for the individual models (the special case when $\alpha = 1$), and CV recommended a smaller value of $\alpha$ for both outcomes.
+For $y_2$, we saw a performance improvement using pretraining. We didn't technically need to train the individual (non-pretrained) models for $y_2$ and $y_3$: during our CV loop to choose $\alpha$, we saw the cross validation performance for the individual models (the special case when $\alpha = 1$), and CV recommended a smaller value of $\alpha$ for both outcomes.
 
 Note that, in this example, we trained a model using $y_1$, and then used this model to form the offset and support for the models for $y_2$ and $y_3$ in parallel. But using pretraining for multi-response data is _flexible_. Pretraining is simply a method to pass information from one model to another, and we are free to choose how information flows. For example, we chose to pass information from model 1 ($y_1$) to model 2 ($y_2$) and to model 3 ($y_3$). But, we could have instead _chained_ our models to pass information from model 1 to model 2, and then from model 2 to model 3 in the following way:
 
