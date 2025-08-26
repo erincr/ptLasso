@@ -161,7 +161,7 @@ argument <code>use.case = "multiresponse"</code>. A call to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
 for each model.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/ptLasso.html">ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/ptLasso.html">ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span>, nfolds <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <p><img src="MultiResponseGaussian_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <p>To choose the pretraining parameter
@@ -171,7 +171,7 @@ the CV curve for pretraining together with the overall model
 (multi-response Gaussian model) and the individual model (a separate
 Gaussian model for each response).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, nfolds <span class="op">=</span> <span class="fl">3</span>, use.case <span class="op">=</span> <span class="st">"multiresponse"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
 <p>As in previous examples, we can predict using the
 <code>predict</code>; if <code>ytest</code> is supplied, this will print
@@ -188,20 +188,20 @@ that minimizes the the average CV MSE across both responses.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; alpha =  0.3 </span></span>
+<span><span class="co">#&gt; alpha =  0.4 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Performance (Mean squared error):</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            allGroups  mean response_1 response_2</span></span>
-<span><span class="co">#&gt; Overall        9.217 4.608      4.092      5.125</span></span>
-<span><span class="co">#&gt; Pretrain       9.006 4.503      4.149      4.857</span></span>
-<span><span class="co">#&gt; Individual     9.324 4.662      4.168      5.157</span></span>
+<span><span class="co">#&gt; Overall        9.287 4.644      4.106      5.181</span></span>
+<span><span class="co">#&gt; Pretrain       8.937 4.469      4.040      4.897</span></span>
+<span><span class="co">#&gt; Individual     9.388 4.694      4.168      5.220</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Support size:</span></span>
 <span><span class="co">#&gt;                                         </span></span>
-<span><span class="co">#&gt; Overall    57                           </span></span>
-<span><span class="co">#&gt; Pretrain   22 (20 common + 2 individual)</span></span>
-<span><span class="co">#&gt; Individual 75</span></span></code></pre></div>
+<span><span class="co">#&gt; Overall    34                           </span></span>
+<span><span class="co">#&gt; Pretrain   17 (17 common + 0 individual)</span></span>
+<span><span class="co">#&gt; Individual 63</span></span></code></pre></div>
 <p>Also as before, we can choose to use the value of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
 that minimizes the CV MSE for <em>each</em> response.</p>
@@ -215,21 +215,21 @@ that minimizes the CV MSE for <em>each</em> response.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; alpha:</span></span>
-<span><span class="co">#&gt; [1] 0.3 0.3</span></span>
+<span><span class="co">#&gt; [1] 0.6 0.4</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Performance (Mean squared error):</span></span>
 <span><span class="co">#&gt;            allGroups  mean response_1 response_2</span></span>
-<span><span class="co">#&gt; Overall        9.217 4.608      4.092      5.125</span></span>
-<span><span class="co">#&gt; Pretrain       9.006 4.503      4.149      4.857</span></span>
-<span><span class="co">#&gt; Individual     9.324 4.662      4.168      5.157</span></span>
+<span><span class="co">#&gt; Overall        9.287 4.644      4.106      5.181</span></span>
+<span><span class="co">#&gt; Pretrain       8.959 4.479      4.062      4.897</span></span>
+<span><span class="co">#&gt; Individual     9.388 4.694      4.168      5.220</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Support size:</span></span>
 <span><span class="co">#&gt;                                         </span></span>
-<span><span class="co">#&gt; Overall    57                           </span></span>
-<span><span class="co">#&gt; Pretrain   22 (20 common + 2 individual)</span></span>
-<span><span class="co">#&gt; Individual 75</span></span></code></pre></div>
+<span><span class="co">#&gt; Overall    34                           </span></span>
+<span><span class="co">#&gt; Pretrain   20 (17 common + 3 individual)</span></span>
+<span><span class="co">#&gt; Individual 63</span></span></code></pre></div>
   </main>
 </div>
 

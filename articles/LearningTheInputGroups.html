@@ -206,7 +206,7 @@ that causes <code>predict</code> to behave as desired.</p>
 as our grouping variable.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">xtrain</span>, <span class="va">ytrain</span>, <span class="va">predgroupstrain</span>, family <span class="op">=</span> <span class="st">"binomial"</span>, </span>
-<span>                   type.measure <span class="op">=</span> <span class="st">"auc"</span>, nfolds <span class="op">=</span> <span class="fl">10</span>, </span>
+<span>                   type.measure <span class="op">=</span> <span class="st">"auc"</span>, nfolds <span class="op">=</span> <span class="fl">3</span>, </span>
 <span>                   overall.lambda <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span>, <span class="va">xtest</span>, <span class="va">predgroupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -215,20 +215,20 @@ as our grouping variable.</p>
 <span><span class="co">#&gt;     ytest = ytest) </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; alpha =  0 </span></span>
+<span><span class="co">#&gt; alpha =  0.6 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Performance (AUC):</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            allGroups   mean wtdMean group_1 group_2 group_3</span></span>
-<span><span class="co">#&gt; Overall       0.7081 0.6448  0.6399  0.6085  0.6575  0.6684</span></span>
-<span><span class="co">#&gt; Pretrain      0.7109 0.6590  0.6526  0.6147  0.6823  0.6800</span></span>
-<span><span class="co">#&gt; Individual    0.7058 0.6525  0.6477  0.6085  0.6428  0.7063</span></span>
+<span><span class="co">#&gt; Overall       0.7049 0.6508  0.6454  0.6134  0.6722  0.6669</span></span>
+<span><span class="co">#&gt; Pretrain      0.7113 0.6538  0.6473  0.5979  0.6492  0.7143</span></span>
+<span><span class="co">#&gt; Individual    0.7097 0.6514  0.6464  0.6085  0.6474  0.6983</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Support size:</span></span>
 <span><span class="co">#&gt;                                       </span></span>
-<span><span class="co">#&gt; Overall    8                          </span></span>
-<span><span class="co">#&gt; Pretrain   8 (8 common + 0 individual)</span></span>
-<span><span class="co">#&gt; Individual 19</span></span></code></pre></div>
+<span><span class="co">#&gt; Overall    5                          </span></span>
+<span><span class="co">#&gt; Pretrain   6 (5 common + 1 individual)</span></span>
+<span><span class="co">#&gt; Individual 20</span></span></code></pre></div>
 <p>Note that the overall model trained by <code>cv.ptLasso</code> takes
 advantage of the clustering: it fits a unique intercept for each group.
 Performance would have been much worse if we hadn’t done any clustering
@@ -236,7 +236,7 @@ at all:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">baseline.model</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">xtrain</span>, <span class="va">ytrain</span>, family <span class="op">=</span> <span class="st">"binomial"</span>, type.measure <span class="op">=</span> <span class="st">"auc"</span>, nfolds <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">baseline.model</span>, newx<span class="op">=</span><span class="va">xtest</span>, newy<span class="op">=</span><span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">auc</span></span>
-<span><span class="co">#&gt; [1] 0.6050242</span></span>
+<span><span class="co">#&gt; [1] 0.6130757</span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
 <span><span class="co">#&gt; [1] "AUC"</span></span></code></pre></div>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">

@@ -213,26 +213,18 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">n</span><span class="op">=</span><span class="fl">100</span></span></span>
 <span class="r-in"><span><span class="va">p</span><span class="op">=</span><span class="fl">10</span></span></span>
+<span class="r-in"><span><span class="va">n.groups</span><span class="op">=</span><span class="fl">2</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">groups</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="va">n</span><span class="op">/</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">groups</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n.groups</span>, <span class="va">n</span><span class="op">/</span><span class="va">n.groups</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">xtest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ytest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">groupstest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="va">n</span><span class="op">/</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">groupstest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n.groups</span>, <span class="va">n</span><span class="op">/</span><span class="va">n.groups</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Now, we can fit a ptLasso model:</span></span></span>
-<span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, </span></span>
+<span class="r-in"><span>              nfolds <span class="op">=</span> <span class="fl">3</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="co"># to see all of the cv.glmnet models trained</span></span></span>
 <span class="r-plt img"><img src="ptLasso-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span><span class="op">)</span> <span class="co"># to predict on new data</span></span></span>
@@ -247,8 +239,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> Support size:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Overall    1                          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   0 (0 common + 0 individual)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 0                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   1 (0 common + 1 individual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 1                          </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest<span class="op">=</span><span class="va">ytest</span><span class="op">)</span> <span class="co"># if ytest is included, we also measure performance</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:  </span>
@@ -260,64 +252,34 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Performance (Mean squared error):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            allGroups  mean group_1 group_2 group_3 group_4 group_5       r^2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Overall        1.166 1.166   1.386   1.486   1.331  0.8051  0.8214  0.006140</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain       1.175 1.175   1.386   1.484   1.396  0.7838  0.8265 -0.001808</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Individual     1.175 1.175   1.386   1.484   1.396  0.7843  0.8267 -0.001864</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            allGroups  mean group_1 group_2      r^2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Overall        1.162 1.162   1.423  0.9020 0.009235</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain       1.167 1.167   1.422  0.9110 0.005515</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual     1.166 1.166   1.421  0.9115 0.005927</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Support size:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Overall    1                          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   0 (0 common + 0 individual)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 0                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   1 (0 common + 1 individual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 1                          </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># When we trained our model, we used "lambda.1se" in the first stage of pretraining by default.</span></span></span>
 <span class="r-in"><span><span class="co"># This is a necessary choice to make during model training; we need to select the model</span></span></span>
 <span class="r-in"><span><span class="co"># we want to use to define the offset and penalty factor for the second stage of pretraining.</span></span></span>
 <span class="r-in"><span><span class="co"># We could instead have used "lambda.min":</span></span></span>
-<span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>,</span></span>
-<span class="r-in"><span>              overall.lambda <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.glmnet, since &lt; 3 observations per fold</span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, </span></span>
+<span class="r-in"><span>              type.measure <span class="op">=</span> <span class="st">"mse"</span>, nfolds <span class="op">=</span> <span class="fl">3</span>, overall.lambda <span class="op">=</span> <span class="st">"lambda.min"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># We can use the 'relax' option to fit relaxed lasso models:</span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>,</span></span>
 <span class="r-in"><span>              family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>,</span></span>
 <span class="r-in"><span>              relax <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># As we did for lambda, we may want to specify the choice of gamma for stage one</span></span></span>
 <span class="r-in"><span><span class="co"># of pretraining. (The default is "gamma.1se".)</span></span></span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu">ptLasso</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>,</span></span>
 <span class="r-in"><span>              family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span>,</span></span>
 <span class="r-in"><span>              relax <span class="op">=</span> <span class="cn">TRUE</span>, overall.gamma <span class="op">=</span> <span class="st">"gamma.min"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Option grouped=FALSE enforced in cv.relaxed, since &lt; 3 observations per fold</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># In practice, we may want to try many values of alpha.</span></span></span>
 <span class="r-in"><span><span class="co"># alpha may range from 0 (the overall model with fine tuning) to 1 (the individual models).</span></span></span>

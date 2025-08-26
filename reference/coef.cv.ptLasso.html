@@ -94,7 +94,7 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">out</span> <span class="op">=</span> <span class="fu"><a href="gaussian.example.data.html">gaussian.example.data</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">out</span> <span class="op">=</span> <span class="fu"><a href="gaussian.example.data.html">gaussian.example.data</a></span><span class="op">(</span>k<span class="op">=</span><span class="fl">2</span>, class.sizes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">=</span> <span class="va">out</span><span class="op">$</span><span class="va">x</span>; <span class="va">y</span><span class="op">=</span><span class="va">out</span><span class="op">$</span><span class="va">y</span>; <span class="va">groups</span> <span class="op">=</span> <span class="va">out</span><span class="op">$</span><span class="va">group</span>;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">cvfit</span> <span class="op">=</span> <span class="fu"><a href="cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span></span>
@@ -103,137 +103,74 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "individual" "pretrain"   "overall"   </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">cvfit</span>, model <span class="op">=</span> <span class="st">"overall"</span><span class="op">)</span> <span class="co"># Overall model only</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 125 x 1 sparse Matrix of class "dgCMatrix"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               lambda.1se</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -1.293077574</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> groups2     -0.802576770</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> groups3      4.688453083</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> groups4     -1.067174861</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> groups5     -0.173873523</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              6.534854270</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              6.813808490</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              5.141281910</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              7.160160979</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              6.284458960</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              6.739156736</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              7.910505452</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              6.294609076</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              5.231380388</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              7.437161907</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              0.316816148</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              0.119524657</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              0.002353154</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              0.257401597</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              0.522864277</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             -0.040566927</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              .          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 62 x 1 sparse Matrix of class "dgCMatrix"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             lambda.1se</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) -2.0911194</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> groups2      6.9480612</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              2.7965296</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              3.3203621</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              0.5383593</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              .        </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">cvfit</span>, model <span class="op">=</span> <span class="st">"individual"</span><span class="op">)</span><span class="op">)</span> <span class="co"># List of coefficients for each group model</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">cvfit</span>, model <span class="op">=</span> <span class="st">"pretrain"</span>, alpha <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span><span class="op">)</span> <span class="co"># List of coefficients for each group model</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -82,14 +82,14 @@ Erin Craig &lt;erincr@stanford.edu&gt;</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Train data</span></span></span>
-<span class="r-in"><span><span class="va">out</span> <span class="op">=</span> <span class="fu"><a href="gaussian.example.data.html">gaussian.example.data</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">out</span> <span class="op">=</span> <span class="fu"><a href="gaussian.example.data.html">gaussian.example.data</a></span><span class="op">(</span>k<span class="op">=</span><span class="fl">2</span>, class.sizes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">=</span> <span class="va">out</span><span class="op">$</span><span class="va">x</span>; <span class="va">y</span><span class="op">=</span><span class="va">out</span><span class="op">$</span><span class="va">y</span>; <span class="va">groups</span> <span class="op">=</span> <span class="va">out</span><span class="op">$</span><span class="va">group</span>;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Test data</span></span></span>
-<span class="r-in"><span><span class="va">outtest</span> <span class="op">=</span> <span class="fu"><a href="gaussian.example.data.html">gaussian.example.data</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">outtest</span> <span class="op">=</span> <span class="fu"><a href="gaussian.example.data.html">gaussian.example.data</a></span><span class="op">(</span>k<span class="op">=</span><span class="fl">2</span>, class.sizes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">xtest</span><span class="op">=</span><span class="va">outtest</span><span class="op">$</span><span class="va">x</span>; <span class="va">ytest</span><span class="op">=</span><span class="va">outtest</span><span class="op">$</span><span class="va">y</span>; <span class="va">groupstest</span><span class="op">=</span><span class="va">outtest</span><span class="op">$</span><span class="va">groups</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="ptLasso.html">ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="ptLasso.html">ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, groups <span class="op">=</span> <span class="va">groups</span>, nfolds <span class="op">=</span> <span class="fl">3</span>, family <span class="op">=</span> <span class="st">"gaussian"</span>, type.measure <span class="op">=</span> <span class="st">"mse"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">pred</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest<span class="op">=</span><span class="va">ytest</span>, s<span class="op">=</span><span class="st">"lambda.min"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pred</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -102,16 +102,16 @@ Erin Craig &lt;erincr@stanford.edu&gt;</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Performance (Mean squared error):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            allGroups  mean group_1 group_2 group_3 group_4 group_5    r^2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Overall        682.5 682.5   654.5   486.9   569.7   730.8   970.8 0.5225</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain       513.4 513.4   455.3   414.8   589.1   578.7   529.1 0.6408</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Individual     560.7 560.7   534.1   440.5   649.3   618.1   561.5 0.6077</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            allGroups  mean group_1 group_2     r^2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Overall        710.8 710.8   487.6   934.0 -0.1502</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain       700.7 700.7   451.1   950.3 -0.1338</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual     700.3 700.3   450.5   950.1 -0.1331</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Support size:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Overall    52                            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   93 (10 common + 83 individual)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 109                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Overall    19                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   13 (0 common + 13 individual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 13                           </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># If ytest is not supplied, just prints the pretrained predictions.</span></span></span>
 <span class="r-in"><span><span class="va">pred</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, s<span class="op">=</span><span class="st">"lambda.min"</span><span class="op">)</span></span></span>
@@ -125,10 +125,10 @@ Erin Craig &lt;erincr@stanford.edu&gt;</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> alpha =  0.5 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Support size:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Overall    52                            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   93 (10 common + 83 individual)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 109                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Overall    19                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Pretrain   13 (0 common + 13 individual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Individual 13                           </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

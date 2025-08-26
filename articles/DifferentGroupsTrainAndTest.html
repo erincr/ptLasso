@@ -113,9 +113,9 @@ to the similarity vector. Here is an example using simulated data.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Start with 5 people, each with 300 observations and 200 features.</span></span>
+<span><span class="co"># Start with 5 people, each with 300 observations and 50 features.</span></span>
 <span><span class="co"># 3 people will be used for training, and 2 for testing.</span></span>
-<span><span class="va">n</span> <span class="op">=</span> <span class="fl">300</span><span class="op">*</span><span class="fl">5</span>; <span class="va">p</span> <span class="op">=</span> <span class="fl">200</span>;</span>
+<span><span class="va">n</span> <span class="op">=</span> <span class="fl">300</span><span class="op">*</span><span class="fl">5</span>; <span class="va">p</span> <span class="op">=</span> <span class="fl">50</span>;</span>
 <span><span class="va">groups</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="va">n</span><span class="op">/</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># We will have different coefficients for each of the 3 training people, </span></span>
@@ -176,7 +176,7 @@ Because this example is simulated, we can measure the performance of our
 model on test data (via the confusion matrix comparing predicted group
 labels to true labels). In real settings, this would be impossible.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">simmod</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">xtrain</span>, <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">gpstrain</span><span class="op">)</span>, family <span class="op">=</span> <span class="st">"multinomial"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">simmod</span> <span class="op">=</span> <span class="fu"><a href="https://glmnet.stanford.edu/reference/cv.glmnet.html" class="external-link">cv.glmnet</a></span><span class="op">(</span><span class="va">xtrain</span>, <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">gpstrain</span><span class="op">)</span>, nlambda <span class="op">=</span> <span class="fl">10</span>, family <span class="op">=</span> <span class="st">"multinomial"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Peek at performance on test data.</span></span>
 <span><span class="co"># Not possible with real data.</span></span>
@@ -185,9 +185,9 @@ labels to true labels). In real settings, this would be impossible.</p>
 <span>      <span class="va">hidden.gps</span><span class="op">[</span><span class="va">groups</span> <span class="op">&gt;=</span> <span class="fl">4</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    </span></span>
 <span><span class="co">#&gt;       1   2   3</span></span>
-<span><span class="co">#&gt;   1 260  37   3</span></span>
-<span><span class="co">#&gt;   2  39  82  29</span></span>
-<span><span class="co">#&gt;   3   0  36 114</span></span></code></pre></div>
+<span><span class="co">#&gt;   1 245  29   2</span></span>
+<span><span class="co">#&gt;   2  51  85  29</span></span>
+<span><span class="co">#&gt;   3   3  41 115</span></span></code></pre></div>
 <p>Finally we can make predictions: we have everything we need. For each
 test observation, we will get the pretrained prediction for all 3
 training classes. Our final predictions are the weighted combination of
@@ -210,7 +210,7 @@ the predictions from <code>ptLasso</code> and the class predictions from
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">pretrained.preds</span> <span class="op">*</span> <span class="va">class.preds</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span></span>
-<span><span class="co">#&gt; [1] 28.17891</span></span>
+<span><span class="co">#&gt; [1] 26.36161</span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
 <span><span class="co">#&gt; [1] "Mean-Squared Error"</span></span></code></pre></div>
 <p>There are two reasonable baselines. The first is the overall model
@@ -223,7 +223,7 @@ with no grouping at all, and the second is the set of individual models
 <span><span class="va">overall.predictions</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cvfit</span><span class="op">$</span><span class="va">fitoverall</span>, <span class="va">xtest</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">overall.predictions</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span></span>
 <span><span class="co">#&gt; lambda.1se </span></span>
-<span><span class="co">#&gt;   29.64747 </span></span>
+<span><span class="co">#&gt;   26.84846 </span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
 <span><span class="co">#&gt; [1] "Mean-Squared Error"</span></span>
 <span></span>
@@ -238,7 +238,7 @@ with no grouping at all, and the second is the set of individual models
 <span>                      <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">individual.preds</span> <span class="op">*</span> <span class="va">class.preds</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span></span>
-<span><span class="co">#&gt; [1] 29.17333</span></span>
+<span><span class="co">#&gt; [1] 27.40796</span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
 <span><span class="co">#&gt; [1] "Mean-Squared Error"</span></span></code></pre></div>
 <p>What we have done – taking a weighted average of predictions with
@@ -269,25 +269,25 @@ so-far-untouched validation set.</p>
 <span>                       <span class="va">pretrained.preds</span> <span class="op">*</span> <span class="va">class.preds</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">final.model</span>, <span class="va">pred.data.test</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span></span>
 <span><span class="co">#&gt; lambda.1se </span></span>
-<span><span class="co">#&gt;   28.28504 </span></span>
+<span><span class="co">#&gt;   26.50864 </span></span>
 <span><span class="co">#&gt; attr(,"measure")</span></span>
 <span><span class="co">#&gt; [1] "Mean-Squared Error"</span></span></code></pre></div>
 <p>Comparing performance of all models side-by-side shows that (1) using
 input groups improved performance – including for the individual models
-and (2) including the final model did not help performance dramatically
-(but we still recommend trying this with real data).</p>
+and (2) including the final model did not help performance (but is
+included because we observed its usefulness with real data).</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rd</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Overall model PSE: "</span>, </span>
 <span>    <span class="fu">rd</span><span class="op">(</span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">overall.predictions</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Overall model PSE:  29.65</span></span>
+<span><span class="co">#&gt; Overall model PSE:  26.85</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Individual model PSE: "</span>, </span>
 <span>    <span class="fu">rd</span><span class="op">(</span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">individual.preds</span><span class="op">*</span><span class="va">class.preds</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Individual model PSE:  29.17</span></span>
+<span><span class="co">#&gt; Individual model PSE:  27.41</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Pretraining model PSE: "</span>, </span>
 <span>    <span class="fu">rd</span><span class="op">(</span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums-methods.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">pretrained.preds</span><span class="op">*</span><span class="va">class.preds</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Pretraining model PSE:  28.18</span></span>
+<span><span class="co">#&gt; Pretraining model PSE:  26.36</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Pretraining model + final prediction model PSE: "</span>, </span>
 <span>    <span class="fu">rd</span><span class="op">(</span><span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">final.model</span>, </span>
 <span>                          <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">pretrained.preds</span>, </span>
@@ -295,7 +295,7 @@ and (2) including the final model did not help performance dramatically
 <span>                                <span class="va">pretrained.preds</span> <span class="op">*</span> <span class="va">class.preds</span><span class="op">)</span></span>
 <span>                      <span class="op">)</span>, </span>
 <span>              newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Pretraining model + final prediction model PSE:  28.29</span></span></code></pre></div>
+<span><span class="co">#&gt; Pretraining model + final prediction model PSE:  26.51</span></span></code></pre></div>
   </main>
 </div>
 

@@ -194,70 +194,16 @@ ridge models”).</p>
 <span><span class="co"># Fit:</span></span>
 <span><span class="co">##################################################</span></span>
 <span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/cv.ptLasso.html">cv.ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">groups</span>, family <span class="op">=</span> <span class="st">"binomial"</span>, type.measure <span class="op">=</span> <span class="st">"auc"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: from glmnet C++ code (error code -100); Convergence for 100th lambda</span></span>
-<span><span class="co">#&gt; value not reached after maxit=100000 iterations; solutions for larger lambdas</span></span>
-<span><span class="co">#&gt; returned</span></span>
-<span><span class="co">#&gt; Warning: from glmnet C++ code (error code -100); Convergence for 100th lambda</span></span>
-<span><span class="co">#&gt; value not reached after maxit=100000 iterations; solutions for larger lambdas</span></span>
-<span><span class="co">#&gt; returned</span></span>
-<span><span class="co">#&gt; Warning: from glmnet C++ code (error code -92); Convergence for 92th lambda</span></span>
-<span><span class="co">#&gt; value not reached after maxit=100000 iterations; solutions for larger lambdas</span></span>
-<span><span class="co">#&gt; returned</span></span>
-<span><span class="co">#&gt; Warning: from glmnet C++ code (error code -90); Convergence for 90th lambda</span></span>
-<span><span class="co">#&gt; value not reached after maxit=100000 iterations; solutions for larger lambdas</span></span>
-<span><span class="co">#&gt; returned</span></span>
 <span></span>
 <span><span class="co">##################################################</span></span>
 <span><span class="co"># Predict with a common alpha for all groups:</span></span>
 <span><span class="co">##################################################</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
-<span><span class="co">#&gt;     ytest = ytest) </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; alpha =  0.7 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Performance (AUC):</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;            allGroups   mean wtdMean group_1 group_2 group_3</span></span>
-<span><span class="co">#&gt; Overall       0.5990 0.5960  0.5960  0.6030  0.6644  0.5206</span></span>
-<span><span class="co">#&gt; Pretrain      0.6401 0.6640  0.6640  0.6965  0.7732  0.5222</span></span>
-<span><span class="co">#&gt; Individual    0.6559 0.6707  0.6707  0.6936  0.7808  0.5377</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Support size:</span></span>
-<span><span class="co">#&gt;                                         </span></span>
-<span><span class="co">#&gt; Overall    7                            </span></span>
-<span><span class="co">#&gt; Pretrain   40 (3 common + 37 individual)</span></span>
-<span><span class="co">#&gt; Individual 37</span></span>
 <span></span>
 <span><span class="co">##################################################</span></span>
 <span><span class="co"># Predict with a different alpha for each group:</span></span>
 <span><span class="co">##################################################</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span>, alphatype <span class="op">=</span> <span class="st">"varying"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
-<span><span class="co">#&gt;     ytest = ytest, alphatype = "varying") </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; alpha:</span></span>
-<span><span class="co">#&gt; [1] 0.2 0.5 0.2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Performance (AUC):</span></span>
-<span><span class="co">#&gt;            overall   mean wtdMean group_1 group_2 group_3</span></span>
-<span><span class="co">#&gt; Overall     0.5990 0.5960  0.5960  0.6030  0.6644  0.5206</span></span>
-<span><span class="co">#&gt; Pretrain    0.6359 0.6573  0.6573  0.6838  0.7736  0.5145</span></span>
-<span><span class="co">#&gt; Individual  0.6559 0.6707  0.6707  0.6936  0.7808  0.5377</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Support size:</span></span>
-<span><span class="co">#&gt;                                         </span></span>
-<span><span class="co">#&gt; Overall    7                            </span></span>
-<span><span class="co">#&gt; Pretrain   40 (3 common + 37 individual)</span></span>
-<span><span class="co">#&gt; Individual 37</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span>, alphatype <span class="op">=</span> <span class="st">"varying"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="base-case-input-grouped-survival-data">Base case: input grouped survival data<a class="anchor" aria-label="anchor" href="#base-case-input-grouped-survival-data"></a>
@@ -387,53 +333,11 @@ partial likelihood).</p>
 <span><span class="co"># Predict with a common alpha for all groups:</span></span>
 <span><span class="co">##################################################</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
-<span><span class="co">#&gt;     ytest = ytest) </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; alpha =  0.2 </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Performance (C-index):</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;            allGroups   mean wtdMean group_1 group_2 group_3</span></span>
-<span><span class="co">#&gt; Overall       0.8527 0.8652  0.8586  0.9113  0.7711  0.9133</span></span>
-<span><span class="co">#&gt; Pretrain      0.8501 0.8795  0.8742  0.9177  0.8043  0.9164</span></span>
-<span><span class="co">#&gt; Individual    0.7865 0.8005  0.8033  0.9126  0.8078  0.6811</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Support size:</span></span>
-<span><span class="co">#&gt;                                        </span></span>
-<span><span class="co">#&gt; Overall    8                           </span></span>
-<span><span class="co">#&gt; Pretrain   13 (4 common + 9 individual)</span></span>
-<span><span class="co">#&gt; Individual 31</span></span>
 <span></span>
 <span><span class="co">##################################################</span></span>
 <span><span class="co"># Predict with a different alpha for each group:</span></span>
 <span><span class="co">##################################################</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span>, alphatype <span class="op">=</span> <span class="st">"varying"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Call:  </span></span>
-<span><span class="co">#&gt; predict.cv.ptLasso(object = fit, xtest = xtest, groupstest = groupstest,  </span></span>
-<span><span class="co">#&gt;     ytest = ytest, alphatype = "varying") </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; alpha:</span></span>
-<span><span class="co">#&gt; [1] 0.3 0.4 0.4</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Performance (C-index):</span></span>
-<span><span class="co">#&gt;            overall   mean wtdMean group_1 group_2 group_3</span></span>
-<span><span class="co">#&gt; Overall     0.8527 0.8652  0.8586  0.9113  0.7711  0.9133</span></span>
-<span><span class="co">#&gt; Pretrain    0.8081 0.8493  0.8475  0.9229  0.8078  0.8173</span></span>
-<span><span class="co">#&gt; Individual  0.7865 0.8005  0.8033  0.9126  0.8078  0.6811</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Support size:</span></span>
-<span><span class="co">#&gt;                                         </span></span>
-<span><span class="co">#&gt; Overall    8                            </span></span>
-<span><span class="co">#&gt; Pretrain   28 (4 common + 24 individual)</span></span>
-<span><span class="co">#&gt; Individual 31</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span>, alphatype <span class="op">=</span> <span class="st">"varying"</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

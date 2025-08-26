@@ -104,8 +104,8 @@ Let’s walk through an example.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dmlc/xgboost" class="external-link">xgboost</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: xgboost</span></span></code></pre></div>
 <p>We start by simulating data
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>1800</mn></mrow><annotation encoding="application/x-tex">n = 1800</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>=</mo><mn>1000</mn></mrow><annotation encoding="application/x-tex">p = 1000</annotation></semantics></math>)
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>1000</mn></mrow><annotation encoding="application/x-tex">n = 1000</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>=</mo><mn>500</mn></mrow><annotation encoding="application/x-tex">p = 500</annotation></semantics></math>)
 with a continuous response. Our coefficients
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
 are sparse; the first 200 entries will be drawn from a standard
@@ -123,7 +123,7 @@ corresponding to
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">n</span> <span class="op">=</span> <span class="fl">1800</span>; <span class="va">p</span> <span class="op">=</span> <span class="fl">1000</span>; <span class="va">noise</span> <span class="op">=</span> <span class="fl">5</span>;</span>
+<span><span class="va">n</span> <span class="op">=</span> <span class="fl">1000</span>; <span class="va">p</span> <span class="op">=</span> <span class="fl">500</span>; <span class="va">noise</span> <span class="op">=</span> <span class="fl">5</span>;</span>
 <span></span>
 <span><span class="va">x</span>     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="va">p</span><span class="op">)</span>, nrow<span class="op">=</span><span class="va">n</span>, ncol<span class="op">=</span><span class="va">p</span><span class="op">)</span></span>
 <span><span class="va">xtest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="va">p</span><span class="op">)</span>, nrow<span class="op">=</span><span class="va">n</span>, ncol<span class="op">=</span><span class="va">p</span><span class="op">)</span></span>
@@ -154,15 +154,15 @@ two baselines are (1) a linear model that does not pretrain with
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Lasso with xgboost pretraining PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">cvfit</span>, newx <span class="op">=</span> <span class="va">xtest.boost</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Lasso with xgboost pretraining PSE:  46.23225</span></span>
+<span><span class="co">#&gt; Lasso with xgboost pretraining PSE:  56.20989</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Lasso without xgboost pretraining PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">cvfit.noboost</span>, newx <span class="op">=</span> <span class="va">xtest</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Lasso without xgboost pretraining PSE:  60.68818</span></span>
+<span><span class="co">#&gt; Lasso without xgboost pretraining PSE:  62.5489</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"xgboost alone PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">xgbfit</span>, <span class="va">xtest</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>
-<span><span class="co">#&gt; xgboost alone PSE:  49.47738</span></span></code></pre></div>
+<span><span class="co">#&gt; xgboost alone PSE:  56.31106</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-2-xgboost-pretraining-with-input-groups">Example 2: xgboost pretraining with input groups<a class="anchor" aria-label="anchor" href="#example-2-xgboost-pretraining-with-input-groups"></a>
@@ -171,8 +171,8 @@ two baselines are (1) a linear model that does not pretrain with
 only difference here is that we will use <code>cv.ptLasso</code> for our
 model instead of <code>cv.glmnet</code>, and we will use the group
 indicators as a feature when fitting <code>xgboost</code>.</p>
-<p>We start by simulating data with 3 groups
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>600</mn><annotation encoding="application/x-tex">600</annotation></semantics></math>
+<p>We start by simulating data with 2 groups
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>500</mn><annotation encoding="application/x-tex">500</annotation></semantics></math>
 observations in each group) and a continuous response. As before, we
 will simulate
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
@@ -182,6 +182,8 @@ only now we have a different
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
 for each group. The coefficients for the groups are in Table
 @ref(tab:nonlinear).</p>
+<p>Because this example closely follows the example above, the code is
+included here but not run by default.</p>
 <table class="table">
 <caption>Coefficients for simulating data for use with xgboost
 pretraining</caption>
@@ -223,7 +225,7 @@ pretraining</caption>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">n</span> <span class="op">=</span> <span class="fl">1800</span>; <span class="va">p</span> <span class="op">=</span> <span class="fl">500</span>; <span class="va">k</span> <span class="op">=</span> <span class="fl">3</span>;</span>
+<span><span class="va">n</span> <span class="op">=</span> <span class="fl">1000</span>; <span class="va">p</span> <span class="op">=</span> <span class="fl">500</span>; <span class="va">k</span> <span class="op">=</span> <span class="fl">2</span>;</span>
 <span><span class="va">noise</span> <span class="op">=</span> <span class="fl">5</span>;</span>
 <span></span>
 <span><span class="va">groups</span> <span class="op">=</span> <span class="va">groupstest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">k</span>, <span class="va">n</span><span class="op">/</span><span class="va">k</span><span class="op">)</span><span class="op">)</span></span>
@@ -260,7 +262,7 @@ is intended to allow interactions between the group indicators and the
 other features.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">xgbfit</span>      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/xgboost/man/xgb.train.html" class="external-link">xgboost</a></span><span class="op">(</span>data<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">group.ids</span><span class="op">)</span>, label<span class="op">=</span><span class="va">y</span>, </span>
-<span>                      nrounds<span class="op">=</span><span class="fl">200</span>, max_depth<span class="op">=</span><span class="fl">2</span>, verbose<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span>
+<span>                      nrounds<span class="op">=</span><span class="fl">100</span>, max_depth<span class="op">=</span><span class="fl">2</span>, verbose<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">x.boost</span>     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">xgbfit</span>, <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">group.ids</span><span class="op">)</span>, predleaf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
 <span><span class="va">xtest.boost</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">xgbfit</span>, <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">xtest</span>, <span class="va">grouptest.ids</span><span class="op">)</span>, predleaf <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span></code></pre></div>
@@ -281,15 +283,12 @@ and (2) xgboost alone.</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"ptLasso with xgboost pretraining PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">preds</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ptLasso with xgboost pretraining PSE:  55.1535</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"ptLasso without xgboost pretraining PSE: "</span>, </span>
 <span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="va">preds.noboost</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ptLasso without xgboost pretraining PSE:  66.37259</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"xgboost alone PSE: "</span>, </span>
-<span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">xgbfit</span>, <span class="va">xtest</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span>
-<span><span class="co">#&gt; xgboost alone PSE:  59.63781</span></span></code></pre></div>
+<span>    <span class="fu"><a href="https://glmnet.stanford.edu/reference/assess.glmnet.html" class="external-link">assess.glmnet</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">xgbfit</span>, <span class="va">xtest</span><span class="op">)</span>, newy <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span><span class="op">$</span><span class="va">mse</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
