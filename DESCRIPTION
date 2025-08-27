@@ -4,7 +4,7 @@ Title: Pretraining and the Lasso
 Description: Implements lasso pretraining for generalized linear models for data with grouped observations; data without grouped observations, but with multinomial responses; data with multiple Gaussian responses; and data with repeated measurements over time. 
  The method fits a lasso model to an initial dataset and then uses its support and coefficient values to guide model fitting for a related task, which can improve performance by leveraging larger datasets and preserve interpretability by identifying features which are generally shared, and which are task specific. See Craig et al. (2025) for details. 
  Model fitting in this package is done with cv.glmnet, and syntax closely follows that of the glmnet package (Friedman, Hastie & Tibshirani, 2010).
-Version: 1.0.1
+Version: 1.0.2
 Authors@R: c(person("Erin", "Craig", role=c("aut", "cre", "cph"), email = "ercr@umich.edu", comment = c(ORCID = "0000-0002-4893-6671")),
 	     person("Rob", "Tibshirani", role=c("aut", "cph")))
 Maintainer: Erin Craig  <ercr@umich.edu>
@@ -33,6 +33,3 @@ Suggests:
     testthat 
 VignetteBuilder: knitr
 Language: en
-Spell-check: 
-    Hastie, Tibshirani, glmnet, Pretraining, pretraining, interpretability, cv, et, al
-
