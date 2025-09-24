@@ -45,7 +45,8 @@ get.individual.support(fit, commonOnly = TRUE)
 # group 1 only
 get.individual.support(fit, groups = 1) 
 
-cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+cvfit = cv.ptLasso(x, y, groups = groups, alphalist = c(0, .5, 1), 
+                   family = "gaussian", type.measure = "mse")
 
 get.individual.support(cvfit)
 

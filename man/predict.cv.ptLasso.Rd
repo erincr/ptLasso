@@ -25,7 +25,7 @@
 
 \item{groupstest}{A vector indicating to which group each observation belongs. Coding should match that used for model training. Will be NULL for target grouped data.}
 
-\item{ytest}{Response variable. Optional. If included, \code{"predict"} will compute performance measures for xtest using code{"type.measure"} from the cvfit object.}
+\item{ytest}{Response variable. Optional. If included, \code{"predict"} will compute performance measures for xtest using \code{"type.measure"} from the cvfit object.}
 
 \item{alpha}{The chosen alpha to use for prediction. May be a vector containing one value of alpha for each group. If NULL, this will rely on the choice of "alphatype".}
 
@@ -66,9 +66,9 @@ Return predictions and performance measures for a test set.
 \examples{
 #### Gaussian example
 set.seed(1234)
-out = gaussian.example.data()
+out = gaussian.example.data(k=2, class.sizes = c(50, 50))
 x = out$x; y=out$y; groups = out$group;
-outtest = gaussian.example.data()
+outtest = gaussian.example.data(k=2, class.sizes = c(50, 50))
 xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups;
 
 # Model fitting
@@ -88,7 +88,7 @@ pred
 
 # Specify a vector of choices for alpha: 
 pred = predict(cvfit, xtest, groupstest, ytest=ytest, s="lambda.min",
-               alphatype = "varying", alpha = c(.1, .2, .3, .4, .5))
+               alphatype = "varying", alpha = c(.1, .5))
 pred
 
 }

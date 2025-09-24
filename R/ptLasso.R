@@ -41,16 +41,20 @@
 #' @examples
 #' # Getting started. First, we simulate data: we need covariates x, response y and group IDs.
 #' set.seed(1234)
-#' x = matrix(rnorm(1000*20), 1000, 20)
-#' y = rnorm(1000)
-#' groups = sort(rep(1:5, 200))
+#' n=100
+#' p=10
+#' n.groups=2
+#' x = matrix(rnorm(n*p), n, p)
+#' y = rnorm(n)
+#' groups = sort(rep(1:n.groups, n/n.groups))
 #'
-#' xtest = matrix(rnorm(1000*20), 1000, 20)
-#' ytest = rnorm(1000)
-#' groupstest = sort(rep(1:5, 200))
+#' xtest = matrix(rnorm(n*p), n, p)
+#' ytest = rnorm(n)
+#' groupstest = sort(rep(1:n.groups, n/n.groups))
 #'
 #' # Now, we can fit a ptLasso model:
-#' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
+#' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", 
+#'               nfolds = 3, type.measure = "mse")
 #' plot(fit) # to see all of the cv.glmnet models trained
 #' predict(fit, xtest, groupstest) # to predict on new data
 #' predict(fit, xtest, groupstest, ytest=ytest) # if ytest is included, we also measure performance
@@ -59,8 +63,8 @@
 #' # This is a necessary choice to make during model training; we need to select the model
 #' # we want to use to define the offset and penalty factor for the second stage of pretraining.
 #' # We could instead have used "lambda.min":
-#' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse",
-#'               overall.lambda = "lambda.min")
+#' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", 
+#'               type.measure = "mse", nfolds = 3, overall.lambda = "lambda.min")
 #'
 #' # We can use the 'relax' option to fit relaxed lasso models:
 #' fit = ptLasso(x, y, groups = groups, alpha = 0.5,
@@ -79,6 +83,7 @@
 #' # and measure performance with a validation set, or (2) use cv.ptLasso.
 #'
 #' 
+#' \donttest{
 #' # Now, we are ready to simulate slightly more realistic data.
 #' # This continuous outcome example has k = 5 groups, where each group has 200 observations.
 #' # There are scommon = 10 features shared across all groups, and
@@ -114,7 +119,9 @@
 #' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
 #' plot(fit) # to see all of the cv.glmnet models trained
 #' predict(fit, xtest, groupstest, ytest=ytest)
+#'}
 #'
+#'\donttest{
 #' # Now, we repeat with a binomial outcome.
 #' # This example has k = 3 groups, where each group has 100 observations.
 #' # There are scommon = 5 features shared across all groups, and
@@ -145,6 +152,7 @@
 #' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "binomial", type.measure = "auc")
 #' plot(fit) # to see all of the cv.glmnet models trained
 #' predict(fit, xtest, groupstest, ytest=ytest)
+#'}
 #'
 #' \dontrun{
 #' ### Model fitting with parallel = TRUE
@@ -153,6 +161,7 @@
 #' fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse", parallel=TRUE)
 #' }
 #'
+#'\donttest{
 #' # Multiresponse pretraining:
 #' # Now let's consider the case of a multiresponse outcome. We'll start by simulating data:
 #' set.seed(1234)
@@ -186,7 +195,9 @@
 #'
 #' # We could also use the glmnet option relax = TRUE:
 #' fit = ptLasso(x, y, type.measure = "mse", relax = TRUE, use.case = "multiresponse")
+#'}
 #'
+#'\donttest{
 #' # Time series pretraining
 #' # Now suppose we have time series data with a binomial outcome measured at 3 different time points.
 #' set.seed(1234)
@@ -217,10 +228,11 @@
 #'               use.case = "timeSeries")
 #' plot(fit)
 #' predict(fit, xtest, ytest=ytest)
+#' }
 #' 
 #' @import glmnet Matrix
 #' @export
-#' @seealso \code{\link{glmnet}}
+#' @seealso \code{\link[glmnet]{glmnet}}
 #' @references Friedman, J., Hastie, T., & Tibshirani, R. (2010). Regularization paths for generalized linear models via coordinate descent. Journal of Statistical Software, 33(1), 1-22.
 #'
 #' 

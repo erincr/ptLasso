@@ -60,7 +60,7 @@ predict(fit, xtest, groupstest, ytest = ytest)
 ```
 
 Using cross validation is the same as in the Gaussian case:
-```{r}
+```{r, eval = FALSE}
 ##################################################
 # Fit:
 ##################################################
@@ -141,7 +141,7 @@ predict(fit, xtest, groupstest, ytest = ytest)
 ```
 
 The call to `cv.ptLasso` is again much the same; we only need to specify `family` ("cox") and `type.measure` (if we want to use the C index instead of the partial likelihood).
-```{r}
+```{r, eval=FALSE}
 ##################################################
 # Fit:
 ##################################################

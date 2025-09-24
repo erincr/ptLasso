@@ -16,14 +16,14 @@ Print the predict.ptLasso object.
 }
 \examples{
 # Train data
-out = gaussian.example.data()
+out = gaussian.example.data(k=2, class.sizes = c(50, 50))
 x = out$x; y=out$y; groups = out$group;
 
 # Test data
-outtest = gaussian.example.data()
+outtest = gaussian.example.data(k=2, class.sizes = c(50, 50))
 xtest=outtest$x; ytest=outtest$y; groupstest=outtest$groups
 
-fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+fit = ptLasso(x, y, groups = groups, nfolds = 3, family = "gaussian", type.measure = "mse")
 pred = predict(fit, xtest, groupstest, ytest=ytest, s="lambda.min")
 print(pred)
 

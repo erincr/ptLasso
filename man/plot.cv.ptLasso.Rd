@@ -18,7 +18,7 @@ A plot is produced, and nothing is returned.
 }
 \examples{
 set.seed(1234)
-out = gaussian.example.data()
+out = gaussian.example.data(k=2, class.sizes = c(50, 50))
 x = out$x; y=out$y; groups = out$group
 
 cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
@@ -27,9 +27,6 @@ plot(cvfit)
 }
 \seealso{
 \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
-}
-\author{
-Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@stanford.edu>
 }
 \keyword{classification}
 \keyword{models}

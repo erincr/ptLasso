@@ -8,3 +8,14 @@ script.R
 TODO.txt
 .#test-ptLasso.R
 docs
+/doc/
+/Meta/
+
+vignettes/*.html
+vignettes/*.pdf
+vignettes/*.tex
+vignettes/*.log
+vignettes/*.out
+vignettes/*.aux
+vignettes/*.bbl
+vignettes/*.blg

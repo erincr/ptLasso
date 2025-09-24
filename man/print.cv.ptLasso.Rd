@@ -15,7 +15,7 @@
 Print the cv.ptLasso object.
 }
 \examples{
-out = gaussian.example.data()
+out = gaussian.example.data(k=2, class.sizes = c(50, 50))
 x = out$x; y=out$y; groups = out$group;
 
 cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")

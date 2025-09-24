@@ -16,7 +16,7 @@ All model fitting in this package is done with `cv.glmnet`, and our syntax close
 # Tutorials 
 The vignette for this package is available online [here](https://erincr.github.io/ptLasso/).
 
-For introductory YouTube tutorials and R Markdown examples, please visit the [website](https://erincraig.me/lasso-pretraining) for lasso pretraining.
+For introductory YouTube tutorials and R Markdown examples, please visit the [website](https://www.erincraig.me/lasso-pretraining) for lasso pretraining.
 
 # Installation
 
@@ -35,7 +35,7 @@ If you find a bug or have a feature request, please open a new issue.
 
 <div id="ref-ptlasso">
 
-Craig, Erin, Mert Pilanci, Thomas Le Menestrel, Balasubramanian Narasimhan, Manuel Rivas, Roozbeh Dehghannasiri, Julia Salzman, Jonathan Taylor, and Robert Tibshirani. "Pretraining and the Lasso." arXiv preprint [arXiv:2401.12911](https://arxiv.org/abs/2401.12911) (2024).
+Erin Craig, Mert Pilanci, Thomas Le Menestrel, Balasubramanian Narasimhan, Manuel A Rivas, Stein-Erik Gullaksen, Roozbeh Dehghannasiri, Julia Salzman, Jonathan Taylor, Robert Tibshirani, Pretraining and the lasso, *Journal of the Royal Statistical Society Series B: Statistical Methodology*, 2025; qkaf050, <https://doi.org/10.1093/jrsssb/qkaf050>.
 
 <div id="ref-glmnet">
 

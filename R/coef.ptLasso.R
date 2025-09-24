@@ -8,13 +8,12 @@
 #' @param includeOverall whether to return the features that are chosen by the overall model and not the group-specific models (TRUE) or the features that are chosen by the overall model or the group-specific models (FALSE). Default is TRUE. Not used when 'use.case = "timeSeries"'.
 #' @param commonOnly whether to return the features that are chosen by more than half of the group- or response-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.
 #' @param groups which groups or responses to include when computing the support. Default is to include all groups/responses. 
-#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
 #' # Train data
 #' set.seed(1234)
-#' out = gaussian.example.data()
+#' out = gaussian.example.data(k=2, class.sizes = c(50, 50))
 #' x = out$x; y=out$y; groups = out$group;
 #'
 #' fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
@@ -72,7 +71,8 @@ get.pretrain.support <- function(fit, s="lambda.min", gamma="gamma.min", commonO
 #' # group 1 only
 #' get.individual.support(fit, groups = 1) 
 #' 
-#' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
+#' cvfit = cv.ptLasso(x, y, groups = groups, alphalist = c(0, .5, 1), 
+#'                    family = "gaussian", type.measure = "mse")
 #' 
 #' get.individual.support(cvfit)
 #' 
@@ -159,7 +159,7 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", gamma="gamma
 #' @examples
 #' # Train data
 #' set.seed(1234)
-#' out = gaussian.example.data()
+#' out = gaussian.example.data(k=2, class.sizes = c(50, 50))
 #' x = out$x; y=out$y; groups = out$group;
 #'
 #' fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
@@ -286,7 +286,7 @@ coef.ptLasso=function(object, model = c("all", "individual", "overall", "pretrai
 #' @keywords models regression classification
 #' @examples
 #' set.seed(1234)
-#' out = gaussian.example.data()
+#' out = gaussian.example.data(k=2, class.sizes = c(50, 50))
 #' x = out$x; y=out$y; groups = out$group;
 #'
 #' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")

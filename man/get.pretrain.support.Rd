@@ -35,7 +35,7 @@ Get the indices of nonzero coefficients from the pretrained models in a fitted p
 \examples{
 # Train data
 set.seed(1234)
-out = gaussian.example.data()
+out = gaussian.example.data(k=2, class.sizes = c(50, 50))
 x = out$x; y=out$y; groups = out$group;
 
 fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
@@ -59,9 +59,6 @@ get.pretrain.support(cvfit, groups = 1)
 }
 \seealso{
 \code{ptLasso}, \code{cv.ptLasso}.
-}
-\author{
-Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@stanford.edu>
 }
 \keyword{classification}
 \keyword{models}

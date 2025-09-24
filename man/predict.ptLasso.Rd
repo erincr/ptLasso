@@ -23,7 +23,7 @@
 
 \item{groupstest}{A vector indicating to which group each observation belongs. Coding should match that used for model training. Will be NULL for target grouped data.}
 
-\item{ytest}{Response variable. Optional. If included, \code{"predict"} will compute performance measures for xtest using code{"type.measure"} from the cvfit object.}
+\item{ytest}{Response variable. Optional. If included, \code{"predict"} will compute performance measures for xtest using \code{"type.measure"} from the cvfit object.}
 
 \item{type}{Type of prediction required. Type '"link"' gives the linear predictors for '"binomial", '"multinomial"' or '"cox"' models; for '"gaussian"' models it gives the fitted values. Type '"response"' gives the fitted probabilities for '"binomial"' or '"multinomial"', and the fitted relative-risk for '"cox"'; for '"gaussian"' type '"response"' is equivalent to type '"link"'. Note that for '"binomial"' models, results are returned only for the class corresponding to the second level of the factor response. Type '"class"' applies only to '"binomial"' or '"multinomial"' models, and produces the class label corresponding to the maximum probability.}
 
