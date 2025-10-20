@@ -601,11 +601,11 @@ predict.ptLasso=function(object, xtest, groupstest=NULL, ytest=NULL,
     phatind=array(NA, c(nrow(xtest), k, 1))
     
     # preTraining predictions
-    offsetTest = (1-fit$alpha) * predict(fit$fitoverall, xtest, s=fit$fitoverall.lambda, gamma=fit$fitoverall.gamma, type="link")[, , 1]
+    offsetTest = (1-fit$alpha) * predict(fit$fitoverall, xtest, s=fit$fitoverall.lambda, gamma=fit$fitoverall.gamma, type="link")[, , 1,drop=FALSE]
 
     for(kk in 1:k){
         # Pretraining predictions
-        phatpre[, kk, 1] = predict(fit$fitpre[[kk]], xtest, newoffset=offsetTest[, kk], type="link", s=s, gamma=gamma) 
+        phatpre[, kk, 1] = predict(fit$fitpre[[kk]], xtest, newoffset=offsetTest[, kk,1], type="link", s=s, gamma=gamma) 
 
         # Individual model predictions
         phatind[, kk, 1] = predict(fit$fitind[[kk]], xtest, type="link", s=s, gamma=gamma)  
