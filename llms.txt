@@ -1,0 +1,155 @@
+# Pretraining and the Lasso
+
+This package fits pretrained generalized linear models for: (1) data
+with grouped observations, (2) data without grouped observations, but
+with multinomial responses, (3) data with multiple Gaussian responses
+and (4) time series data (data with repeated measurements over time).
+
+Documentation and examples are available as vignettes within this
+package, and can be accessed through the “Articles” tab on this page.
+The vignettes also include examples of pretraining for settings not yet
+supported by this package, including conditional average treatment
+effect estimation and unsupervised pretraining.
+
+Details of pretraining may be found in Craig et
+al. ([2026](#ref-ptlasso)).
+
+All model fitting in this package is done with `cv.glmnet`, and our
+syntax closely follows that of the `glmnet` package
+([2010](#ref-glmnet)).
+
+# Tutorials
+
+## Tutorial 1: an introduction
+
+An introduction to pretraining, and to the R package:
+
+- video ([YouTube](https://www.youtube.com/watch?v=zIGc5Z2MaYM))
+- slides
+  ([.pdf](https://erincr.github.io/ptLasso/tutorials/ptLasso_tutorial_1.pdf))
+- code
+  ([.html](https://erincr.github.io/ptLasso/tutorials/ptLasso_Part1.html),
+  [.Rmd](https://erincr.github.io/ptLasso/tutorials/ptLasso_Part1.Rmd))
+
+## Tutorial 2: a deeper dive and more examples
+
+More examples of pretraining and modeling:
+
+- video ([YouTube](https://www.youtube.com/watch?v=97Kej1iomZ8))
+- slides
+  ([.pdf](https://erincr.github.io/ptLasso/tutorials/ptLasso_tutorial_2.pdf))
+- code
+  ([.html](https://erincr.github.io/ptLasso/tutorials/ptLasso_Part2.html),
+  [.Rmd](https://erincr.github.io/ptLasso/tutorials/ptLasso_Part2.Rmd))
+
+# Installation
+
+To install this package, we recommend following [these
+instructions](https://cran.r-project.org/web/packages/githubinstall/vignettes/githubinstall.html).
+
+# Having trouble?
+
+If you find a bug or have a feature request, please open a new issue.
+
+# References
+
+Craig et al. “Pretraining and the lasso.” *Journal of the Royal
+Statistical Society Series B: Statistical Methodology* 88.1 (2026):
+261-281.
+
+Friedman, Hastie, and Tibshirani. 2010. “Regularization Paths for
+Generalized Linear Models via Coordinate Descent.” *Journal of
+Statistical Software, Articles* 33 (1): 1–22.
+
+# Package index
+
+## All functions
+
+- [`binomial.example.data()`](https://erincr.github.io/ptLasso/reference/binomial.example.data.md)
+  : Simulate input grouped data (binomial outcome) for testing with
+  ptLasso.
+
+- [`coef(`*`<cv.ptLasso>`*`)`](https://erincr.github.io/ptLasso/reference/coef.cv.ptLasso.md)
+  : Get the coefficients from a fitted cv.ptLasso model.
+
+- [`coef(`*`<ptLasso>`*`)`](https://erincr.github.io/ptLasso/reference/coef.ptLasso.md)
+  : Get the coefficients from a fitted ptLasso model.
+
+- [`cv.ptLasso()`](https://erincr.github.io/ptLasso/reference/cv.ptLasso.md)
+  : Cross-validation for ptLasso
+
+- [`gaussian.example.data()`](https://erincr.github.io/ptLasso/reference/gaussian.example.data.md)
+  : Simulate input grouped data (gaussian outcome) for testing with
+  ptLasso.
+
+- [`get.individual.support()`](https://erincr.github.io/ptLasso/reference/get.individual.support.md)
+  : Get the support for individual models
+
+- [`get.overall.support()`](https://erincr.github.io/ptLasso/reference/get.overall.support.md)
+  : Get the support for the overall model
+
+- [`get.pretrain.support()`](https://erincr.github.io/ptLasso/reference/get.pretrain.support.md)
+  : Get the support for pretrained models
+
+- [`makedata()`](https://erincr.github.io/ptLasso/reference/makedata.md)
+  : Simulate input grouped data for testing with ptLasso.
+
+- [`makedata.targetgroups()`](https://erincr.github.io/ptLasso/reference/makedata.targetgroups.md)
+  : Simulate target grouped data for testing with ptLasso.
+
+- [`plot(`*`<cv.ptLasso>`*`)`](https://erincr.github.io/ptLasso/reference/plot.cv.ptLasso.md)
+  :
+
+  Plot the cross-validation curve produced by cv.ptLasso, as a function
+  of the `alpha` values used.
+
+- [`plot(`*`<ptLasso>`*`)`](https://erincr.github.io/ptLasso/reference/plot.ptLasso.md)
+  : Plot the models trained by a ptLasso object
+
+- [`predict(`*`<cv.ptLasso>`*`)`](https://erincr.github.io/ptLasso/reference/predict.cv.ptLasso.md)
+  : Predict using a cv.ptLasso object.
+
+- [`predict(`*`<ptLasso>`*`)`](https://erincr.github.io/ptLasso/reference/predict.ptLasso.md)
+  : Predict using a ptLasso object.
+
+- [`print(`*`<cv.ptLasso>`*`)`](https://erincr.github.io/ptLasso/reference/print.cv.ptLasso.md)
+  : Print the cv.ptLasso object.
+
+- [`print(`*`<predict.cv.ptLasso>`*`)`](https://erincr.github.io/ptLasso/reference/print.predict.cv.ptLasso.md)
+  : Print the predict.cv.ptLasso object.
+
+- [`print(`*`<predict.ptLasso>`*`)`](https://erincr.github.io/ptLasso/reference/print.predict.ptLasso.md)
+  : Print the predict.ptLasso object.
+
+- [`print(`*`<ptLasso>`*`)`](https://erincr.github.io/ptLasso/reference/print.ptLasso.md)
+  : Print the ptLasso object.
+
+- [`ptLasso()`](https://erincr.github.io/ptLasso/reference/ptLasso.md) :
+  Fit a pretrained lasso model using glmnet.
+
+# Articles
+
+### All vignettes
+
+- [Conditional average treatment effect
+  estimation](https://erincr.github.io/ptLasso/articles/ConditionalAverageTreatmentEffect.md):
+- [Different groups in train and test
+  data](https://erincr.github.io/ptLasso/articles/DifferentGroupsTrainAndTest.md):
+- [Input grouped
+  data](https://erincr.github.io/ptLasso/articles/InputGroupedData.md):
+- [Learning the input
+  groups](https://erincr.github.io/ptLasso/articles/LearningTheInputGroups.md):
+- [Multi-response data with Gaussian
+  responses](https://erincr.github.io/ptLasso/articles/MultiResponseGaussian.md):
+- [Multi-response data with mixed response
+  types](https://erincr.github.io/ptLasso/articles/MultiResponseMixed.md):
+- [ptLasso Vignette and
+  Manual](https://erincr.github.io/ptLasso/articles/ptLasso.md):
+- [Target grouped or multinomial reponse
+  data](https://erincr.github.io/ptLasso/articles/TargetGroupedData.md):
+- [Time series
+  data](https://erincr.github.io/ptLasso/articles/TimeSeriesData.md):
+- [Unsupervised
+  pretraining](https://erincr.github.io/ptLasso/articles/UnsupervisedPretraining.md):
+- [Using nonlinear
+  bases](https://erincr.github.io/ptLasso/articles/UsingNonlinearBases.md):

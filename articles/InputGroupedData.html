@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Input grouped data • ptLasso</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Input grouped data">
 </head>
@@ -81,7 +81,7 @@
 <span><span class="co">#&gt; Loading required package: ggplot2</span></span>
 <span><span class="co">#&gt; Loading required package: glmnet</span></span>
 <span><span class="co">#&gt; Loading required package: Matrix</span></span>
-<span><span class="co">#&gt; Loaded glmnet 4.1-10</span></span>
+<span><span class="co">#&gt; Loaded glmnet 5.0</span></span>
 <span><span class="co">#&gt; Loading required package: gridExtra</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="base-case-input-grouped-data-with-a-binomial-outcome">Base case: input grouped data with a binomial outcome<a class="anchor" aria-label="anchor" href="#base-case-input-grouped-data-with-a-binomial-outcome"></a>
@@ -220,7 +220,7 @@ where
 is specific to each group and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϵ</mi><annotation encoding="application/x-tex">\epsilon</annotation></semantics></math>
 is noise. Because survival times must be positive, we modify this to be
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">survival</mtext><mo>=</mo><mtext mathvariant="normal">survival</mtext><mo>+</mo><mn>1.1</mn><mo>*</mo><mtext mathvariant="normal">abs</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mtext mathvariant="normal">min</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mtext mathvariant="normal">survival</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{survival} = \text{survival} + 1.1 * \text{abs}(\text{min}(\text{survival}))</annotation></semantics></math>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">survival</mtext><mo>=</mo><mtext mathvariant="normal">survival</mtext><mo>+</mo><mn>1.1</mn><mo>*</mo><mtext mathvariant="normal">abs</mtext><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">min</mtext><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">survival</mtext><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{survival} = \text{survival} + 1.1 * \text{abs}(\text{min}(\text{survival}))</annotation></semantics></math>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
@@ -270,6 +270,317 @@ index.</p>
 <span><span class="co"># Default -- use partial likelihood as the type.measure:</span></span>
 <span><span class="co">############################################################</span></span>
 <span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/ptLasso.html">ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">groups</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, family <span class="op">=</span> <span class="st">"cox"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: from glmnet C++ code (error code -67); Convergence for 67th lambda</span></span>
+<span><span class="co">#&gt; value not reached after maxit=100000 iterations; solutions for larger lambdas</span></span>
+<span><span class="co">#&gt; returned</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
@@ -282,22 +593,346 @@ index.</p>
 <span><span class="co">#&gt; Performance (Deviance):</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            allGroups  mean wtdMean group_1 group_2 group_3</span></span>
-<span><span class="co">#&gt; Overall        381.2 87.60   89.36   99.49  106.53   56.79</span></span>
-<span><span class="co">#&gt; Pretrain       415.1 90.83   91.48  109.50   94.24   68.74</span></span>
-<span><span class="co">#&gt; Individual     425.2 99.07   99.54  111.68  101.85   83.67</span></span>
+<span><span class="co">#&gt; Overall        381.2 87.60   89.35   99.49  106.53   56.79</span></span>
+<span><span class="co">#&gt; Pretrain       374.5 85.36   86.22   92.56   94.35   69.17</span></span>
+<span><span class="co">#&gt; Individual     424.9 99.03   99.51  111.57  101.84   83.68</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Support size:</span></span>
 <span><span class="co">#&gt;                                         </span></span>
 <span><span class="co">#&gt; Overall    10                           </span></span>
-<span><span class="co">#&gt; Pretrain   19 (3 common + 16 individual)</span></span>
+<span><span class="co">#&gt; Pretrain   15 (3 common + 12 individual)</span></span>
 <span><span class="co">#&gt; Individual 24</span></span>
 <span></span>
 <span><span class="co">############################################################</span></span>
 <span><span class="co"># Alternatively -- use the C index:</span></span>
 <span><span class="co">############################################################</span></span>
 <span><span class="va">fit</span> <span class="op">=</span> <span class="fu"><a href="../reference/ptLasso.html">ptLasso</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">groups</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, family <span class="op">=</span> <span class="st">"cox"</span>, type.measure <span class="op">=</span> <span class="st">"C"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: from glmnet C++ code (error code -30075); Numerical error at 75th</span></span>
-<span><span class="co">#&gt; lambda value; solutions for larger values of lambda returned</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: from glmnet C++ code (error code -51); Convergence for 51th lambda</span></span>
+<span><span class="co">#&gt; value not reached after maxit=100000 iterations; solutions for larger lambdas</span></span>
+<span><span class="co">#&gt; returned</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: from glmnet C++ code (error code -54); Convergence for 54th lambda</span></span>
+<span><span class="co">#&gt; value not reached after maxit=100000 iterations; solutions for larger lambdas</span></span>
+<span><span class="co">#&gt; returned</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: from glmnet C++ code (error code -54); Convergence for 54th lambda</span></span>
+<span><span class="co">#&gt; value not reached after maxit=100000 iterations; solutions for larger lambdas</span></span>
+<span><span class="co">#&gt; returned</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: from glmnet C++ code (error code -60); Convergence for 60th lambda</span></span>
+<span><span class="co">#&gt; value not reached after maxit=100000 iterations; solutions for larger lambdas</span></span>
+<span><span class="co">#&gt; returned</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: from glmnet C++ code (error code -57); Convergence for 57th lambda</span></span>
+<span><span class="co">#&gt; value not reached after maxit=100000 iterations; solutions for larger lambdas</span></span>
+<span><span class="co">#&gt; returned</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: from glmnet C++ code (error code -54); Convergence for 54th lambda</span></span>
+<span><span class="co">#&gt; value not reached after maxit=100000 iterations; solutions for larger lambdas</span></span>
+<span><span class="co">#&gt; returned</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
+<span><span class="co">#&gt; Warning: Starting in glmnet 5.1, the default Cox tie-handling method will</span></span>
+<span><span class="co">#&gt; change from 'breslow' to 'efron' (matching survival::coxph). To silence this</span></span>
+<span><span class="co">#&gt; message and lock in the v5.0 default, pass cox.ties = 'breslow' explicitly. To</span></span>
+<span><span class="co">#&gt; preview the v5.1 behavior, pass cox.ties = 'efron'.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">xtest</span>, <span class="va">groupstest</span>, ytest <span class="op">=</span> <span class="va">ytest</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:  </span></span>
@@ -311,13 +946,13 @@ index.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            allGroups   mean wtdMean group_1 group_2 group_3</span></span>
 <span><span class="co">#&gt; Overall       0.8545 0.8673  0.8608  0.9139  0.7746  0.9133</span></span>
-<span><span class="co">#&gt; Pretrain      0.8359 0.8396  0.8393  0.9152  0.8173  0.7864</span></span>
-<span><span class="co">#&gt; Individual    0.7925 0.7985  0.8008  0.9075  0.8007  0.6873</span></span>
+<span><span class="co">#&gt; Pretrain      0.8289 0.8376  0.8375  0.9165  0.8161  0.7802</span></span>
+<span><span class="co">#&gt; Individual    0.7932 0.7995  0.8018  0.9075  0.8007  0.6904</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Support size:</span></span>
 <span><span class="co">#&gt;                                         </span></span>
 <span><span class="co">#&gt; Overall    6                            </span></span>
-<span><span class="co">#&gt; Pretrain   35 (4 common + 31 individual)</span></span>
+<span><span class="co">#&gt; Pretrain   36 (4 common + 32 individual)</span></span>
 <span><span class="co">#&gt; Individual 37</span></span></code></pre></div>
 <p>The call to <code>cv.ptLasso</code> is again much the same; we only
 need to specify <code>family</code> (“cox”) and
@@ -350,7 +985,7 @@ partial likelihood).</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
