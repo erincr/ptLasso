@@ -53,10 +53,10 @@ xtest.model = 1*(xtest > 0)
 
 beta = c(rnorm(200), rep(0, p-200))
 
-y     = x.model %*% beta + noise * rnorm(n)
-ytest = xtest.model %*% beta + noise * rnorm(n)
+y     = as.vector(x.model %*% beta + noise * rnorm(n))
+ytest = as.vector(xtest.model %*% beta + noise * rnorm(n))
 
-train.folds = sample(rep(1:10, n/10))
+train.folds = sample(rep(1:10, 1000/10))
 ```
 
 Now, we run `xgboost` to get our basis functions:
