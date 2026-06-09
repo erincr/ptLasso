@@ -25,7 +25,7 @@ if (!all(ok)) {
 ```
 
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, eval = FALSE}
 require(glmnet)
 require(ptLasso)
 ```
@@ -34,13 +34,13 @@ Suppose we have a dataset with features $X$ and response $y$, where the relation
 
 ### Example 1: xgboost pretraining 
 
-```{r}
+```{r, eval = FALSE}
 require(xgboost)
 ```
 
 We start by simulating data ($n = 1000$, $p = 500$) with a continuous response. Our coefficients $\beta$ are sparse; the first 200 entries will be drawn from a standard univariate normal, and the remainder are $0$. We define $y$ as $y = 1(X > 0) \beta + \epsilon$, where $\epsilon$ is noise; we hope that `xgboost` will learn the splits corresponding to $X > 0$.
 
-```{r}
+```{r, eval = FALSE}
 set.seed(1234)
 
 n = 1000; p = 500; noise = 5;
@@ -60,7 +60,7 @@ train.folds = sample(rep(1:10, 1000/10))
 ```
 
 Now, we run `xgboost` to get our basis functions:
-```{r}
+```{r, eval = FALSE}
 xgbfit      = xgboost(data=x, label=y, nrounds=200, max_depth=1, verbose=0)
 
 x.boost     = predict(xgbfit, x, predleaf = TRUE) - 1
@@ -68,7 +68,7 @@ xtest.boost = predict(xgbfit, xtest, predleaf = TRUE) - 1
 ```
 
 And we are ready for model fitting with `cv.glmnet`. Our two baselines are (1) a linear model that does not pretrain with `xgboost`, and (2) `xgboost`. We find that `glmnet` together with `xgboost` outperforms `glmnet` alone and `xgboost` alone.
-```{r}
+```{r, eval = FALSE}
 cvfit = cv.glmnet(x.boost, y, type.measure = "mse", foldid = train.folds)
 cvfit.noboost = cv.glmnet(x, y, type.measure = "mse", foldid = train.folds)
 
@@ -91,7 +91,7 @@ We start by simulating data with 2 groups ($500$ observations in each group) and
 
 Because this example closely follows the example above, the code is included here but not run by default.
 
-```{r nonlinear, echo = FALSE}
+```{r nonlinear, echo = FALSE, eval = FALSE}
 coef.table = cbind(cbind(
   rep(2, 3),
   c(1, 0, 0),
