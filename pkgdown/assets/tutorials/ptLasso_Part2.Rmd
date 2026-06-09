@@ -1,0 +1,349 @@
+---
+title: 'Introduction to ptLasso: drilling deeper'
+author:
+  name: Erin Craig and Rob Tibshirani
+  affiliation: Stanford University
+output:
+  html_document:
+    df_print: paged
+    toc: true
+date: "2024-06-25"
+self_contained: true
+header-includes: \usepackage{amsmath} \usepackage{amssymb}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE}
+suppressPackageStartupMessages(require(ptLasso))
+```
+
+## Background
+
+In Part 1, we learned about pretraining for the lasso, as it applies to "input grouped" data -- data where each observation belongs to one of $k$ distinct groups (e.g. cancer classes). With simulated data, we saw how to fit pretrained models in this context using the R package `ptLasso`.
+
+Now, we will show how to do pretraining for three different settings:
+
+1. data with a multinomial response
+2. multi-response data, and
+3. time series data.
+
+For all of these examples, we'll use the `ptLasso` package - so let's load it now.
+
+```{r eval = FALSE}
+require(ptLasso)
+```
+
+In all cases, our modeling pipeline will look like this:
+```{r, eval = FALSE}
+
+# Data: features X, response y,
+# and "useCase" (targetGroups, multiresponse or timeSeries)
+
+# Fit a model:
+fit = ptLasso(X, y, use.case = "useCase")
+# ...optionally using cross-validation for parameter selection:
+fit = cv.ptLasso(X, y, use.case = "useCase")
+
+# Visualize the model:
+plot(fit)
+
+# And make predictions:
+predict(fit, Xtest)
+
+# And make predictions:
+coef(fit, Xtest)
+```
+
+## Multinomial response data
+
+- Multinomial response data has a _categorical_ response: each response is in one of three or more categories. For example, observations may be from people with cancer, and our goal can be to predict the type of cancer.
+
+- The pretraining philosophy for modeling data with a multinomial response is analogous to that for input grouped data. 
+
+- We wish to learn across all classes _and_ learn a specific model for each class.
+
+- We again use a two-stage training strategy. 
+
+
+1. __Fit an overall model__: 
+
+&emsp; &emsp; &emsp; Fit a multinomial model using a group lasso penalty on the coefficients $\beta$.
+
+&emsp; &emsp; &emsp; _The group lasso penalty forces all responses to have the same support, but allows different coefficient values._
+
+2. __Fit group-specific models__:
+
+&emsp; &emsp; &emsp; Train individual one-vs-rest models using the penalty factor and offset defined by the overall model (as in the input grouped setting).
+
+&emsp; &emsp; &emsp; _This step allows us to discover features that are specific to each class._
+
+### Example with simulated data
+
+First, simulate data:
+```{r}
+set.seed(1234)
+
+n = 900  # number of observations
+p = 100   # number of features
+k = 3    # number of classes
+class.sizes = rep(n/k, k) # size of each class
+ncommon = 15  # number of shared features
+nindiv = 10    # number of individual features
+base.seq = seq(-.5, .5, length.out = ncommon + 1)
+shift.common = matrix(
+  c(sample(base.seq, ncommon), sample(base.seq, ncommon), sample(base.seq, ncommon)),
+  nrow = 3
+)
+base.seq = seq(-.1, .1, length.out = nindiv + 1)
+shift.indiv = matrix(
+  c(sample(base.seq, nindiv), sample(base.seq, nindiv), sample(base.seq, nindiv)),
+  nrow = 3
+)
+x     = matrix(rnorm(n * p), n, p)
+xtest = matrix(rnorm(n * p), n, p)
+y = ytest = c(sapply(1:length(class.sizes), function(i) rep(i, class.sizes[i])))
+
+# Simulate our data.
+# Shift x according to our coefficients, which differ by class.
+start = ncommon + 1
+for (i in 1:k) {
+  end = start + nindiv - 1
+  
+  for(j in 1:ncommon){
+    x[y == i, j] = x[y == i, j] + shift.common[i, j]
+    xtest[ytest == i, j] = xtest[ytest == i, j] + shift.common[i, j]
+  }
+  jj = 1
+  for(j in start:end){
+    x[y == i, j] = x[y == i, j] + shift.indiv[i, jj]
+    xtest[ytest == i, j] = xtest[ytest == i, j] + shift.indiv[i, jj]
+    jj = jj + 1
+  }
+  
+  start = end + 1
+}
+```
+
+### Model fitting and visualization
+
+Now we are ready to model.
+
+By default, ptLasso uses `type.measure = "deviance"`, but for ease of interpretability, we use `type.measure = "class"` (the misclassification rate).
+
+`ptLasso` uses `cv.glmnet` to fit $7$ models: 
+
+- the *overall* model (one multinomial model trained using all $3$ groups), 
+- the 3 *pretrained* models (a one-vs-rest model for each group) and
+- the 3 *individual* models (a one-vs-rest model for each group).
+```{r}
+fit = ptLasso(x = x, y = y, 
+              use.case = "targetGroups", 
+              type.measure = "class",
+              alpha = 0.5)
+
+predict(fit, xtest, ytest = ytest)
+```
+
+Now, our performance metrics include:
+
+- the "overall" misclassification rate, computed by treating this as a multinomial problem, and
+- the "mean" and group-specific misclassification rates, computed by treating this as a set of one-vs-rest problems.
+
+We can plot each of the models fitted:
+```{r}
+plot(fit)
+```
+And extract coefficients:
+```{r}
+coefs = coef(fit)
+```
+
+### Choosing $\alpha$ with cross-validation
+
+To choose the pretraining hyperparameter $\alpha$, we can use cross-validation. Plotting and predicting are done using the same syntax as before.
+```{r}
+set.seed(2345)
+cvfit = cv.ptLasso(x = x, y = y, 
+              use.case = "targetGroups", 
+              type.measure = "class")
+
+plot(cvfit)
+
+predict(cvfit, xtest, ytest = ytest)
+```
+
+## Multi-response data
+
+- Multi-response data has _multiple_ responses for each observation. Data like this may come from a survey, where each person answered multiple questions. In this case, the people would be the observations and their answers would be the responses. 
+
+- `ptLasso` supports the special case where all responses are continuous (Gaussian).
+
+- Pretraining for multi-response data is quite similar to the multinomial setting.
+
+- We again wish to learn across all classes _and_ learn a specific model for each class, and we use a two-stage training strategy. 
+
+1. __Fit an overall model__: 
+
+&emsp; &emsp; &emsp; Fit a multi-response model using a group lasso penalty on the coefficients $\beta$.
+
+2. __Fit response-specific models__:
+
+&emsp; &emsp; &emsp; Train individual models for each response, using the penalty factor and offset defined by the overall model.
+
+- This is all done within `ptLasso`. Note that we only support data with multiple Gaussian responses.
+
+
+### Example with simulated data
+
+We start by simulating data with two Gaussian responses. The first 5 features are predictive for both responses; there is an extra set of 5 coefficients that are predictive for each individual response.
+```{r}
+set.seed(1234)
+
+# Define constants
+n = 1000         # Total number of samples
+ntrain = 650     # Number of training samples
+p = 500          # Number of features
+sigma = 2        # Standard deviation of noise
+     
+
+# Generate covariate matrix
+x = matrix(rnorm(n * p), n, p)
+
+# Define coefficients for responses 1 and 2
+beta1 = c(rep(1, 5), rep(0.5, 5), rep(0, p - 10))
+beta2 = c(rep(1, 5), rep(0, 5), rep(0.5, 5), rep(0, p - 15))
+
+mu = cbind(x %*% beta1, x %*% beta2)
+y  = cbind(mu[, 1] + sigma * rnorm(n), 
+           mu[, 2] + sigma * rnorm(n))
+
+# Split into train and test
+xtest = x[-(1:ntrain), ]
+ytest = y[-(1:ntrain), ]
+
+x = x[1:ntrain, ]
+y = y[1:ntrain, ]
+
+cat("Correlation between two tasks:", cor(y[, 1], y[, 2]))
+```
+
+### Model fitting and visualization
+
+```{r}
+fit = ptLasso(x = x, y = y, 
+              use.case = "multiresponse",
+              alpha = 0.5)
+
+predict(fit, xtest, ytest = ytest)
+
+plot(fit)
+```
+
+### Choosing $\alpha$ with cross-validation
+
+```{r}
+cvfit = cv.ptLasso(x = x, y = y, 
+                   use.case = "multiresponse")
+
+predict(cvfit, xtest, ytest = ytest)
+
+plot(cvfit)
+```
+
+## Multi-response data with time ordered columns
+
+- Here, we again have multiple responses for each observation. Now, however, these responses are measurements of the same outcome at different moments in _time_. For example, we may observe patients across many hospital visits, and measure the same biomarker at each visit. In this case, the time ordered biomarker measurements would be the responses. 
+
+- `ptLasso` has built-in support for data like this -- we'll call it time series data -- where all responses are either Gaussian or binomial.
+
+- We wish to leverage signal across time points _and_ fit a model specifically tuned for each time point. 
+
+- To do pretraining with time series data, we:
+
+1. __Fit an initial model__: 
+
+&emsp; &emsp; &emsp; Fit a lasso penalized model for the first time point. 
+
+2. __Fit the next time-specific model__:
+
+&emsp; &emsp; &emsp; Train a model for time 2 using the penalty factor and offset defined by previous model.
+
+3. __Continue__:
+
+&emsp; &emsp; &emsp; Train a model for time 3 using the offset from time 2 and the union of supports from times 1 and 2. 
+
+&emsp; &emsp; &emsp; Train a model for time 4 using the offset from time 3 and the union of supports from times 1, 2 and 3. 
+
+&emsp; &emsp; &emsp; etc.
+
+### Example with simulated data
+
+We will again start by simulating data; here we imagine data with two time points. These two time points have a shared support, with different coefficient values.
+```{r}
+set.seed(1234)
+
+# Define constants
+n = 600          # Total number of samples
+ntrain = 300     # Number of training samples
+p = 100          # Number of features
+sigma = 2        # Standard deviation of noise
+
+# Generate covariate matrix
+x = matrix(rnorm(n * p), n, p)
+
+# Define coefficients for time points 1 and 2
+beta1 = c(rnorm(10), rep(0, p - 10))  # Coefs at time 1
+beta2 = 0.5 * beta1 + c(rep(0, 10), runif(5, min = 0, max = 2), rep(0, p-15))
+
+# Generate response variables for times 1 and 2
+y = cbind(
+  x %*% beta1 + sigma * rnorm(n),
+  x %*% beta2 + sigma * rnorm(n)
+)
+
+# Split data into training and testing sets
+xtest = x[-(1:ntrain), ]  # Test covariates
+ytest = y[-(1:ntrain), ]  # Test response
+
+x = x[1:ntrain, ]  # Train covariates
+y = y[1:ntrain, ]  # Train response
+
+
+```
+
+### Model fitting and visualization
+
+Modeling is just as before, only now we specify `use.case = "timeSeries"`.
+
+Notice that our performance metrics no longer include an "Overall" model -- we imagine that the alternative here is to just treat each time point separately. For Gaussian responses, one could alternatively try `use.case = "multiresponse"`. This ignores the time ordering of the responses, but is otherwise a valid approach to consider.
+
+```{r}
+fit = ptLasso(x = x, y = y, 
+              use.case = "timeSeries",
+              alpha = 0.5)
+
+plot(fit)
+
+predict(fit, xtest, ytest = ytest)
+```
+
+### Choosing $\alpha$ with cross-validation
+
+```{r}
+set.seed(2345)
+cvfit = cv.ptLasso(x = x, y = y, 
+                   use.case = "timeSeries")
+
+plot(cvfit)
+
+predict(cvfit, xtest, ytest = ytest)
+```
+
+## Wrap-up
+
+Now we know how to do pretraining for all of the settings covered natively by `ptLasso`. 
+
+If you want to see more example use cases of pretraining -- including conditional average treatment effect estimation and multi-response data with different outcome types -- check out the `ptLasso` vignette! 
