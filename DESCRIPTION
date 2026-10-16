@@ -1,6 +1,6 @@
 Package: ptLasso
 Type: Package
-Title: Pretraining and the Lasso
+Title: Pretraining the Lasso
 Description: Implements lasso pretraining for generalized linear models for data with grouped observations; data without grouped observations, but with multinomial responses; data with multiple Gaussian responses; and data with repeated measurements over time.
  The method fits a lasso model to an initial dataset and then uses its support and coefficient values to guide model fitting for a related task, which can improve performance by leveraging larger datasets and preserve interpretability by identifying features which are generally shared, and which are task specific.
  See Craig et al. (2026) <doi:10.1093/jrsssb/qkaf050> for details.
