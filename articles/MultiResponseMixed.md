@@ -409,7 +409,7 @@ choose for each outcome:
 
 ``` r
 
-par(mfrow = c(2, 1))
+oldpar <- par(mfrow = c(2, 1))
 plot(alphalist, cv.error.y2, type = "b",
      main = bquote("Outcome 2: CV AUC vs " ~ alpha),
      xlab = expression(alpha),
@@ -424,6 +424,11 @@ abline(v = alphalist[which.max(cv.error.y3)])
 ```
 
 ![](MultiResponseMixed_files/figure-html/unnamed-chunk-6-1.png)
+
+``` r
+
+par(oldpar)
+```
 
 Now that we have selected our values of $`\alpha`$, we can fit the final
 models for $`y_2`$ and $`y_3`$:

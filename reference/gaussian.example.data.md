@@ -94,7 +94,7 @@ A list for data with 5 groups and a gaussian outcome, n=1000 and p=120:
 ## Author
 
 Erin Craig and Rob Tibshirani  
-Maintainer: Erin Craig \<erincr@stanford.edu\>
+Maintainer: Erin Craig \<ercr@umich.edu\>
 
 ## Examples
 

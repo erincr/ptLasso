@@ -113,7 +113,7 @@ A list:
 ## Author
 
 Erin Craig and Rob Tibshirani  
-Maintainer: Erin Craig \<erincr@stanford.edu\>
+Maintainer: Erin Craig \<ercr@umich.edu\>
 
 ## Examples
 

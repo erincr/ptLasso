@@ -83,12 +83,16 @@
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>Model coefficients. If <code>model = "overall"</code>, this returns the output of <code>coef</code> for the overall model. If <code>model</code> is "individual", this returns a list containing the results of <code>coef</code> for each group-specific (or response-specific) model. If <code>model = "pretrain"</code>, this returns the pretrained model coefficients: a list with one entry per value of <code>alpha</code> if <code>alpha = NULL</code>, otherwise the coefficients for the chosen <code>alpha</code>. If <code>model = "all"</code>, this returns a list containing all (overall, individual and pretrain) coefficients. (For time series data, there is no overall model, so only individual and pretrain coefficients are returned.) Note that the pretrained coefficients are from the second stage of pretraining only: they do not include the offset from the overall model. The full pretrained linear predictor for a group (or response) is <code>(1 - alpha)</code> times the overall model's linear predictor (at <code>fitoverall.lambda</code>), plus the linear predictor from these coefficients. For time series data, the offset instead comes from the pretrained model for the previous time point.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code>cv.ptLasso</code>, <code>ptLasso</code>.</p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
-    <p>Erin Craig and Rob Tibshirani<br> Maintainer: Erin Craig &lt;erincr@stanford.edu&gt;</p>
+    <p>Erin Craig and Rob Tibshirani<br> Maintainer: Erin Craig &lt;ercr@umich.edu&gt;</p>
     </div>
 
     <div class="section level2">

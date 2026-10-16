@@ -38,7 +38,7 @@ This returns a vector containing the indices of nonzero coefficients
 ## Author
 
 Erin Craig and Rob Tibshirani  
-Maintainer: Erin Craig \<erincr@stanford.edu\>
+Maintainer: Erin Craig \<ercr@umich.edu\>
 
 ## Examples
 

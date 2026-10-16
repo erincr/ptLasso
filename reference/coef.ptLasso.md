@@ -31,7 +31,14 @@ Model coefficients. If `model = "overall"`, this function returns the
 output of `coef`. If `model` is "individual" or "pretrain", this
 function returns a list containing the results of `coef` for each
 group-specific model. If `model = "all"`, this returns a list containing
-all (overall, individual and pretrain) coefficients.
+all (overall, individual and pretrain) coefficients. Note that the
+pretrained coefficients are from the second stage of pretraining only:
+they do not include the offset from the overall model. The full
+pretrained linear predictor for a group (or response) is `(1 - alpha)`
+times the overall model's linear predictor (at `fitoverall.lambda`),
+plus the linear predictor from these coefficients. For time series data,
+the offset instead comes from the pretrained model for the previous time
+point.
 
 ## See also
 
@@ -40,7 +47,7 @@ all (overall, individual and pretrain) coefficients.
 ## Author
 
 Erin Craig and Rob Tibshirani  
-Maintainer: Erin Craig \<erincr@stanford.edu\>
+Maintainer: Erin Craig \<ercr@umich.edu\>
 
 ## Examples
 

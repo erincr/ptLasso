@@ -96,7 +96,7 @@ A list for data with 5 groups and a binomial outcome, n=300 and p=40:
 ## Author
 
 Erin Craig and Rob Tibshirani  
-Maintainer: Erin Craig \<erincr@stanford.edu\>
+Maintainer: Erin Craig \<ercr@umich.edu\>
 
 ## Examples
 

@@ -19,6 +19,11 @@ print(x, ...)
 
   other arguments to pass to the print function.
 
+## Value
+
+Invisibly returns `x`. Called for its side effect of printing a summary
+to the console.
+
 ## See also
 
 `ptLasso`, `cv.ptLasso` and `predict.cv.ptLasso`.
@@ -26,7 +31,7 @@ print(x, ...)
 ## Author
 
 Erin Craig and Rob Tibshirani  
-Maintainer: Erin Craig \<erincr@stanford.edu\>
+Maintainer: Erin Craig \<ercr@umich.edu\>
 
 ## Examples
 

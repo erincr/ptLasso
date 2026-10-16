@@ -19,6 +19,11 @@ plot(x, ...)
 
   Other parameters to pass to the plot function.
 
+## Value
+
+No return value (returns `NULL` invisibly); called for its side effect
+of drawing the plot.
+
 ## See also
 
 `ptLasso`, `cv.ptLasso` and `predict.cv.ptLasso`.
@@ -26,7 +31,7 @@ plot(x, ...)
 ## Author
 
 Erin Craig and Rob Tibshirani  
-Maintainer: Erin Craig \<erincr@stanford.edu\>
+Maintainer: Erin Craig \<ercr@umich.edu\>
 
 ## Examples
 

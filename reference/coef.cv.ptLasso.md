@@ -36,6 +36,25 @@ coef(
   other arguments to be passed to the `"coef"` function. May be e.g.
   `s = "lambda.min"`.
 
+## Value
+
+Model coefficients. If `model = "overall"`, this returns the output of
+`coef` for the overall model. If `model` is "individual", this returns a
+list containing the results of `coef` for each group-specific (or
+response-specific) model. If `model = "pretrain"`, this returns the
+pretrained model coefficients: a list with one entry per value of
+`alpha` if `alpha = NULL`, otherwise the coefficients for the chosen
+`alpha`. If `model = "all"`, this returns a list containing all
+(overall, individual and pretrain) coefficients. (For time series data,
+there is no overall model, so only individual and pretrain coefficients
+are returned.) Note that the pretrained coefficients are from the second
+stage of pretraining only: they do not include the offset from the
+overall model. The full pretrained linear predictor for a group (or
+response) is `(1 - alpha)` times the overall model's linear predictor
+(at `fitoverall.lambda`), plus the linear predictor from these
+coefficients. For time series data, the offset instead comes from the
+pretrained model for the previous time point.
+
 ## See also
 
 `cv.ptLasso`, `ptLasso`.
@@ -43,7 +62,7 @@ coef(
 ## Author
 
 Erin Craig and Rob Tibshirani  
-Maintainer: Erin Craig \<erincr@stanford.edu\>
+Maintainer: Erin Craig \<ercr@umich.edu\>
 
 ## Examples
 
