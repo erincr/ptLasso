@@ -30,7 +30,7 @@
 #' \item{fitoverall.lambda}{Lambda used with fitoverall, to compute the offset for pretraining.}
 #' 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Getting started. First, we simulate data: we need covariates x and multiresponse y.
 #' set.seed(1234)
 #' n = 1000; ntrain = 500;
@@ -284,8 +284,8 @@ ptLassoMult=function(x,y,alpha=0.5,
 #'
 #' @seealso \code{\link{ptLassoMult}} and \code{\link{plot.cv.ptLasso}}.
 #' @examples
-#' \dontrun{
-#' # Not run - these examples are in the cv.ptLasso documentation.
+#' \donttest{
+#' # These examples also appear in the cv.ptLasso documentation.
 #' # Getting started. First, we simulate data: we need covariates x and multiresponse y.
 #' set.seed(1234)
 #' n = 1000; ntrain = 500;

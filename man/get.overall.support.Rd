@@ -40,7 +40,7 @@ get.overall.support(cvfit, s="lambda.1se")
 \code{ptLasso}, \code{cv.ptLasso}.
 }
 \author{
-Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@stanford.edu>
+Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <ercr@umich.edu>
 }
 \keyword{classification}
 \keyword{models}

@@ -21,7 +21,7 @@
 #' \item{snr}{Gaussian outcome only: signal to noise ratio.}
 #' \item{mu}{Gaussian outcome only: the value of y before noise is added.}
 #' 
-#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
+#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <ercr@@umich.edu>
 #' @seealso \code{cv.ptLasso}, \code{ptLasso}.
 #' @keywords models regression classification
 #' @examples
@@ -132,7 +132,7 @@ makedata=function(n, p, k, scommon, sindiv, class.sizes, beta.common, beta.indiv
 #' \item{x}{Simulated features, size n x p.}
 #' \item{y}{Outcomes y, length n.}
 #' 
-#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
+#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <ercr@@umich.edu>
 #' @seealso \code{cv.ptLasso}, \code{ptLasso}.
 #' @keywords models regression classification
 #' @examples
@@ -197,7 +197,7 @@ makedata.targetgroups=function(n, p, scommon, sindiv, class.sizes, shift.common,
 #' \item{snr}{Gaussian outcome only: signal to noise ratio.}
 #' \item{mu}{Gaussian outcome only: the value of y before noise is added.}
 #' 
-#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
+#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <ercr@@umich.edu>
 #' @seealso \code{cv.ptLasso}, \code{ptLasso}.
 #' @keywords models regression classification
 #' @examples
@@ -238,7 +238,7 @@ gaussian.example.data = function(k=5, class.sizes=rep(200, k), n=sum(class.sizes
 #' \item{snr}{Gaussian outcome only: signal to noise ratio.}
 #' \item{mu}{Gaussian outcome only: the value of y before noise is added.}
 #' 
-#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
+#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <ercr@@umich.edu>
 #' @seealso \code{cv.ptLasso}, \code{ptLasso}.
 #' @keywords models regression classification
 #' @examples

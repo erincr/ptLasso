@@ -11,6 +11,9 @@
 
 \item{\dots}{Other parameters to pass to the plot function.}
 }
+\value{
+No return value (returns \code{NULL} invisibly); called for its side effect of drawing the plot.
+}
 \description{
 A plot is produced, and nothing is returned.
 }
@@ -27,7 +30,7 @@ plot(fit)
 \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 }
 \author{
-Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@stanford.edu>
+Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <ercr@umich.edu>
 }
 \keyword{classification}
 \keyword{models}

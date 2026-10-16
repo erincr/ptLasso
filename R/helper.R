@@ -6,7 +6,7 @@
 #' @param x fitted \code{"cv.ptLasso"} object.
 #' @param \dots other arguments to pass to the print function.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer:
-#' Erin Craig <erincr@@stanford.edu>
+#' Erin Craig <ercr@@umich.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
@@ -16,6 +16,7 @@
 #' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
 #' print(cvfit)
 #'
+#' @return Invisibly returns \code{x}. Called for its side effect of printing a summary to the console.
 #' @method print cv.ptLasso
 #' @export
 print.cv.ptLasso=function (x, ...) 
@@ -51,6 +52,7 @@ print.cv.ptLasso=function (x, ...)
     print(alpha.disp)
     #cat(paste(x$varying.alphahat, collapse=", "),fill=TRUE)
     
+    invisible(x)
 }
 
 #' Print the ptLasso object. 
@@ -60,7 +62,7 @@ print.cv.ptLasso=function (x, ...)
 #' @param x fitted \code{"ptLasso"} object.
 #' @param \dots other arguments to pass to the print function.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer:
-#' Erin Craig <erincr@@stanford.edu>
+#' Erin Craig <ercr@@umich.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
@@ -70,12 +72,14 @@ print.cv.ptLasso=function (x, ...)
 #' fit = ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
 #' print(fit)
 #'
+#' @return Invisibly returns \code{x}. Called for its side effect of printing a summary to the console.
 #' @method print ptLasso
 #' @export
 #'
 print.ptLasso=function (x, ...) 
 {
     cat("\nCall: ", deparse(x$call), "\n\n")
+    invisible(x)
 }
 
 
@@ -88,7 +92,7 @@ print.ptLasso=function (x, ...)
 #' @param x output of predict called with a ptLasso object.
 #' @param \dots other arguments to pass to the print function.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer:
-#' Erin Craig <erincr@@stanford.edu>
+#' Erin Craig <ercr@@umich.edu>
 #' @seealso \code{ptLasso} and \code{predict.ptLasso}.
 #' @keywords models regression classification
 #' @examples
@@ -108,6 +112,7 @@ print.ptLasso=function (x, ...)
 #' pred = predict(fit, xtest, groupstest, s="lambda.min")
 #' print(pred)
 #' 
+#' @return Invisibly returns \code{x}. Called for its side effect of printing a summary to the console.
 #' @method print predict.ptLasso
 #' @export
 print.predict.ptLasso=function (x, ...) 
@@ -150,6 +155,7 @@ print.predict.ptLasso=function (x, ...)
     colnames(disp.support) = ""
     print(noquote(disp.support))
     
+    invisible(x)
 }
 
 
@@ -159,7 +165,7 @@ print.predict.ptLasso=function (x, ...)
 #' @param x output of predict called with a ptLasso object.
 #' @param \dots other arguments to pass to the print function.
 #' @author Erin Craig and Rob Tibshirani\cr Maintainer:
-#' Erin Craig <erincr@@stanford.edu>
+#' Erin Craig <ercr@@umich.edu>
 #' @seealso \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
@@ -179,6 +185,7 @@ print.predict.ptLasso=function (x, ...)
 #' pred = predict(cvfit, xtest, groupstest, s="lambda.min")
 #' print(pred)
 #'
+#' @return Invisibly returns \code{x}. Called for its side effect of printing a summary to the console.
 #' @method print predict.cv.ptLasso
 #' @export
 print.predict.cv.ptLasso=function (x, ...) 
@@ -255,6 +262,7 @@ print.predict.cv.ptLasso=function (x, ...)
     
     cat("Support size:\n")
     print(noquote(disp.support))
+    invisible(x)
 }
 
 

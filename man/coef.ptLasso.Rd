@@ -14,7 +14,7 @@
 \item{\dots}{other arguments to be passed to the \code{"coef"} function. May be e.g. \code{s = "lambda.min"}.}
 }
 \value{
-Model coefficients. If \code{model = "overall"}, this function returns the output of \code{coef}. If \code{model} is "individual" or "pretrain", this function returns a list containing the results of \code{coef} for each group-specific model. If \code{model = "all"}, this returns a list containing all (overall, individual and pretrain) coefficients.
+Model coefficients. If \code{model = "overall"}, this function returns the output of \code{coef}. If \code{model} is "individual" or "pretrain", this function returns a list containing the results of \code{coef} for each group-specific model. If \code{model = "all"}, this returns a list containing all (overall, individual and pretrain) coefficients. Note that the pretrained coefficients are from the second stage of pretraining only: they do not include the offset from the overall model. The full pretrained linear predictor for a group (or response) is \code{(1 - alpha)} times the overall model's linear predictor (at \code{fitoverall.lambda}), plus the linear predictor from these coefficients. For time series data, the offset instead comes from the pretrained model for the previous time point.
 }
 \description{
 Get the coefficients from a fitted ptLasso model.
@@ -37,7 +37,7 @@ length(coef(fit, model = "pretrain")) # List of coefficients for each group mode
 \code{ptLasso}.
 }
 \author{
-Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@stanford.edu>
+Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <ercr@umich.edu>
 }
 \keyword{classification}
 \keyword{models}

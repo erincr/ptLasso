@@ -58,7 +58,7 @@ get.individual.support(cvfit, groups = 1)
 \code{ptLasso}, \code{cv.ptLasso}.
 }
 \author{
-Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@stanford.edu>
+Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <ercr@umich.edu>
 }
 \keyword{classification}
 \keyword{models}

@@ -30,7 +30,7 @@
 #' \item{fitoverall.lambda}{Lambda used with fitoverall, to compute the offset for pretraining.}
 #' 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Time series data with a continuous response
 #' set.seed(1234)
 #' n = 600; ntrain = 300; p = 50
@@ -265,8 +265,8 @@ ptLassoTS=function(x,y,groups,alpha=0.5,family=c("gaussian", "binomial"),
 #'
 #' Cross-validation for \code{ptLassoTS}.
 #' @examples
-#' \dontrun{
-#' # Not run - these examples are in the cv.ptLasso documentation.
+#' \donttest{
+#' # These examples also appear in the cv.ptLasso documentation.
 #' set.seed(1234)
 #' n = 600; ntrain = 300; p = 50
 #'

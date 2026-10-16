@@ -52,7 +52,7 @@ get.pretrain.support <- function(fit, s="lambda.min", gamma="gamma.min", commonO
 #' @param gamma for use only when 'relax = TRUE' was specified during training. The choice of 'gamma' to use. May be "gamma.min" or "gamma.1se". Default is "gamma.min".
 #' @param commonOnly whether to return the features that are chosen by more than half of the group- or response-specific models (TRUE) or the features that are chosen by any of the group-specific models (FALSE). Default is FALSE.
 #' @param groups which groups or responses to include when computing the support. Default is to include all groups/responses. 
-#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
+#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <ercr@@umich.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
@@ -153,7 +153,7 @@ get.pretrain.or.individual.support <- function(fit, s="lambda.min", gamma="gamma
 #' @param fit fitted \code{"ptLasso"} or \code{"cv.ptLasso"} object.
 #' @param s the choice of lambda to use. May be "lambda.min", "lambda.1se" or a numeric value. Default is "lambda.min".
 #' @param gamma for use only when 'relax = TRUE' was specified during training. The choice of 'gamma' to use. May be "gamma.min" or "gamma.1se". Default is "gamma.min".
-#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
+#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <ercr@@umich.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
@@ -227,7 +227,7 @@ get.overall.support <- function(fit, s="lambda.min", gamma="gamma.min"){
 #' @param object fitted \code{"ptLasso"} object.
 #' @param model string indicating which coefficients to retrieve. Must be one of "all", "individual", "overall" or "pretrain".
 #' @param \dots other arguments to be passed to the \code{"coef"} function. May be e.g. \code{s = "lambda.min"}.
-#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
+#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <ercr@@umich.edu>
 #' @seealso \code{ptLasso}.
 #' @keywords models regression classification
 #' @examples
@@ -243,7 +243,7 @@ get.overall.support <- function(fit, s="lambda.min", gamma="gamma.min"){
 #' length(coef(fit, model = "individual")) # List of coefficients for each group model
 #' length(coef(fit, model = "pretrain")) # List of coefficients for each group model
 #'
-#' @return Model coefficients. If \code{model = "overall"}, this function returns the output of \code{coef}. If \code{model} is "individual" or "pretrain", this function returns a list containing the results of \code{coef} for each group-specific model. If \code{model = "all"}, this returns a list containing all (overall, individual and pretrain) coefficients. 
+#' @return Model coefficients. If \code{model = "overall"}, this function returns the output of \code{coef}. If \code{model} is "individual" or "pretrain", this function returns a list containing the results of \code{coef} for each group-specific model. If \code{model = "all"}, this returns a list containing all (overall, individual and pretrain) coefficients. Note that the pretrained coefficients are from the second stage of pretraining only: they do not include the offset from the overall model. The full pretrained linear predictor for a group (or response) is \code{(1 - alpha)} times the overall model's linear predictor (at \code{fitoverall.lambda}), plus the linear predictor from these coefficients. For time series data, the offset instead comes from the pretrained model for the previous time point.
 #'
 #' @method coef ptLasso
 #' @export
@@ -281,7 +281,7 @@ coef.ptLasso=function(object, model = c("all", "individual", "overall", "pretrai
 #' @param model string indicating which coefficients to retrieve. Must be one of "all", "individual", "overall" or "pretrain".
 #' @param alpha value between 0 and 1, indicating which alpha to use. If \code{NULL}, return coefficients from all models.  Only impacts the results for model = "all" or model = "pretrain".
 #' @param \dots other arguments to be passed to the \code{"coef"} function. May be e.g. \code{s = "lambda.min"}.
-#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
+#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <ercr@@umich.edu>
 #' @seealso \code{cv.ptLasso}, \code{ptLasso}.
 #' @keywords models regression classification
 #' @examples
@@ -297,6 +297,7 @@ coef.ptLasso=function(object, model = c("all", "individual", "overall", "pretrai
 #' length(coef(cvfit, model = "individual")) # List of coefficients for each group model
 #' length(coef(cvfit, model = "pretrain", alpha = .5)) # List of coefficients for each group model
 #'
+#' @return Model coefficients. If \code{model = "overall"}, this returns the output of \code{coef} for the overall model. If \code{model} is "individual", this returns a list containing the results of \code{coef} for each group-specific (or response-specific) model. If \code{model = "pretrain"}, this returns the pretrained model coefficients: a list with one entry per value of \code{alpha} if \code{alpha = NULL}, otherwise the coefficients for the chosen \code{alpha}. If \code{model = "all"}, this returns a list containing all (overall, individual and pretrain) coefficients. (For time series data, there is no overall model, so only individual and pretrain coefficients are returned.) Note that the pretrained coefficients are from the second stage of pretraining only: they do not include the offset from the overall model. The full pretrained linear predictor for a group (or response) is \code{(1 - alpha)} times the overall model's linear predictor (at \code{fitoverall.lambda}), plus the linear predictor from these coefficients. For time series data, the offset instead comes from the pretrained model for the previous time point.
 #' @method coef cv.ptLasso
 #' @export
 coef.cv.ptLasso=function(object, model = c("all", "individual", "overall", "pretrain"), alpha = NULL, ...){

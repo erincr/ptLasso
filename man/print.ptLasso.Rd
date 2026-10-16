@@ -11,6 +11,9 @@
 
 \item{\dots}{other arguments to pass to the print function.}
 }
+\value{
+Invisibly returns \code{x}. Called for its side effect of printing a summary to the console.
+}
 \description{
 Print the ptLasso object.
 }
@@ -27,7 +30,7 @@ print(fit)
 }
 \author{
 Erin Craig and Rob Tibshirani\cr Maintainer:
-Erin Craig <erincr@stanford.edu>
+Erin Craig <ercr@umich.edu>
 }
 \keyword{classification}
 \keyword{models}

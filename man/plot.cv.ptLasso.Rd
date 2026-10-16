@@ -13,8 +13,11 @@
 
 \item{\dots}{Other graphical parameters to plot.}
 }
+\value{
+Invisibly returns a \code{gtable} object (from \code{gridExtra::grid.arrange}) containing the combined plot. Called mainly for its side effect of drawing the plot.
+}
 \description{
-A plot is produced, and nothing is returned.
+A plot is produced, and the plot object is returned invisibly.
 }
 \examples{
 set.seed(1234)

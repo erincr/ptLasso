@@ -11,7 +11,7 @@ yaxis.name = function(x){
  
 #' Plot the cross-validation curve produced by cv.ptLasso, as a function of the \code{alpha} values used. 
 #'
-#' A plot is produced, and nothing is returned.
+#' A plot is produced, and the plot object is returned invisibly.
 #'
 #' @aliases plot.cv.ptLasso 
 #' @param x Fitted \code{"cv.ptLasso"} object.
@@ -27,14 +27,16 @@ yaxis.name = function(x){
 #' cvfit = cv.ptLasso(x, y, groups = groups, family = "gaussian", type.measure = "mse")
 #' plot(cvfit) 
 #'
+#' @return Invisibly returns a \code{gtable} object (from \code{gridExtra::grid.arrange}) containing the combined plot. Called mainly for its side effect of drawing the plot.
 #' @import ggplot2 gridExtra
 #' @method plot cv.ptLasso
 #' @export
 #'
 #'
 plot.cv.ptLasso = function(x, plot.alphahat = FALSE, ...){
-    if(x$call$use.case %in% c("inputGroups", "multiresponse", "timeSeries"))  .plot_ptLasso_inputGroups(x,  plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
-    if(x$call$use.case == "targetGroups") .plot_ptLasso_targetGroups(x, plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
+    if(x$call$use.case %in% c("inputGroups", "multiresponse", "timeSeries"))  p = .plot_ptLasso_inputGroups(x,  plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
+    if(x$call$use.case == "targetGroups") p = .plot_ptLasso_targetGroups(x, plot.alphahat = plot.alphahat, y.label = yaxis.name(x$call$type.measure), ...)
+    invisible(p)
 }
 
 
@@ -231,7 +233,7 @@ pretrain.color   <- "#2A9D8F"
 #' @aliases plot.ptLasso 
 #' @param x Fitted \code{"ptLasso"} object.
 #' @param \dots Other parameters to pass to the plot function.
-#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@@stanford.edu>
+#' @author Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <ercr@@umich.edu>
 #' @seealso \code{ptLasso}, \code{cv.ptLasso} and \code{predict.cv.ptLasso}.
 #' @keywords models regression classification
 #' @examples
@@ -242,6 +244,7 @@ pretrain.color   <- "#2A9D8F"
 #' fit = ptLasso(x, y, groups = groups, alpha = 0.5, family = "gaussian", type.measure = "mse")
 #' plot(fit) 
 #'
+#' @return No return value (returns \code{NULL} invisibly); called for its side effect of drawing the plot.
 #' @importFrom graphics mtext par
 #' @method plot ptLasso
 #' @export
@@ -252,6 +255,8 @@ plot.ptLasso = function(x, ...){
     if(x$call$use.case %in% c("multiresponse", "timeSeries")) nm = "Response"
     k = if(x$call$use.case %in% c("multiresponse", "timeSeries")) { x$nresps } else { x$k }
 
+    oldpar = graphics::par(no.readonly = TRUE)
+    on.exit(graphics::par(oldpar))
     graphics::par(oma = c(0, 0, 1, 0), mgp = c(2.2, 1, 0))
     if(x$call$use.case != "timeSeries"){
         lo = matrix(

@@ -58,7 +58,7 @@ x = out$x; y=out$y; groups = out$group
 \code{cv.ptLasso}, \code{ptLasso}.
 }
 \author{
-Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <erincr@stanford.edu>
+Erin Craig and Rob Tibshirani\cr Maintainer: Erin Craig <ercr@umich.edu>
 }
 \keyword{classification}
 \keyword{models}

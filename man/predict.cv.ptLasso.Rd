@@ -97,7 +97,7 @@ pred
 }
 \author{
 Erin Craig and Rob Tibshirani\cr Maintainer:
-Erin Craig <erincr@stanford.edu>
+Erin Craig <ercr@umich.edu>
 }
 \keyword{classification}
 \keyword{models}
