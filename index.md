@@ -32,7 +32,12 @@ More examples of pretraining and modeling:
 - code ([.html](https://erincr.github.io/ptLasso/tutorials/ptLasso_Part2.html), [.Rmd](https://erincr.github.io/ptLasso/tutorials/ptLasso_Part2.Rmd))
 
 # Installation
-To install this package, we recommend following [these instructions](https://cran.r-project.org/web/packages/githubinstall/vignettes/githubinstall.html).
+To install the development version of this package from GitHub:
+
+```r
+# install.packages("remotes")
+remotes::install_github("erincr/ptLasso")
+```
 
 # Having trouble?
 If you find a bug or have a feature request, please open a new issue.
