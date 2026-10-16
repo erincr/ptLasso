@@ -7,7 +7,7 @@ require(ptLasso)
 #> Loading required package: ggplot2
 #> Loading required package: glmnet
 #> Loading required package: Matrix
-#> Loaded glmnet 5.0
+#> Loaded glmnet 5.1
 #> Loading required package: gridExtra
 ```
 

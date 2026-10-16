@@ -5,7 +5,7 @@
 require(glmnet)
 #> Loading required package: glmnet
 #> Loading required package: Matrix
-#> Loaded glmnet 5.0
+#> Loaded glmnet 5.1
 ```
 
 ### Background: CATE estimation and pretraining

@@ -44,8 +44,13 @@ More examples of pretraining and modeling:
 
 # Installation
 
-To install this package, we recommend following [these
-instructions](https://cran.r-project.org/web/packages/githubinstall/vignettes/githubinstall.html).
+To install the development version of this package from GitHub:
+
+``` r
+
+# install.packages("remotes")
+remotes::install_github("erincr/ptLasso")
+```
 
 # Having trouble?
 

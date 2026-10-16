@@ -26,7 +26,7 @@ to the similarity vector. Here is an example using simulated data.
 require(glmnet)
 #> Loading required package: glmnet
 #> Loading required package: Matrix
-#> Loaded glmnet 5.0
+#> Loaded glmnet 5.1
 require(ptLasso)
 #> Loading required package: ptLasso
 #> Loading required package: ggplot2
