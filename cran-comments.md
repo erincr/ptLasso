@@ -7,6 +7,7 @@ This is a resubmission. In this version I have:
 * Replaced \dontrun{} with \donttest{}, except for two examples that use parallel fitting with 'doMC', which is not available on all platforms.
 * Restored the user's par() settings in plot.ptLasso() with on.exit(), and in the MultiResponseMixed vignette.
 * Changed the title to "Pretraining the Lasso".
+* Reduced the overall check time: six of the vignettes are now website-only, and some test files are skipped on CRAN.
 
 ## R CMD check results
 

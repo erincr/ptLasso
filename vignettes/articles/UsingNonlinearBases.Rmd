@@ -3,7 +3,7 @@ title: "Using nonlinear bases"
 output: 
   pdf_document:
     toc: false
-bibliography: ptLasso.bib
+bibliography: ../ptLasso.bib
 vignette: >
   %\VignetteIndexEntry{Using nonlinear bases}
   %\VignetteEngine{knitr::rmarkdown}

@@ -1,3 +1,6 @@
+# Slow to fit; skipped on CRAN to keep check time down. Runs with devtools::test().
+skip_on_cran()
+
 # To run this:
 #require(testthat)
 #test_file("~/Dropbox/pretrain/erin/workspace/ptLasso/test-ptLasso.R")

@@ -3,7 +3,7 @@ title: "Conditional average treatment effect estimation"
 output: 
   pdf_document:
    toc: false
-bibliography: ptLasso.bib
+bibliography: ../ptLasso.bib
 vignette: >
   %\VignetteIndexEntry{Conditional average treatment effect estimation}
   %\VignetteEngine{knitr::rmarkdown}

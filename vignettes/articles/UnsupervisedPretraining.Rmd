@@ -3,7 +3,7 @@ title: "Unsupervised pretraining"
 output: 
   pdf_document:
    toc: false
-bibliography: ptLasso.bib
+bibliography: ../ptLasso.bib
 vignette: >
   %\VignetteIndexEntry{Unsupervised pretraining}
   %\VignetteEngine{knitr::rmarkdown}

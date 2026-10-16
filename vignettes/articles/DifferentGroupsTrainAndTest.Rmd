@@ -3,7 +3,7 @@ title: "Different groups in train and test data"
 output: 
   pdf_document:
   toc: false
-bibliography: ptLasso.bib
+bibliography: ../ptLasso.bib
 vignette: >
  %\VignetteIndexEntry{Different groups in train and test data}
  %\VignetteEngine{knitr::rmarkdown}

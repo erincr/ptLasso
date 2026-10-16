@@ -3,7 +3,7 @@ title: "Multi-response data with mixed response types"
 output: 
   pdf_document:
     toc: false
-bibliography: ptLasso.bib
+bibliography: ../ptLasso.bib
 vignette: >
   %\VignetteIndexEntry{Multi-response data with mixed response types}
   %\VignetteEngine{knitr::rmarkdown}

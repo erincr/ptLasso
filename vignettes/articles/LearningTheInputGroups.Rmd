@@ -3,7 +3,7 @@ title: "Learning the input groups"
 output: 
   pdf_document:
    toc: false
-bibliography: ptLasso.bib
+bibliography: ../ptLasso.bib
 vignette: >
   %\VignetteIndexEntry{Learning the input groups}
   %\VignetteEngine{knitr::rmarkdown}
